@@ -9,9 +9,11 @@ import {
   Settings,
   LogOut,
   PenSquare,
+  UserCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { capitalize } from "lodash";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth } from "@/context/AuthContext";
 
 const Logo = () => (
   <Link href="/" className="flex items-center gap-2">
@@ -41,22 +44,27 @@ const navLinks = [
   { href: "/admin", label: "Admin" },
 ];
 
-const UserMenu = () => (
+const UserMenu = ({ email, name }) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <Button variant="ghost" className="relative h-9 w-9 rounded-full">
         <Avatar className="h-9 w-9">
-          <AvatarImage src="https://picsum.photos/seed/103/100/100" alt="User" />
-          <AvatarFallback>U</AvatarFallback>
+          <AvatarImage
+            src="https://picsum.photos/seed/103/100/100"
+            alt="User"
+          />
+          <AvatarFallback>{name.toUpperCase().charAt(0)}</AvatarFallback>
         </Avatar>
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent className="w-56" align="end" forceMount>
       <DropdownMenuLabel className="font-normal">
         <div className="flex flex-col space-y-1">
-          <p className="text-sm font-medium leading-none">John Doe</p>
-          <p className="text-xs leading-none text-muted-foreground">
-            johndoe@example.com
+          <p className="text-sm font-medium leading-none">
+            {capitalize(name)}
+          </p>
+          <p className="text-xs leading-none text-muted-foreground mt-1">
+            {email}
           </p>
         </div>
       </DropdownMenuLabel>
@@ -116,37 +124,48 @@ const MobileNav = () => (
 );
 
 export default function AppHeader() {
+  const { user } = useAuth();
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ">
       <div className="container px-8 flex h-16 items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-            <MobileNav />
-            <Logo />
-            <form className="hidden md:flex ml-4">
-              <div className="relative w-64">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  className="w-full rounded-full bg-secondary pl-9.5"
-                />
-              </div>
-            </form>
+          <MobileNav />
+          <Logo />
+          <form className="hidden md:flex ml-4">
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search..."
+                className="w-full rounded-full bg-secondary pl-9.5"
+              />
+            </div>
+          </form>
         </div>
-        
+
         <div className="flex items-center gap-2">
-            <Link href="/editor">
-              <Button variant="ghost" className="hidden md:flex">
-                  <PenSquare className="mr-2 h-4 w-4" />
-                  Write
+          <Link href="/editor">
+            <Button variant="ghost" className="hidden md:flex">
+              <PenSquare className="mr-2 h-4 w-4" />
+              Write
+            </Button>
+          </Link>
+          <Link href="/notifications">
+            <Button variant="ghost" size="icon" className="hidden md:flex">
+              <Bell className="h-5 w-5" />
+            </Button>
+          </Link>
+          {user ? (
+            <UserMenu {...user} />
+          ) : (
+            <Link href="/auth">
+              <Button variant="outline" className="md:flex">
+                <UserCircle2 className="mr-2 h-4 w-4" />
+                Account
               </Button>
             </Link>
-             <Link href="/notifications">
-              <Button variant="ghost" size="icon" className="hidden md:flex">
-                  <Bell className="h-5 w-5" />
-              </Button>
-            </Link>
-            <UserMenu />
+          )}
         </div>
       </div>
     </header>

@@ -93,7 +93,7 @@ export default function PostCard({
           <Link href={`/post/${id}`} className="block">
             <div className="aspect-[4/3] relative max-w-[200px]">
               <Image
-                src={image.imageUrl}
+                src={image.imageUrl||"/images/placeholder.webp"}
                 alt={image.description}
                 fill
                 className="object-cover rounded-md"

@@ -1,8 +1,44 @@
 import connectToDB from "@/configs/db";
+const crypto = require("crypto");
+import { generateToken, splitMail } from "@/lib/utils";
 import otpModel from "@/models/userOtp";
+import usersModel from "@/models/users";
 import { authSchema } from "@/validations/auth";
+import { serialize } from "cookie";
+
 import { z } from "zod";
 
+const saveNewUser = async (email) => {
+  try {
+    const user = await usersModel.findOne({ email });
+    const rndNumber = crypto.randomInt(1, 20000);
+    if (!user) {
+      
+      const uniqueUsername = await usersModel.findOne({
+        username: splitMail(email),
+      });
+      if (uniqueUsername) {
+        await usersModel.create({
+          name: splitMail(email),
+          username: `${splitMail(email)}-${rndNumber}`,
+          email,
+        });
+        return { success: true, isNew: true };
+      } else {
+        await usersModel.create({
+          name: splitMail(email),
+          username: `${splitMail(email)}`,
+          email,
+        });
+        return { success: true, isNew: true };
+      }
+    }
+    return { success: true, isNew: false };
+  } catch (error) {
+    console.log(error);
+    return { success: true, isNew: false };
+  }
+};
 const handler = async (req, res) => {
   if (req.method !== "POST") return res.status(405).end();
   await connectToDB();
@@ -21,6 +57,7 @@ const handler = async (req, res) => {
       await otpModel.findOneAndDelete({ email: validEmail });
       return res.status(410).json({ message: "OTP has expired" });
     }
+
     if (userOtp.blockedUntil !== null) {
       if (new Date(userOtp.blockedUntil) > new Date()) {
         return res.status(429).json({
@@ -54,8 +91,27 @@ const handler = async (req, res) => {
       );
       return res.status(401).json({ message: "invalid otp!" });
     }
+
+    const userResult = await saveNewUser(validEmail.email);
     await otpModel.findOneAndDelete({ email: validEmail.email });
-    return res.status(200).json({ message: "otp is verified" });
+    if (!userResult.success) {
+      return res.status(405).json({
+        message: "Failed to create user account",
+      });
+    }
+
+    const token = generateToken({ email: validEmail.email });
+    res
+      .setHeader(
+        "Set-Cookie",
+        serialize("token", token, {
+          httpOnly: true,
+          path: "/",
+          maxAge: 60 * 60 * 24,
+        })
+      )
+      .status(200)
+      .json({ message: "successfully signin:)" });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res

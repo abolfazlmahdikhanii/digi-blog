@@ -6,19 +6,19 @@ import { RightSidebar } from "@/components/right-sidebar";
 
 import LeftSidebar from "@/components/left-sidebar";
 import "../styles/globals.css";
+import { AuthProvider } from "@/context/AuthContext";
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const { pathname } = router;
-  const isAuthPage =
-    pathname.startsWith("/auth") ;
+  const isAuthPage = pathname.startsWith("/auth");
   const isAdminPage = pathname.startsWith("/admin");
   const isEditorPage = pathname.startsWith("/editor");
   const showSidebars = !isAuthPage && !isAdminPage && !isEditorPage;
   const isSetting = !pathname.startsWith("/setting");
-console.log(isAuthPage);
+  console.log(isAuthPage);
   return (
-    <>
+    <AuthProvider initialUser={pageProps.user}>
       <Head></Head>
       <div className=" min-h-screen flex flex-col">
         <AppHeader />
@@ -27,11 +27,11 @@ console.log(isAuthPage);
           <main className="flex-grow py-8">
             <Component {...pageProps} />
           </main>
-          {showSidebars&&isSetting && <RightSidebar />}
+          {showSidebars && isSetting && <RightSidebar />}
         </div>
         <Toaster />
       </div>
-    </>
+    </AuthProvider>
   );
 }
 

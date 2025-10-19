@@ -36,5 +36,5 @@ const schema = mongoose.Schema(
   { timestamps: true }
 );
 
-const usersModel = mongoose.model.Users || mongoose.model("User", schema);
+const usersModel = mongoose.models.Users || mongoose.model("Users", schema);
 export default usersModel;
