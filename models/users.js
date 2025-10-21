@@ -32,6 +32,11 @@ const schema = mongoose.Schema(
     profileImg: {
       type: String,
     },
+    role: {
+      type: String,
+      required: true,
+      default: "USER",
+    },
   },
   { timestamps: true }
 );
