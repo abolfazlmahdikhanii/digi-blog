@@ -7,7 +7,7 @@ import { RightSidebar } from "@/components/right-sidebar";
 import LeftSidebar from "@/components/left-sidebar";
 import "../styles/globals.css";
 import { AuthProvider } from "@/context/AuthContext";
-
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const { pathname } = router;
@@ -16,22 +16,24 @@ function MyApp({ Component, pageProps }) {
   const isEditorPage = pathname.startsWith("/editor");
   const showSidebars = !isAuthPage && !isAdminPage && !isEditorPage;
   const isSetting = !pathname.startsWith("/setting");
-  console.log(isAuthPage);
+  const queryClient = new QueryClient();
   return (
-    <AuthProvider initialUser={pageProps.user}>
-      <Head></Head>
-      <div className=" min-h-screen flex flex-col">
-        <AppHeader />
-        <div className="container mx-auto flex flex-1">
-          {showSidebars && <LeftSidebar />}
-          <main className="flex-grow py-8">
-            <Component {...pageProps} />
-          </main>
-          {showSidebars && isSetting && <RightSidebar />}
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider initialUser={pageProps.user}>
+        <Head></Head>
+        <div className=" min-h-screen flex flex-col">
+          <AppHeader />
+          <div className="container mx-auto flex flex-1">
+            {showSidebars && <LeftSidebar />}
+            <main className="flex-grow py-8">
+              <Component {...pageProps} />
+            </main>
+            {showSidebars && isSetting && <RightSidebar />}
+          </div>
+          <Toaster />
         </div>
-        <Toaster />
-      </div>
-    </AuthProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

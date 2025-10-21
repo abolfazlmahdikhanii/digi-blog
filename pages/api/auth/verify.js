@@ -10,10 +10,10 @@ import { z } from "zod";
 
 const saveNewUser = async (email) => {
   try {
+    const users = await usersModel.find({});
     const user = await usersModel.findOne({ email });
     const rndNumber = crypto.randomInt(1, 20000);
     if (!user) {
-      
       const uniqueUsername = await usersModel.findOne({
         username: splitMail(email),
       });
@@ -22,6 +22,7 @@ const saveNewUser = async (email) => {
           name: splitMail(email),
           username: `${splitMail(email)}-${rndNumber}`,
           email,
+          role: users.length > 0 ? "USER" : "ADMIN",
         });
         return { success: true, isNew: true };
       } else {
@@ -29,6 +30,7 @@ const saveNewUser = async (email) => {
           name: splitMail(email),
           username: `${splitMail(email)}`,
           email,
+          role: users.length > 0 ? "USER" : "ADMIN",
         });
         return { success: true, isNew: true };
       }
@@ -119,7 +121,7 @@ const handler = async (req, res) => {
         .json({ message: "Validation error", errors: error.errors });
     }
 
-    console.log(error);
+
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };

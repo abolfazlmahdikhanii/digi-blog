@@ -39,9 +39,9 @@ const handler = async (req, res) => {
   await connectToDB();
   try {
     const { email } = req.body;
-    console.log(email);
+  
     const validEmail = authSchema.parse({ email: `${email}` });
-    console.log(validEmail);
+
     // check if block send otp and time passed unblock
     const existing = await otpModel.findOne({ email: validEmail.email });
     if (existing && existing.blockedUntil !== null) {
