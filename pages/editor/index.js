@@ -13,6 +13,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { PublishingModal } from "@/components/publishing-modal";
+import { isObject } from "lodash";
+import { useAuth } from "@/context/AuthContext";
 
 // Import editor dynamically with no SSR
 const TextEditor = dynamic(() => import("@/components/text-editor"), {
@@ -21,20 +23,12 @@ const TextEditor = dynamic(() => import("@/components/text-editor"), {
 
 export default function EditorPage() {
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [coverImage, setCoverImage] = useState(null);
+  const [content, setContent] = useState(null);
+ const {user}=useAuth()
+  const [isOpenPublishModal, setIsOpenPublishModal] = useState(false);
 
-  const handleCoverImageChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setCoverImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-  console.log(content);
+
+
   return (
     <div className="flex flex-col h-full min-h-[calc(100vh-4rem)]">
       <header className="py-4 px-7 w-10/12 mx-auto border-b flex items-center justify-between">
@@ -44,38 +38,38 @@ export default function EditorPage() {
         <div className="flex items-center gap-2">
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="ghost">
-                <Eye className="mr-2 h-4 w-4" /> Preview
+              <Button
+                variant="outline"
+                disabled={
+                  !title || !isObject(content) || !content.blocks.length
+                }
+              >
+                <Eye className=" h-4 w-4" /> Preview
               </Button>
             </DialogTrigger>
             <DialogContent className="w-full min-w-4xl  h-[90vh] flex flex-col ">
-              <DialogHeader>
+              <DialogHeader className="p-6 border-b">
                 <DialogTitle>Post Preview</DialogTitle>
               </DialogHeader>
               <div className="flex-grow overflow-y-auto prose dark:prose-invert lg:prose-xl w-full px-2 py-4 n-scroll">
-                <h1 className="font-headline font-bold">
+                <h1 className="font-headline font-bold text-lg">
                   {title || "Your Post Title"}
                 </h1>
-                <div className="flex items-center gap-4 mt-6 mb-4">
+                <div className="flex items-center gap-4 mt-4.5 mb-4">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
                       <AvatarImage
-                        src="https://picsum.photos/seed/103/100/100"
+                        src={user?.profileImage}
                         alt="User"
                       />
-                      <AvatarFallback>U</AvatarFallback>
+                      <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>
                       <p className="font-semibold text-sm not-prose mb-1.5">
-                        John Doe
+                        {user?.name}
                       </p>
                       <p className="text-xs text-muted-foreground not-prose">
-                        5 min read ·{" "}
-                        {new Date().toLocaleDateString("en-US", {
-                          month: "long",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
+                        Author
                       </p>
                     </div>
                   </div>
@@ -85,18 +79,31 @@ export default function EditorPage() {
               </div>
             </DialogContent>
           </Dialog>
-          <Button variant="outline">Save Draft</Button>
-          <Dialog>
+
+          <Dialog
+            open={isOpenPublishModal}
+            onOpenChange={setIsOpenPublishModal}
+          >
             <DialogTrigger asChild>
               <Button
-                
+                disabled={
+                  !title || !isObject(content) || !content.blocks.length
+                }
                 className="bg-green-100 text-green-700 hover:bg-green-200 hover:text-green-800 "
               >
                 Publish
               </Button>
             </DialogTrigger>
-            <DialogContent className="min-w-4xl h-[90vh] flex flex-col">
-              <PublishingModal title={title} />
+            <DialogContent className="min-w-4xl h-[95%] flex flex-col">
+              <PublishingModal
+                title={title}
+                content={content}
+                onClose={() => {
+                  setIsOpenPublishModal(false);
+                  setTitle("");
+                  setContent(null);
+                }}
+              />
             </DialogContent>
           </Dialog>
           {/* <Button variant="ghost" size="icon">
