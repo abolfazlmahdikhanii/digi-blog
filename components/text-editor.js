@@ -27,7 +27,7 @@ const TextEditor = ({
       onChange: async () => {
         try {
           const output = await editor.save();
-          // IMPORTANT: we do NOT convert to HTML — only emit Editor.js JSON
+         
           onChange(output);
         } catch (err) {
           // ignore transient errors until editor is fully ready
