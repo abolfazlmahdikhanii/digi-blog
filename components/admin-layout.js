@@ -11,7 +11,7 @@ import {
   SidebarFooter,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, FileText, Users, Settings, Feather } from 'lucide-react';
+import { LayoutDashboard, FileText, Users, Settings, Feather, Package, Shapes } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 
@@ -26,8 +26,8 @@ export default function AdminLayout({ children }) {
               <span className="font-headline text-lg font-bold">EchoJournal</span>
             </div>
           </SidebarHeader>
-          <SidebarContent className={"mt-3 space-y-4"}>
-            <SidebarMenu>
+          <SidebarContent className={"mt-4 space-y-8"}>
+            <SidebarMenu className={"space-y-3"}>
               <SidebarMenuItem>
                 <Link href="/admin"  passHref>
                   <SidebarMenuButton tooltip="Dashboard">
@@ -49,6 +49,14 @@ export default function AdminLayout({ children }) {
                   <SidebarMenuButton tooltip="Users">
                     <Users />
                     <span>Users</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="/admin/categories"  passHref>
+                  <SidebarMenuButton tooltip="Category">
+                    <Shapes />
+                    <span>Category</span>
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>

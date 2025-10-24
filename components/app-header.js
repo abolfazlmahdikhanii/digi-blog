@@ -44,16 +44,16 @@ const navLinks = [
   { href: "/admin", label: "Admin" },
 ];
 
-const UserMenu = ({ email, name }) => (
+const UserMenu = ({ email, name,profileImage="" }) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <Button variant="ghost" className="relative h-9 w-9 rounded-full">
         <Avatar className="h-9 w-9">
           <AvatarImage
-            src="https://picsum.photos/seed/103/100/100"
+            src={profileImage}
             alt="User"
           />
-          <AvatarFallback>{name.toUpperCase().charAt(0)}</AvatarFallback>
+          <AvatarFallback>{name?.toUpperCase().charAt(0)}</AvatarFallback>
         </Avatar>
       </Button>
     </DropdownMenuTrigger>
