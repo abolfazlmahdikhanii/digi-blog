@@ -10,16 +10,19 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
+import { ImageKitProvider } from "@imagekit/next";
+import { relativeTimeFormat } from "@/lib/utils";
+import { capitalize } from "lodash";
 
 export default function PostCard({
-  id,
+  _id,
   author,
-  authorAvatar,
-  date,
+  profileImage,
+  createdAt,
   readTime,
-  image,
+  postCover,
   title,
-  snippet,
+  shortDescription,
   comments,
   likes,
   category,
@@ -28,32 +31,36 @@ export default function PostCard({
     <div className="flex flex-col py-4 border-b ">
       <div className="flex flex-row-reverse sm:flex-row gap-8">
         <div className="flex-1 space-y-3">
-          <Link
-            href={`/profile/${author.toLowerCase().replace(" ", "")}`}
-            className=""
-          >
+          <Link href={`/profile/@${author?.username}`} className="">
             <div className="flex items-center gap-2 mb-5">
-              <Avatar className="h-6 w-6">
-                <AvatarImage src={authorAvatar.imageUrl} alt={author} />
-                <AvatarFallback>{author.charAt(0)}</AvatarFallback>
+              <Avatar className="h-6.5 w-6.5">
+                <AvatarImage
+                  src={author?.profileImage}
+                  alt={author?.name}
+                />
+                <AvatarFallback>
+                  {author?.name?.toUpperCase().charAt(0)}
+                </AvatarFallback>
               </Avatar>
               <span className="text-xs font-semibold hover:underline dark:text-neutral-300">
-                {author}
+                {author?.name}
               </span>
             </div>
           </Link>
           <Link
-            href={`/post/${id}`}
+            href={`/post/${_id}`}
             className="hover:text-primary transition-colors "
           >
             <h2 className="font-bold text-xl font-headline tracking-tight">
               {title}
             </h2>
           </Link>
-          <p className="text-muted-foreground text-base mt-2">{snippet}</p>
+          <p className="text-muted-foreground text-base mt-2">
+            {shortDescription}
+          </p>
           <div className="flex items-center justify-between text-muted-foreground text-sm pt-4">
             <div className="flex items-center gap-5.5">
-              <span className="text-xs">{readTime} ago</span>
+              <span className="text-xs">{relativeTimeFormat(createdAt)}</span>
 
               <button className="h-6 w-6 text-muted-foreground hover:text-foreground">
                 <ThumbsUp className="h-3.5 w-3.5" />
@@ -67,16 +74,14 @@ export default function PostCard({
               {category && (
                 <Badge
                   variant="default"
-                  className="bg-blue-50 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900 py-0.5 text-xs"
+                  className="bg-blue-50 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900 py-0.5 text-xs px-2"
                 >
-                  {category}
+                  {capitalize(category?.name)}
                 </Badge>
               )}
             </div>
             <div className="flex items-center gap-1">
-              <button
-                className="h-8 w-8 text-muted-foreground hover:text-foreground "
-              >
+              <button className="h-8 w-8 text-muted-foreground hover:text-foreground ">
                 <Bookmark className="h-5 w-5" />
               </button>
               <Button
@@ -90,15 +95,17 @@ export default function PostCard({
           </div>
         </div>
         <div className="sm:w-1/3  flex-shrink-0">
-          <Link href={`/post/${id}`} className="block">
+          <Link href={`/post/${_id}`} className="block">
             <div className="aspect-[4/3] relative max-w-[200px]">
-              <Image
-                src={image.imageUrl||"/images/placeholder.webp"}
-                alt={image.description}
-                fill
-                className="object-cover rounded-md"
-                data-ai-hint={image.imageHint}
-              />
+              <ImageKitProvider urlEndpoint="https://ik.imagekit.io/gv5d2avxy">
+                <Image
+                  src={postCover || "/images/placeholder.webp"}
+                  alt={title}
+                  fill
+                  className="object-cover rounded-md"
+                  data-ai-hint={title}
+                />
+              </ImageKitProvider>
             </div>
           </Link>
         </div>

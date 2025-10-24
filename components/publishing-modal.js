@@ -17,8 +17,10 @@ import { useQuery } from "@tanstack/react-query";
 import postSchema from "@/validations/post";
 import { ScrollArea } from "./ui/scroll-area";
 import { toast } from "sonner";
-import z from "zod";
+import z, { number } from "zod";
 import { DialogHeader, DialogTitle } from "./ui/dialog";
+import { Spinner } from "./ui/spinner";
+import { Switch } from "./ui/switch";
 
 export function PublishingModal({ title, content, onClose }) {
   const { data, isLoading } = useQuery({
@@ -29,8 +31,10 @@ export function PublishingModal({ title, content, onClose }) {
   const [tagInput, setTagInput] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("draft");
-
+  const [isPostLoading, setIsPostLoading] = useState(false);
   const [categoryId, setCategoryId] = useState("");
+  const [readTime, setReadTime] = useState(0);
+  const [showComment, setShowComment] = useState(1);
   const [coverImage, setCoverImage] = useState(null);
 
   const handleTagKeyDown = (e) => {
@@ -60,6 +64,7 @@ export function PublishingModal({ title, content, onClose }) {
       try {
         const form = new FormData();
         form.append("image", file);
+        form.append("title", title);
         const res = await fetch("/api/upload/post-images", {
           method: "POST",
           body: form,
@@ -97,8 +102,10 @@ export function PublishingModal({ title, content, onClose }) {
   };
 
   const onSubmitForm = async (e) => {
+    e.preventDefault();
     let fid = null;
     try {
+      setIsPostLoading(true);
       const uploadResult = await uploadPostCoverHandler(coverImage);
       if (!uploadResult.success || !uploadResult.url) {
         throw new Error("Upload failed!");
@@ -116,6 +123,8 @@ export function PublishingModal({ title, content, onClose }) {
         tags: tagValues || [],
         status: status || "draft",
         postCover: uploadResult.url,
+        readTime: Number(readTime),
+        isShowComment: Number(showComment),
       });
 
       if (!validPost.success) {
@@ -146,15 +155,18 @@ export function PublishingModal({ title, content, onClose }) {
       }
 
       toast.success("Post created successfully :)");
+      setIsPostLoading(false);
       onClose();
       setCategoryId("");
       setCoverImage("");
       setDescription("");
       setStatus("draft");
       setTags([]);
+      setReadTime(0);
+      setShowComment(1)
     } catch (error) {
       console.log("Error:", error);
-
+      setIsPostLoading(false);
       if (fid) {
         await removePostCover(fid).catch(console.error);
       }
@@ -214,7 +226,7 @@ export function PublishingModal({ title, content, onClose }) {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Categories</SelectLabel>
-                    {data?.categories?.length &&
+                    {!!data?.categories?.length &&
                       data?.categories?.map((item) => (
                         <SelectItem
                           key={item._id.toString()}
@@ -276,6 +288,29 @@ export function PublishingModal({ title, content, onClose }) {
                 />
               </div>
             </div>
+            <div>
+              <Label htmlFor="read" className="font-semibold mb-1 text-sm">
+                read time
+              </Label>
+              <Input
+                id="read"
+                type={"number"}
+                value={readTime}
+                onChange={(e) => setReadTime(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="show" className="font-semibold mb-1 text-sm">
+                hidden comment
+              </Label>
+              <Switch
+              id="show"
+                onCheckedChange={(checked) =>
+                  checked ? setShowComment(0) : setShowComment(1)
+                }
+                checked={!showComment}
+              />
+            </div>
           </div>
         </ScrollArea>
         <div className="flex flex-col items-center">
@@ -317,8 +352,16 @@ export function PublishingModal({ title, content, onClose }) {
         <Button
           className="bg-green-600 hover:bg-green-700 text-white "
           onClick={onSubmitForm}
-          disabled={!content||!title||!coverImage||!description||!categoryId}
+          disabled={
+            !content ||
+            !title ||
+            !coverImage ||
+            !description ||
+            !categoryId ||
+            isPostLoading
+          }
         >
+          {isPostLoading && <Spinner />}
           Publish Now
         </Button>
       </div>
