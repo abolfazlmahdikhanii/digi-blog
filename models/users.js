@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
 
-const schema = mongoose.Schema(
+const schema =new mongoose.Schema(
   {
     name: {
       type: String,
@@ -40,6 +40,10 @@ const schema = mongoose.Schema(
   },
   { timestamps: true }
 );
-
+schema.virtual("posts",{
+  ref:"Posts",
+  localField:"_id",
+  foreignField:"author"
+})
 const usersModel = mongoose.models.Users || mongoose.model("Users", schema);
 export default usersModel;

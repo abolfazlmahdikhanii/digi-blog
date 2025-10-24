@@ -11,12 +11,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const { pathname } = router;
+  const hiddenSidebarPages = ["/post", "/setting"];
+
   const isAuthPage = pathname.startsWith("/auth");
   const isAdminPage = pathname.startsWith("/admin");
   const isEditorPage = pathname.startsWith("/editor");
+  const isHome = pathname==="/";
   const showSidebars = !isAuthPage && !isAdminPage && !isEditorPage;
-  const isSetting = !pathname.startsWith("/setting");
+
   const queryClient = new QueryClient();
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider initialUser={pageProps.user}>
@@ -28,7 +32,7 @@ function MyApp({ Component, pageProps }) {
             <main className="flex-grow py-8">
               <Component {...pageProps} />
             </main>
-            {showSidebars && isSetting && <RightSidebar />}
+            {showSidebars && isHome && <RightSidebar />}
           </div>
           <Toaster />
         </div>

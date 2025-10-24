@@ -6,36 +6,21 @@ const {
   useEffect,
   useCallback,
 } = require("react");
+import { useQuery } from "@tanstack/react-query";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children, initialUser }) => {
-  const [user, setUser] = useState(initialUser || null);
+  const { data: user, refetch } = useQuery({
+    queryKey: ["user"],
+    queryFn: () => fetch("/api/auth/me").then((res) => res.json()),
+    initialData: initialUser,
+  });
+ 
   const router = useRouter();
-  useEffect(() => {
-    if (!initialUser) fetchUser();
-  }, []);
-
-  const fetchUser = useCallback(() => {
-    fetch("/api/auth/me")
-      .then((res) => {
-        if (res.ok) return res.json();
-      })
-      .then((data) => {
-       
-        if (data) {
-          setUser(data);
-        } else {
-          setUser(null);
-        }
-      })
-      .catch((err) => {
-        setUser(null);
-      });
-  }, []);
 
   return (
-    <AuthContext.Provider value={{ fetchUser, user, setUser }}>
+    <AuthContext.Provider value={{ user:user?.user, refetch }}>
       {children}
     </AuthContext.Provider>
   );

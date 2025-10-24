@@ -15,6 +15,7 @@ import dynamic from "next/dynamic";
 import { PublishingModal } from "@/components/publishing-modal";
 import { isObject } from "lodash";
 import { useAuth } from "@/context/AuthContext";
+import { Textarea } from "@/components/ui/textarea";
 
 // Import editor dynamically with no SSR
 const TextEditor = dynamic(() => import("@/components/text-editor"), {
@@ -101,7 +102,7 @@ export default function EditorPage() {
                 onClose={() => {
                   setIsOpenPublishModal(false);
                   setTitle("");
-                  setContent(null);
+                  setContent({});
                 }}
               />
             </DialogContent>
@@ -113,11 +114,12 @@ export default function EditorPage() {
       </header>
       <div className="flex-grow container mx-auto px-4 py-8">
         <div className="w-10/12 mx-auto space-y-6">
-          <input
+          <Textarea
             placeholder="Post Title..."
-            className="text-3xl md:text-4xl font-headline font-bold h-auto p-2 border-0 focus-visible:ring-0 shadow-none focus-visible:outline-0 w-full"
+            className="text-3xl md:text-4xl font-headline font-bold  p-2 border-0 focus-visible:ring-0 shadow-none focus-visible:outline-0 w-full  resize-none !bg-[#09090B] leading-[1.6]"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+          
           />
 
           <TextEditor

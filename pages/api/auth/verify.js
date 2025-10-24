@@ -23,6 +23,8 @@ const saveNewUser = async (email) => {
           username: `${splitMail(email)}-${rndNumber}`,
           email,
           role: users.length > 0 ? "USER" : "ADMIN",
+          profileImage: "",
+          bio: "",
         });
         return { success: true, isNew: true };
       } else {
@@ -31,6 +33,8 @@ const saveNewUser = async (email) => {
           username: `${splitMail(email)}`,
           email,
           role: users.length > 0 ? "USER" : "ADMIN",
+          profileImage: "",
+          bio: "",
         });
         return { success: true, isNew: true };
       }
@@ -120,7 +124,6 @@ const handler = async (req, res) => {
         .status(400)
         .json({ message: "Validation error", errors: error.errors });
     }
-
 
     return res.status(500).json({ message: "Internal ServerError" });
   }

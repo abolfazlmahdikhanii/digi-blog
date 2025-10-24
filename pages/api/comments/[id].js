@@ -1,6 +1,5 @@
 import connectToDB from "@/configs/db";
 import { verifyToken } from "@/lib/utils";
-import likesModel from "@/models/commentLikes";
 import commentsModel from "@/models/comments";
 import usersModel from "@/models/users";
 import { isValidObjectId } from "mongoose";
@@ -11,8 +10,8 @@ const handler = async (req, res) => {
   try {
     const { token } = req.cookies;
     const { id } = req.query;
-    const { commentId } = req.body;
-
+    const { content, commentId } = req.body;
+   
     if (!token) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -24,38 +23,25 @@ const handler = async (req, res) => {
     if (!isValidObjectId(id)) {
       return res.status(404).json({ message: "Invalid post id !" });
     }
-
+    if (!content.trim()) {
+      return res.status(421).json({ message: "fill the field!" });
+    }
     const user = await usersModel.findOne({ email: validToken.email });
     if (!user) {
       return res.status(404).json({ message: "User Not Found !" });
     }
-
-    const isLikeUser = await likesModel.findOne({
-      commentId,
-      postId: id,
-      userId: user._id,
+    const newComment = commentsModel.create({
+      content,
+      author: user._id,
+      post: id,
+      parentComment: commentId || null,
+      status: "pending",
     });
-    console.log(isLikeUser);
-    if (!isLikeUser) {
-      const newLike = likesModel.create({
-        commentId,
-        userId: user._id,
-        postId: id,
-      });
-      if (!newLike) {
-        return res.status(400).json({ message: "Create Like Has Problem!" });
-      }
-      return res.status(200).json({ message: "Create Like Successfully :)" });
-    } else {
-      const removeLike = await likesModel.deleteOne({ _id: isLikeUser._id });
-
-      if (!removeLike.deletedCount) {
-        return res.status(400).json({ message: "Remove Like Has Problem!" });
-      }
-      return res.status(200).json({ message: "Remove Like Successfully :)" });
+    if (!newComment) {
+      return res.status(400).json({ message: "Create Comment Has Problem!" });
     }
+    return res.status(200).json({ message: "Create Comment Successfully :)" });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };

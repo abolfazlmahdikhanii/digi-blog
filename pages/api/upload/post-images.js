@@ -47,7 +47,10 @@ const handler = async (req, res) => {
           .json({ message: "User not found", success: false });
       }
 
-      const uploadResult = await uploadFile(file, `blogs/${user.username}`);
+      const uploadResult = await uploadFile(
+        file,
+        `blogs/${user.username}`
+      );
 
       if (uploadResult) {
         return res.status(200).json({
@@ -70,9 +73,9 @@ const handler = async (req, res) => {
     }
   }
   if (req.method === "DELETE") {
-      try {
-        const { fid } = req.query;
-   
+    try {
+      const { fid } = req.query;
+
       if (!fid) {
         return res.status(404).json({
           message: "No id exist!",

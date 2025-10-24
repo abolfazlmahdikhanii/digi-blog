@@ -62,7 +62,7 @@ export default function LoginPage() {
   const [step, setStep] = useState("EMAIL");
   const [email, setEmail] = useState("");
   const [timer, setTimer] = useState(120);
-  const { fetchUser } = useAuth();
+  const { refetch } = useAuth();
   const [otp, setOtp] = useState("");
   const router = useRouter();
   useEffect(() => {
@@ -152,7 +152,7 @@ export default function LoginPage() {
               background: "#1C1C1C",
             },
           });
-          fetchUser();
+          refetch();
           router.replace("/");
         }
       })

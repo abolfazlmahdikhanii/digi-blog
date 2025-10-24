@@ -18,6 +18,8 @@ const createNewPost = async (req, res) => {
       postCover,
       author,
       status,
+      readTime,
+      isShowComment,
     } = req.body;
     if (!token) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -33,13 +35,14 @@ const createNewPost = async (req, res) => {
       shortDescription,
       tags,
       postCover,
-      status
+      status,
+      readTime,
+      isShowComment,
     });
     if (!validPost) {
       return res.status(400).json({ message: "Invalid Post Data!" });
     }
 
-    console.log(title);
     const user = await usersModel.findOne({ email: validToken.email }, "_id");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -54,6 +57,8 @@ const createNewPost = async (req, res) => {
       postCover: validPost.postCover,
       author: user._id,
       status: validPost.status,
+      readTime: validPost.readTime,
+      isShowComment: validPost.isShowComment,
     });
     if (!newPost) {
       return res.status(400).json({ message: "Created Post Has Problem!" });
