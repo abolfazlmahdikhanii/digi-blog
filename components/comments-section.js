@@ -4,17 +4,25 @@ import { CommentThread } from "./comment-thread";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 
-export function CommentsSection({ comments = [], total, refetch }) {
-  const { query } = useRouter();
-    const { user } = useAuth();
+export function CommentsSection({
+  comments = [],
+  total,
+  refetch,
+  isSheet = false,
+  postId,
+}) {
+  const { user } = useAuth();
   const handleSubmitLike = async (e, id) => {
     e.preventDefault();
     try {
-      if (!user) toast.warning("You Should Signin!");
+      if (!user) {
+        toast.warning("You Should Signin!");
+        return;
+      }
       const newLike = {
-        commentId: id,
+        postId,
       };
-      const res = await fetch(`/api/post/${query.postId}/like`, {
+      const res = await fetch(`/api/comments/${id}/like`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -27,26 +35,38 @@ export function CommentsSection({ comments = [], total, refetch }) {
         throw new Error(data.message || "Failed to add comment");
       }
 
-      refetch([`post-${query.postId}-comment`]);
+      refetch([`post-${postId}-comment`]);
       console.log(comments);
     } catch (error) {
       toast.error(error.message);
     }
   };
+
   return (
-    <div className="mt-12 pt-8 border-t">
-      <h2 className="text-2xl font-bold font-headline mb-4">
-        Responses ({total})
-      </h2>
-      <CommentForm isReply={false} onRefetch={refetch} />
-      <div className="mt-8 divide-y">
+    <div className={`${!isSheet ? "mt-12 pt-8 border-t" : "pt-3"}`}>
+      {!isSheet && (
+        <h2 className="text-2xl font-bold font-headline mb-4">
+          Responses ({total})
+        </h2>
+      )}
+      {user && (
+        <CommentForm
+          isReply={false}
+          onRefetch={refetch}
+          isSheet={isSheet}
+          postId={postId}
+        />
+      )}
+      <div className={`mt-8 divide-y ${isSheet ? "border-t" : ""}`}>
         {!!comments.length &&
           comments.map((comment) => (
             <CommentThread
               key={comment._id}
               {...comment}
               onRefetch={refetch}
-              handleSubmitLike={ handleSubmitLike}
+              handleSubmitLike={handleSubmitLike}
+              isSheet={isSheet}
+              postId={postId}
             />
           ))}
       </div>
