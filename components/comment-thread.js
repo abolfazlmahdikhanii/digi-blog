@@ -22,15 +22,17 @@ export function CommentThread({
   likeCount,
   onRefetch,
   handleSubmitLike,
-  isLiked
+  isLiked,
+  isSheet,
+  postId
 }) {
   const [isReplying, setIsReplying] = useState(false);
-  const { query } = useRouter();
+ 
 
   return (
     <div className="py-6 border-b last:border-b-0">
       <div className="flex items-start gap-4 ">
-        <Link href={`/profile/@${author?.username}`}>
+        <Link href={`/@${author?.username}`}>
           <Avatar className="h-8 w-8">
             <AvatarImage src={author?.profileImage} alt={author?.name} />
             <AvatarFallback>
@@ -42,7 +44,7 @@ export function CommentThread({
           <div className="flex items-center justify-between">
             <div>
               <Link
-                href={`/profile/@${author.username}}`}
+                href={`/@${author.username}}`}
                 className="font-semibold hover:underline"
               >
                 {capitalize(author.name)}
@@ -61,8 +63,13 @@ export function CommentThread({
         <p className="mt-4 text-foreground/90">{content}</p>
         <div className="mt-5 flex items-center gap-4 text-muted-foreground">
           <div className="flex items-center gap-x-2">
-            <button className="cursor-pointer" onClick={(e)=>handleSubmitLike(e,_id)}>
-              <ThumbsUp className={`h-4.5 w-4.5 ${isLiked?"text-blue-500":""}`} />
+            <button
+              className="cursor-pointer"
+              onClick={(e) => handleSubmitLike(e, _id)}
+            >
+              <ThumbsUp
+                className={`h-4.5 w-4.5 ${isLiked ? "text-blue-500" : ""}`}
+              />
             </button>
             <span className="text-xs">{likeCount}</span>
           </div>
@@ -85,6 +92,8 @@ export function CommentThread({
               onCancel={() => setIsReplying(false)}
               onComment={() => setIsReplying(false)}
               onRefetch={onRefetch}
+              isSheet={isSheet}
+              postId={postId}
             />
           </div>
         )}
@@ -92,7 +101,14 @@ export function CommentThread({
       <div className="pl-4 mt-2">
         {!!replies?.length &&
           replies?.map((comment) => (
-            <CommentThread key={comment._id} {...comment} isReplyComment handleSubmitLike={(e)=>handleSubmitLike(e,comment._id)}/>
+            <CommentThread
+              isSheet={isSheet}
+              key={comment._id}
+              {...comment}
+              isReplyComment
+              handleSubmitLike={(e) => handleSubmitLike(e, comment._id)}
+              postId={postId}
+            />
           ))}
       </div>
     </div>
