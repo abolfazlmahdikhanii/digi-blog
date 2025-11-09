@@ -27,5 +27,5 @@ const likeSchema = new Schema(
 likeSchema.index({ commentId: 1, userId: 1 }, { unique: true });
 
 const likesModel =
-  mongoose.models.CommentLikes || mongoose.model("CommentLikes", likeSchema);
+  mongoose.models.Comment_Likes || mongoose.model("Comment_Likes", likeSchema);
 export default likesModel;
