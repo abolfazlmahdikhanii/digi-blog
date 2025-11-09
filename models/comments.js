@@ -36,7 +36,7 @@ schema.virtual("replies", {
   foreignField: "parentComment",
 });
 schema.virtual("likes", {
-  ref: "CommentLikes",
+  ref: "Comment_Likes",
   localField: "_id",
   foreignField: "commentId",
   
