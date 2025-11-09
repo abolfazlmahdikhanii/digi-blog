@@ -16,6 +16,8 @@ const Toaster = ({
   return (
     <Sonner
       theme={theme}
+      // position="top-center"
+      offset={"18px"}
       className="toaster group"
       icons={{
         success: <CircleCheckIcon className="size-4" />,
