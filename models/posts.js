@@ -2,11 +2,19 @@ const { Schema, default: mongoose } = require("mongoose");
 import categoryModel from "./category";
 import commentsModel from "./comments";
 import usersModel from "./users";
+import postLikesModel from "./postLikes";
+import saveModel from "./save";
+import postImagesModel from "./potsImages";
 const schema = new Schema(
   {
     title: {
       type: String,
-      required: true,
+
+      min: 2,
+    },
+    slug: {
+      type: String,
+      index: true,
       min: 2,
       unique: true,
     },
@@ -21,22 +29,21 @@ const schema = new Schema(
     },
     shortDescription: {
       type: String,
-      required: true,
     },
     tags: {
       type: Array,
     },
     postCover: {
-      type: String,
-      required: true,
+      type: mongoose.Types.ObjectId,
+      ref: "Post_Images",
     },
     readTime: {
       type: Number,
     },
+
     category: {
       type: mongoose.Types.ObjectId,
       ref: "Category",
-      required: true,
     },
     author: {
       type: mongoose.Types.ObjectId,
@@ -52,11 +59,28 @@ const schema = new Schema(
     timestamps: true,
   }
 );
-
+// schema.index(
+//   { slug: 1 },
+//   {
+//     unique: true,
+//     required: true,
+//     partialFilterExpression: { status: "published" },
+//   }
+// );
 schema.virtual("comments", {
   ref: "Comments",
   localField: "_id",
   foreignField: "post",
+});
+schema.virtual("likes", {
+  ref: "Post_Likes",
+  localField: "_id",
+  foreignField: "postId",
+});
+schema.virtual("save", {
+  ref: "Save",
+  localField: "_id",
+  foreignField: "postId",
 });
 
 const postModel = mongoose.models.Posts || mongoose.model("Posts", schema);
