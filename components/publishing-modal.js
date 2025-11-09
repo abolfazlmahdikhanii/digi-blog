@@ -21,8 +21,9 @@ import z, { number } from "zod";
 import { DialogHeader, DialogTitle } from "./ui/dialog";
 import { Spinner } from "./ui/spinner";
 import { Switch } from "./ui/switch";
+import { useRouter } from "next/router";
 
-export function PublishingModal({ title, content, onClose }) {
+export function PublishingModal({ title, content, onClose, storyId, clear }) {
   const { data, isLoading } = useQuery({
     queryKey: ["category"],
     queryFn: () => fetch("/api/categories").then((res) => res.json()),
@@ -36,7 +37,7 @@ export function PublishingModal({ title, content, onClose }) {
   const [readTime, setReadTime] = useState(0);
   const [showComment, setShowComment] = useState(1);
   const [coverImage, setCoverImage] = useState(null);
-
+  const router = useRouter();
   const handleTagKeyDown = (e) => {
     if (e.key === "Enter" && tagInput.trim() !== "") {
       e.preventDefault();
@@ -60,7 +61,12 @@ export function PublishingModal({ title, content, onClose }) {
   };
 
   const uploadPostCoverHandler = async (file) => {
+    const maxSize = 2 * 1024 * 1024;
     if (file) {
+      if (file.size > maxSize) {
+        toast.error("File size must be less than 2 MB");
+        return;
+      }
       try {
         const form = new FormData();
         form.append("image", file);
@@ -73,10 +79,20 @@ export function PublishingModal({ title, content, onClose }) {
           const data = await res.json();
 
           if (data && data.success && data.url) {
-            return { success: true, url: data.url, fid: data.fid };
+            return {
+              success: true,
+              url: data.url,
+              imgId: data.imgId,
+              fid: data.fid,
+            };
           }
           if (data && data.url) {
-            return { success: true, url: data.url, fid: data.fid };
+            return {
+              success: true,
+              url: data.url,
+              imgId: data.imgId,
+              fid: data.fid,
+            };
           }
         }
       } catch (e) {
@@ -88,7 +104,7 @@ export function PublishingModal({ title, content, onClose }) {
   const removePostCover = async (fid) => {
     if (fid) {
       try {
-        const res = await fetch(`/api/upload/post-images?fid=${fid}`, {
+        const res = await fetch(`/api/upload/post-images?fid=${fid}&type=cover`, {
           method: "DELETE",
         });
         if (res.ok) {
@@ -103,6 +119,7 @@ export function PublishingModal({ title, content, onClose }) {
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
+    let imgId = null;
     let fid = null;
     try {
       setIsPostLoading(true);
@@ -110,6 +127,7 @@ export function PublishingModal({ title, content, onClose }) {
       if (!uploadResult.success || !uploadResult.url) {
         throw new Error("Upload failed!");
       }
+      imgId = uploadResult.imgId;
       fid = uploadResult.fid;
       const tagValues = tags
         ? tags.map((tag) =>
@@ -122,7 +140,7 @@ export function PublishingModal({ title, content, onClose }) {
         shortDescription: description,
         tags: tagValues || [],
         status: status || "draft",
-        postCover: uploadResult.url,
+
         readTime: Number(readTime),
         isShowComment: Number(showComment),
       });
@@ -147,6 +165,8 @@ export function PublishingModal({ title, content, onClose }) {
         body: JSON.stringify({
           ...validPost.data, //
           category: categoryId,
+          postId: storyId,
+          imgId,
         }),
       });
 
@@ -163,7 +183,9 @@ export function PublishingModal({ title, content, onClose }) {
       setStatus("draft");
       setTags([]);
       setReadTime(0);
-      setShowComment(1)
+      setShowComment(1);
+   
+      router.replace("/editor");
     } catch (error) {
       console.log("Error:", error);
       setIsPostLoading(false);
@@ -253,7 +275,7 @@ export function PublishingModal({ title, content, onClose }) {
                 <SelectContent>
                   <SelectGroup>
                     <SelectItem value={"draft"}>Draft</SelectItem>
-                    <SelectItem value={"publish"}>Publish</SelectItem>
+                    <SelectItem value={"published"}>Publish</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -304,7 +326,7 @@ export function PublishingModal({ title, content, onClose }) {
                 hidden comment
               </Label>
               <Switch
-              id="show"
+                id="show"
                 onCheckedChange={(checked) =>
                   checked ? setShowComment(0) : setShowComment(1)
                 }
