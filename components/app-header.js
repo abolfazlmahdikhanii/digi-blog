@@ -44,7 +44,7 @@ const navLinks = [
   { href: "/admin", label: "Admin" },
 ];
 
-const UserMenu = ({ email, name,profileImage="" }) => (
+const UserMenu = ({ email, name,profileImage="",logOut }) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <Button variant="ghost" className="relative h-9 w-9 rounded-full">
@@ -90,7 +90,7 @@ const UserMenu = ({ email, name,profileImage="" }) => (
         </Link>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
-      <DropdownMenuItem>
+      <DropdownMenuItem onClick={logOut}>
         <LogOut className="mr-2 h-4 w-4" />
         <span>Log out</span>
       </DropdownMenuItem>
@@ -124,7 +124,7 @@ const MobileNav = () => (
 );
 
 export default function AppHeader() {
-  const { user } = useAuth();
+  const { user,logoutHandler } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ">
@@ -157,7 +157,7 @@ export default function AppHeader() {
             </Button>
           </Link>
           {user ? (
-            <UserMenu {...user} />
+            <UserMenu {...user} logOut={logoutHandler} />
           ) : (
             <Link href="/auth">
               <Button variant="outline" className="md:flex">
