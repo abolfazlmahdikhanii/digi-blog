@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Spinner } from "./ui/spinner";
 import { useAuth } from "@/context/AuthContext";
 
-const FollowBtn = ({ username, isFollowPage = false }) => {
+const FollowBtn = ({ username, isFollowPage = false, isFullWidth = false }) => {
   const { user } = useAuth();
   const { followHandler, followLoading, follow } = useFollow(username);
   return (
@@ -12,7 +12,9 @@ const FollowBtn = ({ username, isFollowPage = false }) => {
       variant={"outline"}
       className={`capitalize rounded-full h-10 ${
         !isFollowPage ? " self-end" : ""
-      } ${user && user.username === username ? "hidden" : ""}`}
+      } ${isFullWidth ? "w-full" : ""} ${
+        user && user.username === username ? "hidden" : ""
+      }`}
       onClick={followHandler}
       disabled={followLoading}
     >
