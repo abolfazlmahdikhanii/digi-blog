@@ -52,14 +52,7 @@ export default function AdminLayout({ children }) {
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <Link href="/admin/categories"  passHref>
-                  <SidebarMenuButton tooltip="Category">
-                    <Shapes />
-                    <span>Category</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
+            
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
