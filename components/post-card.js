@@ -28,13 +28,20 @@ export default function PostCard({
   shortDescription,
   comments,
   likes,
-  category,
+
   save,
   isSave,
+  isCol = false,
 }) {
   return (
-    <div className="flex flex-col py-4 border-b ">
-      <div className="flex flex-row-reverse sm:flex-row gap-8">
+    <div className={`flex flex-col py-4 ${!isCol ? "border-b " : ""}`}>
+      <div
+        className={`flex ${
+          !isCol
+            ? "flex-row-reverse sm:flex-row gap-8"
+            : "flex-col-reverse gap-7"
+        } `}
+      >
         <div className="flex-1 space-y-3">
           <HoverProfile author={author} />
 
@@ -49,7 +56,11 @@ export default function PostCard({
           <p className="text-muted-foreground text-base mt-2 line-clamp-3">
             {shortDescription}
           </p>
-          <div className="flex items-center justify-between text-muted-foreground text-sm pt-4">
+          <div
+            className={`flex items-center justify-between text-muted-foreground text-sm ${
+              !isCol ? "pt-4" : "pt-3"
+            }`}
+          >
             <div className="flex items-center gap-5.5">
               <span className="text-xs">{relativeTimeFormat(createdAt)}</span>
 
@@ -70,14 +81,6 @@ export default function PostCard({
                     {comments ? comments.length : 0}
                   </span>
                 </div>
-              )}
-              {category && (
-                <Badge
-                  variant="default"
-                  className="bg-blue-50 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900 py-0.5 text-xs px-2"
-                >
-                  {capitalize(category?.name)}
-                </Badge>
               )}
             </div>
             <div className="flex items-center gap-1">
@@ -102,16 +105,20 @@ export default function PostCard({
             </div>
           </div>
         </div>
-        <div className="sm:w-1/4  flex-shrink-0">
+        <div className={`${!isCol ? "sm:w-1/4" : "sm:w-full "}  flex-shrink-0`}>
           <Link href={`/post/${_id}`} className="block">
-            <div className="aspect-[4/3] relative max-w-[200px]">
+            <div
+              className={` relative ${
+                !isCol ? "max-w-[200px] aspect-[4/3]" : "w-full h-[380px]"
+              }`}
+            >
               <ImageKitProvider urlEndpoint="https://ik.imagekit.io/gv5d2avxy">
                 <Image
                   src={postCover?.imageUrl || "/images/placeholder.webp"}
                   alt={title}
                   fill
-                  className="object-cover rounded-md"
-                  data-ai-hint={title}
+                  className="object-cover rounded-md aspect-auto   w-full"
+               
                 />
               </ImageKitProvider>
             </div>
