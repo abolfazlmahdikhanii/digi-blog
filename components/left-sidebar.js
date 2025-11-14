@@ -62,14 +62,14 @@ const LeftSidebar = () => {
         ))}
       </nav>
       <div className="mt-8">
-        <h3 className="font-semibold text-sm mb-4 px-4">Following</h3>
-        <nav className="flex flex-col gap-2">
+        <h3 className="font-semibold text-base mb-4 px-4">Following</h3>
+        <nav className="flex flex-col gap-2 ">
           {follower?.follower && follower?.follower.length > 0 ? (
             follower.follower.map((userInfo) => (
               <Button
                 key={userInfo?.follower._id}
                 variant="ghost"
-                className="justify-start h-auto"
+                className="justify-start h-auto mb-12"
                 asChild
               >
                 <Link href={`/@${userInfo?.follower?.username}`}>
@@ -84,11 +84,11 @@ const LeftSidebar = () => {
               </Button>
             ))
           ) : (
-            <p>empty</p>
+          null
           )}
         </nav>
       </div>
-      <div className="mt-8">
+      <div className="">
         <Button variant="ghost" className="justify-start w-full" asChild>
           <Link href="#">
             <Search className="mr-4 h-6 w-6" />
