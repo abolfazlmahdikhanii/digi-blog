@@ -22,34 +22,82 @@ import { DialogHeader, DialogTitle } from "./ui/dialog";
 import { Spinner } from "./ui/spinner";
 import { Switch } from "./ui/switch";
 import { useRouter } from "next/router";
+import {
+  Popover,
+  PopoverAnchor,
+  PopoverArrow,
+  PopoverContent,
+} from "./ui/popover";
 
 export function PublishingModal({ title, content, onClose, storyId, clear }) {
-  const { data, isLoading } = useQuery({
-    queryKey: ["category"],
-    queryFn: () => fetch("/api/categories").then((res) => res.json()),
-  });
-  const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState("");
+  const { data, isLoading } = useQuery({
+    queryKey: ["topics", tagInput],
+    queryFn: () =>
+      fetch(`/api/topics?search=${tagInput.trim()}`).then((res) => res.json()),
+    enabled: tagInput.trim().length > 1, // only run when input has text
+    keepPreviousData: true,
+  });
+
+  const [tags, setTags] = useState([]);
+  const [tagIds, setTagIds] = useState([]);
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("draft");
+
   const [isPostLoading, setIsPostLoading] = useState(false);
   const [categoryId, setCategoryId] = useState("");
   const [readTime, setReadTime] = useState(0);
   const [showComment, setShowComment] = useState(1);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [coverImage, setCoverImage] = useState(null);
   const router = useRouter();
+  const addTag = async (tagName) => {
+    try {
+      if (
+        tags.length < 5 &&
+        !tags.some((item) => item.name.toLowerCase() === tagName.toLowerCase())
+      ) {
+        const res = await fetch("/api/topics", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name: tagName }),
+        });
+        const data = await res.json();
+        if (res.status === 201) {
+          setTags([...tags, data.data]);
+          setTagIds([...tagIds, data.data._id]);
+          setTagInput("");
+          setShowSuggestions(false);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to create topic. Please try again.");
+    }
+  };
   const handleTagKeyDown = (e) => {
     if (e.key === "Enter" && tagInput.trim() !== "") {
       e.preventDefault();
-      if (tags.length < 5) {
-        setTags([...tags, { id: Date.now(), name: tagInput.trim() }]);
-        setTagInput("");
-      }
+      addTag(tagInput.trim());
     }
   };
 
-  const removeTag = (idToRemove) => {
-    setTags(tags.filter((tag) => tag.id !== idToRemove));
+  const removeTag = async (idToRemove) => {
+    try {
+      const res = await fetch(`/api/topics/${idToRemove}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (res.status === 200) {
+        setTags(tags.filter((tag) => tag._id !== idToRemove));
+      }
+    } catch (error) {
+      toast.error("Failed to remove topic. Please try again.");
+    }
   };
 
   const handleImageUpload = (e) => {
@@ -104,9 +152,12 @@ export function PublishingModal({ title, content, onClose, storyId, clear }) {
   const removePostCover = async (fid) => {
     if (fid) {
       try {
-        const res = await fetch(`/api/upload/post-images?fid=${fid}&type=cover`, {
-          method: "DELETE",
-        });
+        const res = await fetch(
+          `/api/upload/post-images?fid=${fid}&type=cover`,
+          {
+            method: "DELETE",
+          }
+        );
         if (res.ok) {
           return { success: true };
         }
@@ -129,17 +180,11 @@ export function PublishingModal({ title, content, onClose, storyId, clear }) {
       }
       imgId = uploadResult.imgId;
       fid = uploadResult.fid;
-      const tagValues = tags
-        ? tags.map((tag) =>
-            typeof tag === "string" ? tag : tag.value || tag.label || tag.name
-          )
-        : [];
+
       const validPost = postSchema.safeParse({
         title,
         content,
         shortDescription: description,
-        tags: tagValues || [],
-        status: status || "draft",
 
         readTime: Number(readTime),
         isShowComment: Number(showComment),
@@ -164,9 +209,11 @@ export function PublishingModal({ title, content, onClose, storyId, clear }) {
         },
         body: JSON.stringify({
           ...validPost.data, //
-          category: categoryId,
+
           postId: storyId,
           imgId,
+          topics: tagIds,
+          // status: "published",
         }),
       });
 
@@ -177,14 +224,15 @@ export function PublishingModal({ title, content, onClose, storyId, clear }) {
       toast.success("Post created successfully :)");
       setIsPostLoading(false);
       onClose();
-      setCategoryId("");
+
       setCoverImage("");
       setDescription("");
-      setStatus("draft");
+
       setTags([]);
       setReadTime(0);
       setShowComment(1);
-   
+      setTagIds([]);
+
       router.replace("/editor");
     } catch (error) {
       console.log("Error:", error);
@@ -211,7 +259,7 @@ export function PublishingModal({ title, content, onClose, storyId, clear }) {
       </DialogHeader>
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8 p-6 overflow-y-auto">
         <ScrollArea className=" h-[430px]">
-          <div className="space-y-4 p-4">
+          <div className="space-y-4.5 p-4">
             <div>
               <Label
                 htmlFor="description"
@@ -234,52 +282,7 @@ export function PublishingModal({ title, content, onClose, storyId, clear }) {
                 {description.length}/200
               </p>
             </div>
-            <div>
-              <Label
-                htmlFor="description"
-                className="font-semibold mb-1 text-sm"
-              >
-                Category
-              </Label>
-              <Select onValueChange={(value) => setCategoryId(value)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Categories</SelectLabel>
-                    {!!data?.categories?.length &&
-                      data?.categories?.map((item) => (
-                        <SelectItem
-                          key={item._id.toString()}
-                          value={item._id.toString()}
-                        >
-                          {item.name}
-                        </SelectItem>
-                      ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label
-                htmlFor="description"
-                className="font-semibold mb-1 text-sm"
-              >
-                status
-              </Label>
-              <Select onValueChange={(value) => setStatus(value)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value={"draft"}>Draft</SelectItem>
-                    <SelectItem value={"published"}>Publish</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
+
             <div>
               <Label htmlFor="tags" className="font-semibold mb-1 text-sm">
                 Tags
@@ -287,28 +290,76 @@ export function PublishingModal({ title, content, onClose, storyId, clear }) {
               <p className="text-xs text-muted-foreground mb-3">
                 Add up to 5 tags to help readers discover your story.
               </p>
-              <div className="border rounded-md p-2 flex flex-wrap gap-2 items-center">
-                {tags.map((tag) => (
-                  <div
-                    key={tag.id}
-                    className="flex items-center gap-1 bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-sm"
-                  >
-                    <span>{tag.name}</span>
-                    <button onClick={() => removeTag(tag.id)}>
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
-                <Input
-                  id="tags"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={handleTagKeyDown}
-                  placeholder={tags.length < 5 ? "Add a tag..." : "5 tags max"}
-                  className="border-0 focus-visible:ring-0 shadow-none flex-1 min-w-[100px]  h-auto py-1 px-1.5 bg-transparent"
-                  disabled={tags.length >= 5}
-                />
-              </div>
+              <Popover
+                open={showSuggestions && data && data.data.length > 0}
+                onOpenChange={setShowSuggestions}
+              >
+                <div className="border rounded-md p-2 flex flex-wrap gap-2 items-center">
+                  {tags.map((tag) => (
+                    <div
+                      key={tag._id}
+                      className="flex items-center justify-between gap-1 bg-secondary text-secondary-foreground rounded-lg px-3 py-1 text-sm"
+                    >
+                      <span>{tag.name}</span>
+                      <button onClick={() => removeTag(tag._id)}>
+                        <X className="h-3 w-3  cursor-pointer" />
+                      </button>
+                    </div>
+                  ))}
+                  <PopoverAnchor asChild>
+                    <Input
+                      id="tags"
+                      autocomplete="off"
+                      value={tagInput}
+                      onChange={(e) => {
+                        setTagInput(e.target.value);
+                        if (e.target.value.trim() !== "") {
+                          setShowSuggestions(true);
+                        } else {
+                          setShowSuggestions(false);
+                        }
+                      }}
+                      onKeyDown={handleTagKeyDown}
+                      onFocus={() => setShowSuggestions(true)}
+                      onBlur={() =>
+                        setTimeout(() => setShowSuggestions(false), 150)
+                      }
+                      placeholder={
+                        tags.length < 5 ? "Add a tag..." : "5 tags max"
+                      }
+                      className="border-0 focus-visible:ring-0 shadow-none flex-1 min-w-[100px]  h-auto py-1 px-1.5 bg-transparent"
+                      disabled={tags.length >= 5}
+                    />
+                  </PopoverAnchor>
+                </div>
+                <PopoverContent
+                  className="w-[var(--radix-popover-trigger-width)] p-2"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                  sideOffset={10}
+                >
+                  {data &&
+                    data.data.map((suggestion) => (
+                      <Button
+                        key={suggestion._id ?? suggestion.name}
+                        type="button"
+                        variant="ghost"
+                        className="w-full justify-between"
+                        onMouseDown={(e) => {
+                          e.preventDefault(); // prevents focus change if needed
+                          addTag(suggestion.name); // runs before input blur
+                        }}
+                      >
+                        <div className="w-full flex justify-between p-2">
+                          <span>{suggestion.name}</span>
+                          <span className="text-muted-foreground">
+                            {suggestion.count}
+                          </span>
+                        </div>
+                      </Button>
+                    ))}
+                  <PopoverArrow />
+                </PopoverContent>
+              </Popover>
             </div>
             <div>
               <Label htmlFor="read" className="font-semibold mb-1 text-sm">
@@ -379,7 +430,7 @@ export function PublishingModal({ title, content, onClose, storyId, clear }) {
             !title ||
             !coverImage ||
             !description ||
-            !categoryId ||
+            !tags.length ||
             isPostLoading
           }
         >
