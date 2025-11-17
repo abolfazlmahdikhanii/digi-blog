@@ -1,5 +1,6 @@
 const { Schema, default: mongoose } = require("mongoose");
-import categoryModel from "./category";
+
+import topicModel from "./topics";
 import commentsModel from "./comments";
 import usersModel from "./users";
 import postLikesModel from "./postLikes";
@@ -30,9 +31,7 @@ const schema = new Schema(
     shortDescription: {
       type: String,
     },
-    tags: {
-      type: Array,
-    },
+    topics: [{ type: mongoose.Schema.Types.ObjectId, ref: "Topics" }],
     postCover: {
       type: mongoose.Types.ObjectId,
       ref: "Post_Images",
@@ -41,10 +40,6 @@ const schema = new Schema(
       type: Number,
     },
 
-    category: {
-      type: mongoose.Types.ObjectId,
-      ref: "Category",
-    },
     author: {
       type: mongoose.Types.ObjectId,
       ref: "Users",
