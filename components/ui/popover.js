@@ -35,11 +35,19 @@ function PopoverContent({
     </PopoverPrimitive.Portal>
   );
 }
-
+const PopoverArrow = React.forwardRef(({ className, ...props }, ref) => (
+  <PopoverPrimitive.Arrow
+    ref={ref}
+    
+    className={cn("fill-popover stroke-border -ml-8", className)}
+    {...props}
+  />
+))
+PopoverArrow.displayName = PopoverPrimitive.Arrow.displayName
 function PopoverAnchor({
   ...props
 }) {
   return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />;
 }
 
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor }
+export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor,PopoverArrow }
