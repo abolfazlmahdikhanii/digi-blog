@@ -9,7 +9,7 @@ const FollowBtn = ({ username, isFollowPage = false, isFullWidth = false }) => {
   const { followHandler, followLoading, follow } = useFollow(username);
   return (
     <Button
-      variant={"outline"}
+      variant={follow?.isFollow ? "outline" : "secondary"}
       className={`capitalize rounded-full h-10 ${
         !isFollowPage ? " self-end" : ""
       } ${isFullWidth ? "w-full" : ""} ${
