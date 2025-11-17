@@ -6,8 +6,8 @@ const FollowItem = ({ author }) => {
 
   return (
     <>
-      <div className="flex items-center justify-between w-full">
-        <Link href={`@${author.username}`} className="flex items-center gap-4.5 mb-4">
+      <div className="flex items-center justify-between w-full mb-4">
+        <Link href={`@${author.username}`} className="flex items-center gap-4.5">
           <Avatar className="w-16 h-16 self-start">
             <AvatarImage src={author?.profileImage} alt={author?.name} />
             <AvatarFallback className={"capitalize text-lg"}>
