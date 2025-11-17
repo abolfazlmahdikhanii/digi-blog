@@ -85,7 +85,7 @@ export function PublishingModal({ title, content, onClose, storyId, clear }) {
 
   const removeTag = async (idToRemove) => {
     try {
-      const res = await fetch(`/api/topics/${idToRemove}`, {
+      const res = await fetch(`/api/topics/remove/${idToRemove}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -309,7 +309,7 @@ export function PublishingModal({ title, content, onClose, storyId, clear }) {
                   <PopoverAnchor asChild>
                     <Input
                       id="tags"
-                      autocomplete="off"
+                      autoComplete="off"
                       value={tagInput}
                       onChange={(e) => {
                         setTagInput(e.target.value);
