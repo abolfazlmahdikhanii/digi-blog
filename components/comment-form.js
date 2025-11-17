@@ -37,7 +37,7 @@ export function CommentForm({
         return;
       }
       if (!comment.trim()) toast.error("Comment Is Empty!");
-      if (followLoading) return;
+      if (isLoading) return;
       setIsLoading(true);
       const newComment = {
         content: comment,
