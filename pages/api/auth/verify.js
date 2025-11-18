@@ -1,6 +1,7 @@
 import connectToDB from "@/configs/db";
 const crypto = require("crypto");
-import { generateToken, splitMail } from "@/lib/utils";
+import { generateRefreshToken, generateToken, splitMail } from "@/lib/utils";
+import refreshTokenModel from "@/models/refreshToken";
 import otpModel from "@/models/userOtp";
 import usersModel from "@/models/users";
 import { authSchema } from "@/validations/auth";
@@ -25,8 +26,8 @@ const saveNewUser = async (email) => {
           role: users.length > 0 ? "USER" : "ADMIN",
           profileImage: "",
           bio: "",
-          isProfileComplete:false,
-          interests:[]
+          isProfileComplete: false,
+          interests: [],
         });
         return { success: true, isNew: true };
       } else {
@@ -37,8 +38,8 @@ const saveNewUser = async (email) => {
           role: users.length > 0 ? "USER" : "ADMIN",
           profileImage: "",
           bio: "",
-          isProfileComplete:false,
-          interests:[]
+          isProfileComplete: false,
+          interests: [],
         });
         return { success: true, isNew: true };
       }
@@ -58,7 +59,8 @@ const handler = async (req, res) => {
     // check otp filed has fill
     if (!otp) return res.status(400).json({ message: "invalid otp!" });
     // check otp is verify
-    const userOtp = await otpModel.findOne({ email: validEmail.email });
+    const userOtp = await otpModel.find({ email: `${validEmail.email}` });
+
     if (!userOtp) {
       return res.status(404).json({ message: "not found otp for this email!" });
     }
@@ -111,18 +113,35 @@ const handler = async (req, res) => {
     }
     await otpModel.findOneAndDelete({ email: validEmail.email });
     const token = generateToken({ email: validEmail.email });
+    const refreshToken = generateRefreshToken({ email: validEmail.email });
+
+    // Delete old refresh tokens for this user
+    await refreshTokenModel.deleteMany({ email: validEmail.email });
+
+    // Save new refresh token to database
+    await refreshTokenModel.create({
+      email: validEmail.email,
+      token: refreshToken,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    });
+
     res
-      .setHeader(
-        "Set-Cookie",
+      .setHeader("Set-Cookie", [
         serialize("token", token, {
           httpOnly: true,
           path: "/",
           maxAge: 60 * 60 * 24,
-        })
-      )
+        }),
+        serialize("refreshToken", refreshToken, {
+          httpOnly: true,
+          path: "/",
+          maxAge: 60 * 60 * 24 * 7,
+        }),
+      ])
       .status(200)
       .json({ message: "successfully signin:)" });
   } catch (error) {
+    console.log(error);
     if (error instanceof z.ZodError) {
       return res
         .status(400)
