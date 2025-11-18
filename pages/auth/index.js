@@ -66,14 +66,14 @@ export default function LoginPage() {
   const [otp, setOtp] = useState("");
   const router = useRouter();
   useEffect(() => {
-    const timerIntravl = setInterval(() => {
+    const timerInterval = setInterval(() => {
       setTimer((prev) => {
         if (prev <= 1) return 0;
         return prev - 1;
       });
     }, 1000);
     return () => {
-      clearInterval(timerIntravl);
+      clearInterval(timerInterval);
     };
   }, [timer]);
 
@@ -92,33 +92,18 @@ export default function LoginPage() {
         })
           .then((res) => {
             if (res.status === 200) {
-              toast.success("Email Sent Succesfully:)", {
-                position: "top-right",
-                style: {
-                  color: "oklch(62.7% 0.194 149.214)",
-                  background: "#1C1C1C",
-                },
-              });
+              toast.success("Email Sent Succesfully:)");
               setStep("OTP");
               setTimer(120);
             }
           })
           .catch((err) => {
             console.log(err);
-            toast.error(err, {
-              position: "top-right",
-              style: {
-                color: "oklch(57.7% 0.245 27.325)",
-                background: "#1C1C1C",
-              },
-            });
+            toast.error(err);
           });
       }
     } catch (error) {
-      toast.error("Email Is Not Valid !", {
-        position: "top-right",
-        style: { color: "oklch(57.7% 0.245 27.325)", background: "#1C1C1C" },
-      });
+      toast.error("Email Is Not Valid !");
     }
   };
 
@@ -126,50 +111,41 @@ export default function LoginPage() {
     setStep("EMAIL");
     setEmail("");
   };
-  const handleVerifyOtp = (e) => {
+  const handleVerifyOtp = async (e) => {
     e.preventDefault();
     if (!otp) {
-      toast.error(err, {
-        position: "top-right",
-        style: { color: "oklch(57.7% 0.245 27.325)", background: "#1C1C1C" },
-      });
+      toast.error(err);
       return;
     }
-
-    fetch("/api/auth/verify", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, otp }),
-    })
-      .then((res) => {
-        if (res.status === 200) {
-          toast.success("Wellcome To digi-blog", {
-            position: "top-right",
-            style: {
-              color: "oklch(62.7% 0.194 149.214)",
-              background: "#1C1C1C",
-            },
-          });
-          refetch();
-          router.replace("/");
-        }
-      })
-      .catch((err) => {
-        toast.error(err.message, {
-          position: "top-right",
-          style: { color: "oklch(57.7% 0.245 27.325)", background: "#1C1C1C" },
-        });
+    try {
+      const res = await fetch("/api/auth/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, otp }),
       });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error("Failed Verify Otp!");
+      }
+      refetch();
+      if (data.isProfileComplete) {
+        router.replace("/");
+      } else {
+        router.replace("/get-started");
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
-    <Card className="mx-auto max-w-sm w-full">
+    <Card className="mx-auto max-w-sm w-full mt-24">
       {step === "EMAIL" && (
         <>
           <CardHeader>
-            <CardTitle className="text-2xl font-headline">
+            <CardTitle className="text-xl font-headline text-center mb-3">
               Log in or sign up
             </CardTitle>
           </CardHeader>
@@ -200,20 +176,7 @@ export default function LoginPage() {
                 </span>
               </div>
             </div>
-            <div className="grid gap-4">
-              <Button variant="outline" className="w-full justify-center">
-                <GoogleIcon />
-                Sign in with Google
-              </Button>
-              <Button variant="outline" className="w-full justify-center">
-                <FacebookIcon />
-                Sign in with Facebook
-              </Button>
-              <Button variant="outline" className="w-full justify-center">
-                <AppleIcon />
-                Sign in with Apple
-              </Button>
-            </div>
+
             <p className="mt-4 px-8 text-center text-xs text-muted-foreground">
               By continuing, you agree to our{" "}
               <Link
