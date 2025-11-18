@@ -1,11 +1,13 @@
 import {z} from "zod"
 
 const userSchema=z.object({
-    name:z.string().trim().minLength(1).maxLength(50),
-    username:z.string().trim().minLength(1).maxLength(30),
-    email:z.email(),
-    job:z.string().trim().optional(),
-    bio:z.string().trim().maxLength(200).optional(),
-    profileImg:z.string().trim().optional(),
+    name:z.string().trim().min(1).max(50).optional(),
+    username:z.string().trim().min(1).max(30).optional(),
+    email:z.email().optional(),
+    job:z.string().trim().optional().optional(),
+    bio:z.string().trim().max(200).optional().optional(),
+    profileImage:z.string().trim().optional().optional(),
 
 })
+
+export default userSchema
