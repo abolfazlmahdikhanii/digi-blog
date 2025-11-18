@@ -21,7 +21,6 @@ const schema = new Schema(
     },
     content: {
       type: Object,
-      required: true,
     },
     status: {
       type: String,
@@ -54,14 +53,20 @@ const schema = new Schema(
     timestamps: true,
   }
 );
-// schema.index(
-//   { slug: 1 },
-//   {
-//     unique: true,
-//     required: true,
-//     partialFilterExpression: { status: "published" },
-//   }
-// );
+schema.index(
+  { content: true },
+  {
+    required: true,
+    partialFilterExpression: { status: "published" },
+  }
+);
+schema.index(
+  { title: true },
+  {
+    required: true,
+    partialFilterExpression: { status: "published" },
+  }
+);
 schema.virtual("comments", {
   ref: "Comments",
   localField: "_id",
