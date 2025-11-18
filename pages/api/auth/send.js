@@ -39,9 +39,12 @@ const handler = async (req, res) => {
   await connectToDB();
   try {
     const { email } = req.body;
-  
-    const validEmail = authSchema.parse({ email: `${email}` });
 
+    const validEmail = authSchema.parse({ email: `${email}` });
+    // Clean up all expired OTPs for this email
+    await otpModel.deleteMany({
+      expireTime: { $lt: new Date() }, // Delete all expired OTPs
+    });
     // check if block send otp and time passed unblock
     const existing = await otpModel.findOne({ email: validEmail.email });
     if (existing && existing.blockedUntil !== null) {
@@ -78,7 +81,7 @@ const handler = async (req, res) => {
         .status(400)
         .json({ message: "Validation error", errors: error.errors });
     }
-    
+
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };
