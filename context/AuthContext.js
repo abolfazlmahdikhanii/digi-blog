@@ -12,13 +12,35 @@ import { toast } from "sonner";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children, initialUser }) => {
+  const router = useRouter();
+
+  const refresh = async () => {
+    try {
+      const res = await fetch("/api/auth/refresh", { method: "POST" });
+      if (!res.ok) return null;
+      return res.json();
+    } catch {
+      return null;
+    }
+  };
   const { data: user, refetch } = useQuery({
     queryKey: ["user"],
-    queryFn: () => fetch("/api/auth/me").then((res) => res.json()),
     initialData: initialUser,
+    queryFn: async () => {
+      const res = await fetch("/api/auth/me");
+
+      if (res.status === 401) {
+        const refreshed = await refresh();
+        if (refreshed) {
+          return fetch("/api/auth/me").then((r) => r.json());
+        }
+        return { user: null };
+      }
+
+      return res.json();
+    },
   });
 
-  const router = useRouter();
   const logoutHandler = () => {
     fetch("/api/auth/signout").then((res) => {
       if (res.ok) {
