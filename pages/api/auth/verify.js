@@ -25,6 +25,8 @@ const saveNewUser = async (email) => {
           role: users.length > 0 ? "USER" : "ADMIN",
           profileImage: "",
           bio: "",
+          isProfileComplete:false,
+          interests:[]
         });
         return { success: true, isNew: true };
       } else {
@@ -35,6 +37,8 @@ const saveNewUser = async (email) => {
           role: users.length > 0 ? "USER" : "ADMIN",
           profileImage: "",
           bio: "",
+          isProfileComplete:false,
+          interests:[]
         });
         return { success: true, isNew: true };
       }
@@ -99,13 +103,13 @@ const handler = async (req, res) => {
     }
 
     const userResult = await saveNewUser(validEmail.email);
-    await otpModel.findOneAndDelete({ email: validEmail.email });
+
     if (!userResult.success) {
       return res.status(405).json({
         message: "Failed to create user account",
       });
     }
-
+    await otpModel.findOneAndDelete({ email: validEmail.email });
     const token = generateToken({ email: validEmail.email });
     res
       .setHeader(
