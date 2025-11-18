@@ -29,6 +29,6 @@ const schema =new mongoose.Schema(
   { timestamps: true }
 );
 
-const otpModel = mongoose.models.UserOtp || mongoose.model("UserOtp", schema);
+const otpModel = mongoose.models.User_Otp || mongoose.model("User_Otp", schema);
 
 export default otpModel;
