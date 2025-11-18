@@ -24,9 +24,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowDown, ChevronRight, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
-import { ProfileInformationModal } from "@/components/profile-information-modal";
+import  ProfileInformationModal  from "@/components/profile-information-modal";
 import { UsernameAndSubdomainModal } from "@/components/username-subdomain-modal";
 import { EmailAddressModal } from "@/components/email-address-modal";
+import { toast } from "sonner";
+import userSchema from "@/validations/user";
+import { useAuth } from "@/context/AuthContext";
+import usersModel from "@/models/users";
+import { verifyToken } from "@/lib/utils";
+import connectToDB from "@/configs/db";
 
 const MastodonIcon = ({ className }) => (
   <svg
@@ -81,6 +87,8 @@ function SettingsItem({
   modalTitle,
   modalDescription,
   startContent,
+  open,
+  setOpen,
 }) {
   const hasModal = modalContent ? true : false;
   const content = (
@@ -106,7 +114,7 @@ function SettingsItem({
 
   if (hasModal) {
     return (
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>{content}</DialogTrigger>
         <DialogContent>
           {modalContent ? (
@@ -163,7 +171,13 @@ function SettingsItem({
 }
 
 export default function SettingsPage() {
+  const { user, refetch } = useAuth();
   const [activeTab, setActiveTab] = useState("account");
+
+  const [openEmailModal, setOpenEmailModal] = useState(false);
+  const [openUserModal, setOpenUserModal] = useState(false);
+  const [openInfoModal, setOpenInfoModal] = useState(false);
+
   const tabs = [
     { id: "account", label: "Account" },
     { id: "publishing", label: "Publishing" },
@@ -171,6 +185,7 @@ export default function SettingsPage() {
     { id: "membership", label: "Membership & Payment" },
     { id: "security", label: "Security & Apps" },
   ];
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-12 gap-16">
@@ -213,31 +228,37 @@ export default function SettingsPage() {
               <div className="divide-y">
                 <SettingsItem
                   title="Email address"
-                  modalContent={<EmailAddressModal />}
+                  open={openEmailModal}
+                  setOpen={setOpenEmailModal}
+                  modalContent={
+                    <EmailAddressModal onClose={() => setOpenEmailModal(false)} />
+                  }
                 >
-                  <span className="text-muted-foreground">
-                    johndoe@example.com
-                  </span>
+                  <span className="text-muted-foreground">{user?.email}</span>
                 </SettingsItem>
                 <SettingsItem
                   title="Username and subdomain"
-                  modalContent={<UsernameAndSubdomainModal />}
+                  open={openUserModal}
+                  setOpen={setOpenUserModal}
+                  modalContent={<UsernameAndSubdomainModal onClose={() => setOpenUserModal(false)} />}
                 >
-                  <span className="text-muted-foreground">@johndoe</span>
+                  <span className="text-muted-foreground">@{user?.username}</span>
                 </SettingsItem>
                 <SettingsItem
                   title="Profile information"
                   description="Edit your photo, name, pronouns, short bio, etc."
-                  modalContent={<ProfileInformationModal />}
+                  open={openInfoModal}
+                  setOpen={setOpenInfoModal}
+                  modalContent={<ProfileInformationModal onClose={() => setOpenInfoModal(false)} />}
                 >
                   <div className="flex items-center gap-2.5 text-muted-foreground">
-                    <span>John Doe</span>
+                    <span className="capitalize">{user?.name}</span>
                     <Avatar className="h-8 w-8">
                       <AvatarImage
-                        src="https://picsum.photos/seed/103/100/100"
+                        src={user?.profileImage}
                         alt="User"
                       />
-                      <AvatarFallback>JD</AvatarFallback>
+                      <AvatarFallback className={"capitalize text-sm"}>{user?.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                   </div>
                 </SettingsItem>
@@ -634,4 +655,33 @@ export default function SettingsPage() {
       </div>
     </div>
   );
+}
+export async function getServerSideProps(context) {
+  const { token } = context.req.cookies;
+  await connectToDB()
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  const validToken = verifyToken(token);
+
+  if (!validToken) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  const user=await usersModel.findOne({email:validToken.email})
+  if (!user) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  return { props: {} };
 }
