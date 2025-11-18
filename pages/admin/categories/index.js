@@ -34,7 +34,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AdminLayout from "@/components/admin-layout";
-import categorySchema from "@/validations/categories";
+import categorySchema from "@/validations/topics";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 
