@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
-
-const schema =new mongoose.Schema(
+import postModel from "./posts";
+const schema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -29,7 +29,7 @@ const schema =new mongoose.Schema(
       type: String,
       maxLength: 200,
     },
-    profileImg: {
+    profileImage: {
       type: String,
     },
     role: {
@@ -37,13 +37,26 @@ const schema =new mongoose.Schema(
       required: true,
       default: "USER",
     },
+    imgId: {
+      type: String,
+    },
+    interests: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Topics",
+      },
+    ],
+    isProfileComplete: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
-schema.virtual("posts",{
-  ref:"Posts",
-  localField:"_id",
-  foreignField:"author"
-})
+schema.virtual("posts", {
+  ref: "Posts",
+  localField: "_id",
+  foreignField: "author",
+});
 const usersModel = mongoose.models.Users || mongoose.model("Users", schema);
 export default usersModel;
