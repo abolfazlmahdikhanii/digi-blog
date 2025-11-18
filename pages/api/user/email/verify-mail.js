@@ -1,0 +1,117 @@
+import connectToDB from "@/configs/db";
+const crypto = require("crypto");
+import { generateToken, splitMail, verifyToken } from "@/lib/utils";
+import otpModel from "@/models/userOtp";
+import usersModel from "@/models/users";
+import { authSchema } from "@/validations/auth";
+import { serialize } from "cookie";
+
+import { z } from "zod";
+
+const saveUpdateUser = async (currentEmail,newEmail) => {
+  try {
+    const user = await usersModel.findOneAndUpdate({ email:currentEmail },{email:newEmail});
+    if(!user){
+        return { success: false, isNew: false }
+    }
+    return { success: true, isNew: false };
+  } catch (error) {
+    console.log(error);
+    return { success: true, isNew: false };
+  }
+};
+const handler = async (req, res) => {
+  if (req.method !== "POST") return res.status(405).end();
+  await connectToDB();
+  try {
+    const { token } = req.cookies;
+    const { email, otp } = req.body;
+    // Check authentication
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const validToken = verifyToken(token);
+    if (!validToken) {
+      return res.status(401).json({ message: "Invalid Token" });
+    }
+    const validEmail = authSchema.parse({ email: email });
+    // check otp filed has fill
+    if (!otp) return res.status(400).json({ message: "invalid otp!" });
+    // check otp is verify
+    const userOtp = await otpModel.findOne({ email: validEmail.email });
+    if (!userOtp) {
+      return res.status(404).json({ message: "not found otp for this email!" });
+    }
+    // Check if OTP is expired
+    if (userOtp.expiresAt && new Date() > new Date(userOtp.expiresAt)) {
+      await otpModel.findOneAndDelete({ email: validEmail });
+      return res.status(410).json({ message: "OTP has expired" });
+    }
+
+    if (userOtp.blockedUntil !== null) {
+      if (new Date(userOtp.blockedUntil) > new Date()) {
+        return res.status(429).json({
+          message: "max used otp disable for min",
+        });
+      } else if (new Date(userOtp.blockedUntil) <= new Date()) {
+        await otpModel.findOneAndDelete({ email: validEmail });
+        return res.status(410).json({ message: "OTP has expired" });
+      }
+    }
+    if (userOtp.used >= 3) {
+      await otpModel.findOneAndUpdate(
+        { email: validEmail.email },
+        {
+          blockedUntil: new Date(Date.now() + 1 * 60 * 1000),
+        }
+      );
+
+      return res.status(429).json({ message: "max used otp disable for min!" });
+    }
+    const otpVerify = await otpModel.findOne({
+      email: validEmail.email,
+      otp: Number(otp),
+    });
+    if (!otpVerify) {
+      await otpModel.findOneAndUpdate(
+        { email: validEmail.email },
+        {
+          $inc: { used: 1 },
+        }
+      );
+      return res.status(401).json({ message: "invalid otp!" });
+    }
+
+    const userResult = await saveUpdateUser(validToken.email,validEmail.email);
+
+    if (!userResult.success) {
+      return res.status(405).json({
+        message: "Failed to update user account",
+      });
+    }
+    await otpModel.findOneAndDelete({ email: validEmail.email });
+    const newToken = generateToken({ email: validEmail.email });
+    res
+      .setHeader(
+        "Set-Cookie",
+        serialize("token", newToken, {
+          httpOnly: true,
+          path: "/",
+          maxAge: 60 * 60 * 24,
+        })
+      )
+      .status(200)
+      .json({ message: "successfully update:)" });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res
+        .status(400)
+        .json({ message: "Validation error", errors: error.errors });
+    }
+
+    return res.status(500).json({ message: "Internal ServerError" });
+  }
+};
+
+export default handler;
