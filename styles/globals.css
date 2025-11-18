@@ -174,7 +174,7 @@
   .ce-code__textarea {
     @apply dark:!bg-[#121215] dark:!border-neutral-800;
   }
-  .image-tool--caption .image-tool__caption,.inline-image__caption {
+  .image-tool--caption .image-tool__caption,.inline-image__caption,.post .cdx-input.image-tool__caption,.post .cdx-input.image-tool__alt {
     @apply hidden;
   }
   .ce-block__content a {
@@ -182,5 +182,8 @@
   }
   .ce-block__content .cdx-list__item-content a {
     @apply font-bold text-white;
+  }
+  .cdx-button.image-tool__button.image-tool__button--active,.cdx-block.image-tool.image-tool--loading .image-tool__image{
+   @apply dark:!bg-[#121215] dark:!text-gray-200 dark:!border-neutral-800
   }
 }
