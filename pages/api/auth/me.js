@@ -14,8 +14,11 @@ const handler = async (req, res) => {
       return res.status(401).json({ message: "Invalid Token" });
     }
 
-    const user = await usersModel.findOne({ email: validToken.email }).lean();
-    if (!user) return res.status(404).json({ message: "User Not Found!" });
+    const user = await usersModel.findOne({ email: validToken.email });
+    if (!user){
+  
+       return res.status(404).json({ message: "User Not Found!" })
+    };
 
     return res.status(200).json({ user });
   } catch (error) {
