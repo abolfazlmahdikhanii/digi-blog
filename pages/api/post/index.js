@@ -1,26 +1,78 @@
 const { default: connectToDB } = require("@/configs/db");
 import { verifyToken } from "@/lib/utils";
+import notifyModel from "@/models/notifications";
 import postModel from "@/models/posts";
+import postImagesModel from "@/models/potsImages";
+import topicModel from "@/models/topics";
 import usersModel from "@/models/users";
 import postSchema from "@/validations/post";
 import { isValidObjectId } from "mongoose";
+import slugify from "slugify";
 import { z } from "zod";
-const getAllPosts = async (req, res) => {};
+const getAllPosts = async (req, res) => {
+  try {
+    const { token } = req.cookies;
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const validToken = verifyToken(token);
+    if (!validToken) {
+      return res.status(401).json({ message: "Invalid Token" });
+    }
+
+    const currentUser = await usersModel.findOne({ email: validToken.email });
+    if (!currentUser) {
+      return res.status(404).json({ message: "User Not Found !" });
+    }
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const totalPosts = await postModel.countDocuments({
+      status: "published",
+    });
+    const posts = await postModel
+      .find({ status: "published" })
+      .populate("topics")
+      .populate({ path: "comments" })
+      .populate({ path: "likes" })
+      .populate({ path: "save", match: { userId: currentUser?._id } })
+      .populate("author", "name username")
+      .populate("postCover")
+      .lean({ virtuals: true })
+      .sort({ updatedAt: -1 });
+
+    const hasMore = skip + posts.length < totalPosts;
+
+    return res.status(200).json({
+      posts: JSON.parse(JSON.stringify(posts)),
+      hasMore,
+      totalPosts: totalPosts,
+      currentPage: page,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal ServerError" });
+  }
+};
+
 const createNewPost = async (req, res) => {
   try {
     const { token } = req.cookies;
     const {
-      category,
       title,
       content,
       shortDescription,
-      tags,
+      topics,
       postCover,
       author,
       status,
       readTime,
       isShowComment,
+      postId,
+      imgId,
     } = req.body;
+    console.log(req.body);
     if (!token) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -33,14 +85,55 @@ const createNewPost = async (req, res) => {
       title,
       content,
       shortDescription,
-      tags,
-      postCover,
-      status,
+
       readTime,
       isShowComment,
     });
     if (!validPost) {
       return res.status(400).json({ message: "Invalid Post Data!" });
+    }
+    if (topics && Array.isArray(topics)) {
+      if (topics.length > 5) {
+        return res.status(400).json({
+          message: "Maximum 5 topics allowed per post",
+        });
+      }
+
+      // Validate all topic IDs exist
+      const validTopicIds = topics.filter((id) => isValidObjectId(id));
+      if (validTopicIds.length !== topics.length) {
+        return res.status(400).json({
+          message: "Invalid topic IDs provided",
+        });
+      }
+
+      const topicsExist = await topicModel.find({
+        _id: { $in: validTopicIds },
+      });
+
+      if (topicsExist.length !== validTopicIds.length) {
+        return res.status(400).json({
+          message: "Some topics do not exist",
+        });
+      }
+    }
+    // Generate unique slug
+    let slug = slugify(validPost.title, {
+      lower: true,
+      strict: true,
+      remove: /[*+~.()'"!:@]/g,
+    });
+
+    // Check if slug exists and make it unique
+    let slugExists = await postModel.findOne({ slug });
+    let counter = 1;
+    while (slugExists) {
+      slug = `${slugify(validPost.title, {
+        lower: true,
+        strict: true,
+      })}-${counter}`;
+      slugExists = await postModel.findOne({ slug });
+      counter++;
     }
 
     const user = await usersModel.findOne({ email: validToken.email }, "_id");
@@ -48,22 +141,66 @@ const createNewPost = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const newPost = await postModel.create({
-      title: validPost.title,
-      content: validPost.content,
-      shortDescription: validPost.shortDescription,
-      category,
-      tags: validPost.tags,
-      postCover: validPost.postCover,
-      author: user._id,
-      status: validPost.status,
-      readTime: validPost.readTime,
-      isShowComment: validPost.isShowComment,
-    });
-    if (!newPost) {
-      return res.status(400).json({ message: "Created Post Has Problem!" });
+    if (postId && isValidObjectId(postId)) {
+      const updatePost = await postModel.findOneAndUpdate(
+        { _id: postId, author: user._id },
+        {
+          title: validPost.title,
+          slug,
+          content: validPost.content,
+          shortDescription: validPost.shortDescription,
+
+          topics: topics || [],
+          postCover: imgId,
+          author: user._id,
+          status: status || "published",
+          readTime: validPost.readTime,
+          isShowComment: validPost.isShowComment,
+        }
+      );
+      if (!updatePost) {
+        return res.status(400).json({ message: "Created Post Has Problem!" });
+      }
+      await notifyModel.create({
+        userId: user._id,
+        title: "New Post",
+        type: "POST_PUBLISHED",
+        message: `${user.name} published a new post: "${validPost.title}"`,
+        metadata: {
+          url: `/@${updatePost.author.username}/${updatePost.slug}`,
+        },
+        isRead: false,
+      });
+      return res.status(200).json({ message: "Created Post Successfully:)" });
+    } else {
+      const newPost = await postModel.create({
+        title: validPost.title,
+        slug,
+        content: validPost.content,
+        shortDescription: validPost.shortDescription,
+        topics: topics || [],
+        postCover: imgId,
+        author: user._id,
+        status: status || "published",
+        readTime: validPost.readTime,
+        isShowComment: validPost.isShowComment,
+      });
+      if (!newPost) {
+        return res.status(400).json({ message: "Created Post Has Problem!" });
+      }
+
+      await notifyModel.create({
+        userId: user._id,
+        title: "New Post",
+        type: "POST_PUBLISHED",
+        message: `${user.name} published a new post: "${validPost.title}"`,
+        metadata: {
+          url: `/@${newPost.author.username}/${newPost.slug}`,
+        },
+        isRead: false,
+      });
+      return res.status(200).json({ message: "Created Post Successfully:)" });
     }
-    return res.status(200).json({ message: "Created Post Successfully:)" });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res
@@ -75,11 +212,97 @@ const createNewPost = async (req, res) => {
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };
+const createDraftPost = async (req, res) => {
+  try {
+    const { token } = req.cookies;
+    const { title, content, status, postId } = req.body;
+
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const validToken = verifyToken(token);
+    if (!validToken) {
+      return res.status(401).json({ message: "Invalid Token" });
+    }
+
+    const user = await usersModel.findOne({ email: validToken.email }, "_id");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    // Generate slug for draft too
+    let slug = slugify(title, {
+      lower: true,
+      strict: true,
+      remove: /[*+~.()'"!:@]/g,
+    });
+
+    // Check if slug exists and make it unique
+    let slugExists = await postModel.findOne({ slug });
+    let counter = 1;
+    while (slugExists) {
+      slug = `${slugify(title, {
+        lower: true,
+        strict: true,
+      })}-${counter}`;
+      slugExists = await postModel.findOne({ slug });
+      counter++;
+    }
+
+    if (postId && isValidObjectId(postId)) {
+      const updatePost = await postModel.findOneAndUpdate(
+        { _id: postId, author: user._id },
+        {
+          title,
+          content,
+          author: user._id,
+          status: "draft",
+        }
+      );
+      if (!updatePost) {
+        return res.status(400).json({ message: "Created Post Has Problem!" });
+      }
+
+      return res
+        .status(200)
+        .json({ message: "Created Post Successfully:)", id: updatePost._id });
+    } else {
+      const newPost = await postModel.create({
+        title,
+        slug,
+        content,
+        author: user._id,
+        status: "draft",
+      });
+      if (!newPost) {
+        return res.status(400).json({ message: "Created Post Has Problem!" });
+      }
+
+      return res
+        .status(200)
+        .json({ message: "Created Post Successfully:)", id: newPost._id });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal ServerError" });
+  }
+};
 
 const handler = async (req, res) => {
   await connectToDB();
+  const { status } = req.body;
+
   if (req.method === "POST") {
-    await createNewPost(req, res);
+    if (status === "draft") {
+      await createDraftPost(req, res);
+      return;
+    } else {
+      await createNewPost(req, res);
+      return;
+    }
+  } else if (req.method === "GET") {
+    await getAllPosts(req, res);
+    return;
   }
 };
 
