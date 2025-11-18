@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useRef, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
-import {  getEditorTools } from "@/lib/tools";
+import { getEditorTools } from "@/lib/tools";
 import { useRouter } from "next/router";
 
 const TextEditor = ({
@@ -17,7 +17,7 @@ const TextEditor = ({
   saveTimeoutRef,
 }) => {
   const holderRef = useRef(null);
-  
+
   const editorRef = useRef(null);
   const savingRef = useRef(false); // prevent concurrent saves
   const lastBlockCountRef = useRef(0); // track block count changes
@@ -56,8 +56,8 @@ const TextEditor = ({
       autofocus: true,
       data: initialData || { time: Date.now(), blocks: [] },
       readOnly,
-    
-      tools: getEditorTools(query.postId||id),
+
+      tools: getEditorTools(query.postId || id),
       // style: { "background:": "#f65" },
       onReady: () => {
         editorRef.current = editor;
@@ -130,6 +130,16 @@ const TextEditor = ({
         await saveDraft();
       }
     };
+    const handleKeyDown = async (e) => {
+      if (!holderRef.current) return;
+      if (e.key === "F5") {
+        await saveDraft();
+      } else {
+        setTimeout(async () => {
+          await saveDraft();
+        }, 1000);
+      }
+    };
 
     // when tab/window loses focus, save draft
     const handleWindowBlur = async () => {
@@ -179,10 +189,12 @@ const TextEditor = ({
     };
 
     if (!readOnly || !isPublish) {
-      // document.addEventListener("focusout", handleWindowBlur);
+     
+      document.addEventListener("mouseover", handlePointerDown);
       document.addEventListener("mousedown", handlePointerDown);
       document.addEventListener("touchstart", handlePointerDown);
-      // document.addEventListener("blur", handleWindowBlur);
+      document.addEventListener("keydown", handleKeyDown);
+   
       document.addEventListener("visibilitychange", handleVisibilityChange);
     }
 
@@ -193,6 +205,8 @@ const TextEditor = ({
       // document.removeEventListener("focusout", handleWindowBlur);
       document.removeEventListener("touchstart", handlePointerDown);
       document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("mouseover", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
       // document.removeEventListener("blur", handleWindowBlur);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       if (editorRef.current && holderRef.current) {
