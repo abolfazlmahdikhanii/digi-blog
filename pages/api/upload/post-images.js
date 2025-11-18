@@ -1,7 +1,10 @@
 import { verifyToken } from "@/lib/utils";
+import postImagesModel from "@/models/potsImages";
 import usersModel from "@/models/users";
 import { deleteFile, uploadFile } from "@/service/fileService";
 import formidable from "formidable";
+import { url } from "inspector";
+import { isValidObjectId } from "mongoose";
 
 export const config = {
   api: {
@@ -11,6 +14,7 @@ export const config = {
 
 const handler = async (req, res) => {
   const { token } = req.cookies;
+  const { imgType, id } = req.query;
 
   if (!token) {
     return res.status(401).json({ message: "Unauthorized", success: false });
@@ -47,16 +51,29 @@ const handler = async (req, res) => {
           .json({ message: "User not found", success: false });
       }
 
-      const uploadResult = await uploadFile(
-        file,
-        `blogs/${user.username}`
-      );
+      const uploadResult = await uploadFile(file, `blogs/${user.username}`);
 
       if (uploadResult) {
+        const newUpload = await postImagesModel.create({
+          imageId: uploadResult.fileId,
+          userId: user._id,
+          imageUrl: uploadResult.url,
+          postId: id  ? id : null,
+          imageType: imgType ? "posts" : "cover",
+        });
+        if (!newUpload) {
+          await deleteFile(uploadResult.fileId);
+          return res.status(400).json({
+            success: false,
+            message: "File upload failed",
+          });
+        }
+        
         return res.status(200).json({
           success: true,
           url: uploadResult.url,
           fid: uploadResult.fileId,
+          imgId: newUpload._id
         });
       } else {
         return res.status(400).json({
@@ -74,16 +91,54 @@ const handler = async (req, res) => {
   }
   if (req.method === "DELETE") {
     try {
-      const { fid } = req.query;
-
-      if (!fid) {
-        return res.status(404).json({
-          message: "No id exist!",
+      const { fid, url,type } = req.query;
+      if (!fid && !url) {
+        return res.status(400).json({
+          message: "No identifier provided (fid, url, or docId required)",
           success: false,
         });
       }
 
-      const uploadResult = await deleteFile(fid);
+      let imageToDelete = null;
+      if (fid&&type) {
+        const removeImg = await postImagesModel.findOneAndDelete({
+          imageId: fid,
+          imageType:"cover"
+        });
+        if (!removeImg) {
+          return res.status(400).json({
+            message: "remove failed!",
+            success: false,
+          });
+        }
+        imageToDelete = fid;
+      } else if (url&&!type) {
+        const postImg = await postImagesModel.findOne({ imageUrl: url });
+        if (!postImg) {
+          return res.status(404).json({
+            message: "No image exist!",
+            success: false,
+          });
+        }
+        const removeImg = await postImagesModel.findOneAndDelete({
+          imageId: postImg.imageId,
+        });
+        if (!removeImg) {
+          return res.status(400).json({
+            message: "remove failed!",
+            success: false,
+          });
+        }
+        imageToDelete = postImg.imageId;
+      }
+      if (!imageToDelete) {
+        return res.status(404).json({
+          message: "Image not found in database",
+          success: false,
+        });
+      }
+
+      const uploadResult = await deleteFile(imageToDelete);
 
       if (uploadResult) {
         return res.status(200).json({
