@@ -16,8 +16,12 @@ function MyApp({ Component, pageProps }) {
   const isAuthPage = pathname.startsWith("/auth");
   const isAdminPage = pathname.startsWith("/admin");
   const isEditorPage = pathname.startsWith("/editor");
-  const isHome = pathname==="/";
-  const showSidebars = !isAuthPage && !isAdminPage && !isEditorPage;
+  const isWelcome = pathname.startsWith("/welcome");
+  const isStarted = pathname.startsWith("/get-started");
+  const isHome = pathname === "/";
+  const showSidebars =
+    !isAuthPage && !isAdminPage && !isEditorPage && !isWelcome && !isStarted;
+  const showHeader = !isAuthPage && !isStarted;
 
   const queryClient = new QueryClient();
 
@@ -26,7 +30,7 @@ function MyApp({ Component, pageProps }) {
       <AuthProvider initialUser={pageProps.user}>
         <Head></Head>
         <div className=" min-h-screen flex flex-col">
-          <AppHeader />
+          {showHeader && <AppHeader />}
           <div className="container mx-auto flex flex-1">
             {showSidebars && <LeftSidebar />}
             <main className="flex-grow py-8">
@@ -34,7 +38,7 @@ function MyApp({ Component, pageProps }) {
             </main>
             {showSidebars && isHome && <RightSidebar />}
           </div>
-          <Toaster />
+          <Toaster richColors />
         </div>
       </AuthProvider>
     </QueryClientProvider>
