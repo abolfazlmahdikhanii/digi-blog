@@ -21,7 +21,7 @@ function MyApp({ Component, pageProps }) {
   const isHome = pathname === "/";
   const showSidebars =
     !isAuthPage && !isAdminPage && !isEditorPage && !isWelcome && !isStarted;
-  const showHeader = !isAuthPage && !isStarted;
+  const showHeader = !isAuthPage && !isStarted&&!isWelcome;
 
   const queryClient = new QueryClient();
 
