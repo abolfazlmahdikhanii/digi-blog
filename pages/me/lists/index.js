@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bookmark, ChevronDown, Lock, MoreHorizontal, X } from "lucide-react";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { ListCard } from "@/components/list-card";
-import { verifyToken } from "@/lib/utils";
+import { verifyRefreshToken, verifyToken } from "@/lib/utils";
 import CreateList from "@/components/create-list";
 import { useState } from "react";
 import connectToDB from "@/configs/db";
@@ -156,9 +156,9 @@ export default function LibraryPage() {
   );
 }
 export async function getServerSideProps(context) {
-  const { token } = context.req.cookies;
+  const { token,refreshToken } = context.req.cookies;
   await connectToDB();
-  if (!token) {
+  if (!token&&!refreshToken) {
     return {
       redirect: {
         destination: "/",
@@ -166,15 +166,15 @@ export async function getServerSideProps(context) {
     };
   }
   const validToken = verifyToken(token);
-
-  if (!validToken) {
+   const validRefreshToken = verifyRefreshToken(refreshToken);
+  if (!validToken&&!validRefreshToken) {
     return {
       redirect: {
         destination: "/",
       },
     };
   }
-  const user = await usersModel.findOne({ email: validToken.email });
+  const user = await usersModel.findOne({ email: validToken.email||validRefreshToken.email });
   if (!user) {
     return {
       redirect: {
