@@ -31,7 +31,7 @@ import { toast } from "sonner";
 import userSchema from "@/validations/user";
 import { useAuth } from "@/context/AuthContext";
 import usersModel from "@/models/users";
-import { verifyToken } from "@/lib/utils";
+import { verifyRefreshToken, verifyToken } from "@/lib/utils";
 import connectToDB from "@/configs/db";
 
 const MastodonIcon = ({ className }) => (
@@ -285,7 +285,7 @@ export default function SettingsPage() {
                   <span />
                 </SettingsItem>
                 <SettingsItem
-                  title="Your EchoJournal Digest frequency"
+                  title="Your DigiBlog Digest frequency"
                   description="Adjust how often you see a new Digest."
                 >
                   <span></span>
@@ -305,7 +305,7 @@ export default function SettingsPage() {
                 </SettingsItem>
                 <SettingsItem
                   title="Provide Feedback"
-                  description="Receive occasional invitations to share your feedback with EchoJournal."
+                  description="Receive occasional invitations to share your feedback with DigiBlog."
                 >
                   <span></span>
                   <div onClick={(e) => e.stopPropagation()}>
@@ -417,8 +417,8 @@ export default function SettingsPage() {
                     Story recommendations
                   </h3>
                   <SettingsItem
-                    title="New EchoJournal Digest"
-                    description="The best stories on EchoJournal personalized based on your interests, as well as outstanding stories selected by our editors."
+                    title="New DigiBlog Digest"
+                    description="The best stories on DigiBlog personalized based on your interests, as well as outstanding stories selected by our editors."
                   >
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
@@ -514,15 +514,15 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold font-headline mt-6 mb-2">
-                    Others from EchoJournal
+                    Others from DigiBlog
                   </h3>
-                  <SettingsItem title="New product features from EchoJournal">
+                  <SettingsItem title="New product features from DigiBlog">
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
                       <Checkbox id="product-features" defaultChecked />
                     </div>
                   </SettingsItem>
-                  <SettingsItem title="Information about EchoJournal membership">
+                  <SettingsItem title="Information about DigiBlog membership">
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
                       <Checkbox id="membership-info" defaultChecked />
@@ -551,7 +551,7 @@ export default function SettingsPage() {
                   Push notifications
                 </h2>
                 <p className="text-muted-foreground">
-                  Open the EchoJournal app from your mobile device to make
+                  Open the DigiBlog app from your mobile device to make
                   changes to push notifications.
                 </p>
               </div>
@@ -559,8 +559,8 @@ export default function SettingsPage() {
             <TabsContent value="membership" className="mt-6 px-2">
               <div className="divide-y">
                 <SettingsItem
-                  title="Upgrade to a EchoJournal Membership"
-                  description="Subscribe for unlimited access to the smartest writers and biggest ideas on EchoJournal."
+                  title="Upgrade to a DigiBlog Membership"
+                  description="Subscribe for unlimited access to the smartest writers and biggest ideas on DigiBlog."
                   isLink
                 ></SettingsItem>
               </div>
@@ -573,7 +573,7 @@ export default function SettingsPage() {
                 ></SettingsItem>
                 <SettingsItem
                   title="Download your information"
-                  description="Download a copy of the information you've shared on EchoJournal to a .zip file."
+                  description="Download a copy of the information you've shared on DigiBlog to a .zip file."
                 ></SettingsItem>
                 <SettingsItem
                   title={
@@ -583,7 +583,7 @@ export default function SettingsPage() {
                       </span>
                     </>
                   }
-                  description="Join our premium instance exclusively for EchoJournal members at me.dm."
+                  description="Join our premium instance exclusively for DigiBlog members at me.dm."
                   isLink
                   startContent={<MastodonIcon className="w-6 h-6" />}
                 ></SettingsItem>
@@ -612,7 +612,7 @@ export default function SettingsPage() {
                   title={
                     <span className="text-destructive">Disconnect Google</span>
                   }
-                  description="You can now sign in to EchoJournal using your Google account."
+                  description="You can now sign in to DigiBlog using your Google account."
                   startContent={<GoogleIcon className="w-5 h-5" />}
                 >
                   <div className="flex items-center gap-4">
@@ -657,9 +657,9 @@ export default function SettingsPage() {
   );
 }
 export async function getServerSideProps(context) {
-  const { token } = context.req.cookies;
+  const { token ,refreshToken} = context.req.cookies;
   await connectToDB()
-  if (!token) {
+  if (!token&&!refreshToken) {
     return {
       redirect: {
         destination: "/",
@@ -667,15 +667,15 @@ export async function getServerSideProps(context) {
     };
   }
   const validToken = verifyToken(token);
-
-  if (!validToken) {
+   const validRefreshToken = verifyRefreshToken(refreshToken);
+  if (!validToken&&!validRefreshToken) {
     return {
       redirect: {
         destination: "/",
       },
     };
   }
-  const user=await usersModel.findOne({email:validToken.email})
+  const user=await usersModel.findOne({email:validToken.email||validRefreshToken.email})
   if (!user) {
     return {
       redirect: {
