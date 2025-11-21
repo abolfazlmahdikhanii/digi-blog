@@ -205,11 +205,7 @@ export async function getServerSideProps(context) {
   try {
     const { slug } = context.query;
 
-    // if (!isValidObjectId(postId)) {
-    //   return {
-    //     notFound: true,
-    //   };
-    // }
+  
     const detail = await postModel
       .findOne({ slug: slug })
       .populate("topics")
