@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import usersModel from "@/models/users";
-import { verifyToken } from "@/lib/utils";
+import { verifyRefreshToken, verifyToken } from "@/lib/utils";
 import connectToDB from "@/configs/db";
 import { toast } from "sonner";
 
@@ -88,30 +88,39 @@ export default function FullNamePage({ userInfo }) {
   );
 }
 export async function getServerSideProps(context) {
-  const { token } = context.req.cookies;
+  const { token, refreshToken } = context.req.cookies;
   await connectToDB();
 
-  if (!token) {
+  if (!token && !refreshToken) {
     return { redirect: { destination: "/", permanent: false } };
   }
 
   const validToken = verifyToken(token);
-  if (!validToken) {
+  const validRefreshToken = verifyRefreshToken(refreshToken);
+  if (!validToken && !validRefreshToken) {
     return { redirect: { destination: "/", permanent: false } };
   }
 
-  const user = await usersModel.findOne({ email: validToken.email });
+  const user = await usersModel.findOne({ email: validToken.email||validRefreshToken.email });
   if (!user) {
     return { redirect: { destination: "/", permanent: false } };
   }
 
-  const hasCompletedName = user.name ;
-  
+  const hasCompletedName = user.name;
+
   // If name not completed, redirect back to name page
   if (!hasCompletedName) {
     return {
       redirect: {
         destination: "/get-started/name",
+        permanent: false,
+      },
+    };
+  }
+  if (user.interests.length < 3) {
+    return {
+      redirect: {
+        destination: "/get-started/topics",
         permanent: false,
       },
     };
@@ -128,9 +137,9 @@ export async function getServerSideProps(context) {
   }
 
   // Stay on topics page
-  return { 
-    props: { 
-      userInfo: JSON.parse(JSON.stringify(user)) 
-    } 
+  return {
+    props: {
+      userInfo: JSON.parse(JSON.stringify(user)),
+    },
   };
 }
