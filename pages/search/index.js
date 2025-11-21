@@ -26,8 +26,10 @@ import topicModel from "@/models/topics";
 import { Badge } from "@/components/ui/badge";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/ui/spinner";
-import { verifyToken } from "@/lib/utils";
+import { verifyRefreshToken, verifyToken } from "@/lib/utils";
 import ShowMoreBtn from "@/components/show-more-btn";
+import FollowItemSkeleton from "@/components/follow-item-skeleton";
+import BadgeSkeleton from "@/components/badge-skeleton";
 
 export default function SearchPage({ stories, people, lists, topics }) {
   const searchParams = useSearchParams();
@@ -163,6 +165,17 @@ const SearchTopics = ({ initialTopics, query }) => {
       },
       initialPageParam: 1,
     });
+  if (isLoading) {
+    return (
+      <div className="flex items-center flex-wrap gap-8">
+        {Array(9)
+          .fill(0)
+          .map((item) => (
+            <BadgeSkeleton />
+          ))}
+      </div>
+    );
+  }
   const topics =
     data?.pages.flatMap((page) => page.topics) || initialTopics || [];
 
@@ -215,6 +228,17 @@ const SearchPeople = ({ initialPeople, query }) => {
       },
       initialPageParam: 1,
     });
+  if (isLoading) {
+    return (
+      <>
+        {Array(3)
+          .fill(0)
+          .map((item) => (
+            <FollowItemSkeleton />
+          ))}
+      </>
+    );
+  }
   const people =
     data?.pages.flatMap((page) => page.people) || initialPeople || [];
 
@@ -287,12 +311,15 @@ export async function getServerSideProps(context) {
   await connectToDB();
   try {
     const { q } = context.query;
-    const { token } = context.req.cookies;
+    const { token, refreshToken } = context.req.cookies;
 
     const validToken = verifyToken(token);
+    const validRefreshToken = verifyRefreshToken(refreshToken);
     let currentUser = null;
-    if (validToken) {
-      currentUser = await usersModel.findOne({ email: validToken.email });
+    if (validToken || validRefreshToken) {
+      currentUser = await usersModel.findOne({
+        email: validToken.email || validRefreshToken.email,
+      });
     }
     if (!q.trim()) {
       return {
