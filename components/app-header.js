@@ -39,13 +39,18 @@ import {
 import { SearchPreview } from "./search-preview";
 import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 
 const Logo = () => (
-  <Link href="/" className="flex items-center gap-2">
-    <Feather className="h-6 w-6 text-primary" />
-    <span className="font-headline text-xl font-bold tracking-tight">
-      EchoJournal
-    </span>
+  <Link href="/" className="flex items-center gap-2 overflow-hidden">
+    <Image
+      width={150}
+      height={140}
+      src={"/images/logo.png"}
+      className="object-cover w-[140px] h-[180px]"
+      alt="logo"
+    />
+  
   </Link>
 );
 
