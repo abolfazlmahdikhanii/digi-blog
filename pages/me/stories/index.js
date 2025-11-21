@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { relativeTimeFormat, verifyToken } from "@/lib/utils";
+import { relativeTimeFormat, verifyRefreshToken, verifyToken } from "@/lib/utils";
 import { MoreHorizontal, Link as LinkIcon, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -204,7 +204,7 @@ export default function StoriesPage() {
   );
 }
 export async function getServerSideProps(context) {
-  const { token } = context.req.cookies;
+  const { token,refreshToken } = context.req.cookies;
   await connectToDB();
   if (!token) {
     return {
@@ -214,15 +214,15 @@ export async function getServerSideProps(context) {
     };
   }
   const validToken = verifyToken(token);
-
-  if (!validToken) {
+   const validRefreshToken = verifyRefreshToken(refreshToken);
+  if (!validToken&&!validRefreshToken) {
     return {
       redirect: {
         destination: "/",
       },
     };
   }
-  const user = await usersModel.findOne({ email: validToken.email });
+  const user = await usersModel.findOne({ email: validToken.emai||validRefreshToken.emaill });
   if (!user) {
     return {
       redirect: {
