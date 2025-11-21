@@ -8,6 +8,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/ui/spinner";
 import { ChevronDown } from "lucide-react";
 import ShowMoreBtn from "@/components/show-more-btn";
+import { verifyRefreshToken } from "@/lib/utils";
 
 const Recommended = ({ posts, topic }) => {
   const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
@@ -59,7 +60,7 @@ export async function getServerSideProps(context) {
   await connectToDB();
   try {
     const { slug } = context.query;
-    const { token } = context.req.cookies;
+    const { token, refreshToken } = context.req.cookies;
 
     const topic = await topicModel.findOne({ slug });
     if (!topic) {
@@ -68,9 +69,10 @@ export async function getServerSideProps(context) {
       };
     }
     const validToken = verifyToken(token);
+    const validRefreshToken = verifyRefreshToken(refreshToken);
     let currentUser = null;
-    if (validToken) {
-      currentUser = await usersModel.findOne({ email: validToken.email });
+    if (validToken || validRefreshToken) {
+      currentUser = await usersModel.findOne({ email: validToken.email ||validRefreshToken.email});
     }
     // Get all posts for this topic
     const allPosts = await postModel
