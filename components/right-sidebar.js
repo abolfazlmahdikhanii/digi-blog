@@ -44,7 +44,7 @@ export function RightSidebar() {
                 <Button variant="ghost" size="icon" className="absolute top-1 right-1 h-6 w-6">
                     <X className="h-4 w-4" />
                 </Button>
-                <h3 className="font-bold font-headline mb-2">Writing on EchoJournal</h3>
+                <h3 className="font-bold font-headline mb-2">Writing on DigiBlog</h3>
                 <ul className="space-y-2 text-sm">
                     <li>Join our Writing 101 Webinar</li>
                     <li>Read tips & tricks</li>
