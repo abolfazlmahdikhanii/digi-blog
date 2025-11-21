@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/carousel";
 import { WhoToFollowCard } from "@/components/who-to-follow-card";
 import connectToDB from "@/configs/db";
-import { verifyToken } from "@/lib/utils";
+import { verifyRefreshToken, verifyToken } from "@/lib/utils";
 import postModel from "@/models/posts";
 import topicModel from "@/models/topics";
 import usersModel from "@/models/users";
@@ -154,7 +154,7 @@ export async function getServerSideProps(context) {
   await connectToDB();
   try {
     const { slug } = context.query;
-    const { token } = context.req.cookies;
+    const { token,refreshToken } = context.req.cookies;
 
     const topic = await topicModel.findOne({ slug });
     if (!topic) {
@@ -163,9 +163,10 @@ export async function getServerSideProps(context) {
       };
     }
     const validToken = verifyToken(token);
+       const validRefreshToken = verifyRefreshToken(refreshToken);
     let currentUser = null;
-    if (validToken) {
-      currentUser = await usersModel.findOne({ email: validToken.email });
+    if (validToken||validRefreshToken) {
+      currentUser = await usersModel.findOne({ email: validToken.email ||validRefreshToken.email});
     }
 
     // Get all posts for this topic
