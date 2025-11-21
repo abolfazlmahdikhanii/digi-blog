@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import connectToDB from "@/configs/db";
 
-import { verifyToken } from "@/lib/utils";
+import { verifyRefreshToken, verifyToken } from "@/lib/utils";
 import usersModel from "@/models/users";
 import { useEffect } from "react";
 import postModel from "@/models/posts";
@@ -186,9 +186,9 @@ export async function getServerSideProps(context) {
   await connectToDB();
 
   try {
-    const { token } = context.req.cookies;
+    const { token, refreshToken } = context.req.cookies;
     let currentUser = null;
-    if (!token) {
+    if (!token && !refreshToken) {
       return {
         redirect: {
           destination: "/welcome",
@@ -196,14 +196,16 @@ export async function getServerSideProps(context) {
       };
     }
     const validToken = verifyToken(token);
-    if (!validToken) {
+    const validRefreshToken = verifyRefreshToken(refreshToken);
+    
+    if (!validToken && !validRefreshToken) {
       return {
         redirect: {
           destination: "/welcome",
         },
       };
     }
-    currentUser = await usersModel.findOne({ email: validToken.email });
+    currentUser = await usersModel.findOne({ email: validToken.email||validRefreshToken.email });
     if (!currentUser) {
       return {
         redirect: {
