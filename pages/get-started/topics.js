@@ -8,7 +8,7 @@ import { Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import topicModel from "@/models/topics";
 import connectToDB from "@/configs/db";
-import { verifyToken } from "@/lib/utils";
+import { verifyRefreshToken, verifyToken } from "@/lib/utils";
 import usersModel from "@/models/users";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
@@ -95,7 +95,7 @@ export default function TopicSelectionPage({ topics, userInfo }) {
   );
 }
 export async function getServerSideProps(context) {
-  const { token } = context.req.cookies;
+  const { token,refreshToken } = context.req.cookies;
   await connectToDB();
 
   // No token - redirect to home/login
@@ -110,7 +110,8 @@ export async function getServerSideProps(context) {
 
   // Invalid token - redirect to home/login
   const validToken = verifyToken(token);
-  if (!validToken) {
+  const validRefreshToken = verifyRefreshToken(refreshToken);
+  if (!validToken && !validRefreshToken) {
     return {
       redirect: {
         destination: "/",
@@ -131,7 +132,7 @@ export async function getServerSideProps(context) {
   }
 
   // User not found - redirect to home/login
-  const user = await usersModel.findOne({ email: validToken.email });
+  const user = await usersModel.findOne({ email: validToken.email||validRefreshToken.email });
   if (!user) {
     return {
       redirect: {
@@ -142,8 +143,8 @@ export async function getServerSideProps(context) {
   }
 
   // Check if user has completed name step
-  const hasCompletedName = user.name ;
-  
+  const hasCompletedName = user.name;
+
   // If name not completed, redirect to name page first
   if (!hasCompletedName) {
     return {
@@ -182,4 +183,3 @@ export async function getServerSideProps(context) {
     },
   };
 }
-
