@@ -98,7 +98,7 @@ export function EmailAddressModal({ onClose }) {
           <DialogHeader>
             <DialogTitle>Email address</DialogTitle>
             <DialogDescription>
-              You can sign in to EchoJournal with this email address.
+              You can sign in to DigiBlog with this email address.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleContinue}>
