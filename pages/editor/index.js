@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { useRouter } from "next/router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { verifyToken } from "@/lib/utils";
+import { verifyRefreshToken, verifyToken } from "@/lib/utils";
 import { redirect } from "next/navigation";
 import usersModel from "@/models/users";
 import { email } from "zod";
@@ -360,9 +360,9 @@ export default function EditorPage({ id, initContent }) {
 }
 
 export async function getServerSideProps(context) {
-  const { token } = context.req.cookies;
+  const { token,refreshToken } = context.req.cookies;
   await connectToDB();
-  if (!token) {
+  if (!token&&!refreshToken) {
     return {
       redirect: {
         destination: "/",
@@ -370,15 +370,15 @@ export async function getServerSideProps(context) {
     };
   }
   const validToken = verifyToken(token);
-
-  if (!validToken) {
+   const validRefreshToken = verifyRefreshToken(refreshToken);
+  if (!validToken&&!validRefreshToken) {
     return {
       redirect: {
         destination: "/",
       },
     };
   }
-  const user = await usersModel.findOne({ email: validToken.email });
+  const user = await usersModel.findOne({ email: validToken.email||validRefreshToken.email });
   if (!user) {
     return {
       redirect: {
