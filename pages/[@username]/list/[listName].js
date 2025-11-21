@@ -111,7 +111,7 @@ export async function getServerSideProps(context) {
   await connectToDB();
   try {
     const query = context.query;
-    const { token } = context.req.cookies;
+    const { token,refreshToken } = context.req.cookies;
 
     const decodeUsernameUrl = decodeURIComponent(query["@username"]).replace(
       "@",
@@ -151,7 +151,7 @@ export async function getServerSideProps(context) {
 
     if (saveList.isPrivate) {
       // No token = redirect immediately
-      if (!token) {
+      if (!token&&!refreshToken) {
         return {
           redirect: {
             destination: `/${query["@username"]}`,
