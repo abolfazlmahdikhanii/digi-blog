@@ -10,15 +10,17 @@ import { ChevronDown } from "lucide-react";
 import ShowMoreBtn from "@/components/show-more-btn";
 import { verifyRefreshToken } from "@/lib/utils";
 import PostsListSkeleton from "@/components/post-card-skeleton";
+import { useRouter } from "next/router";
 
 const Archive = ({ posts, topic }) => {
+  const { query } = useRouter();
   const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ["posts", topic],
       queryFn: async ({ pageParam }) => {
         const res = await fetch(
           `/api/topics/archive?slug=${encodeURIComponent(
-            topic.name
+            topic.name || query.slug
           )}&page=${pageParam}&limit=10`
         );
         if (!res.ok) throw new Error("Failed to fetch stories");
@@ -32,7 +34,7 @@ const Archive = ({ posts, topic }) => {
   if (isLoading) {
     return (
       <div>
-        <PostsListSkeleton count={5}/>
+        <PostsListSkeleton count={5} />
       </div>
     );
   }
@@ -41,7 +43,7 @@ const Archive = ({ posts, topic }) => {
   return (
     <div className="w-11/12 mx-auto">
       <TopicWrapper
-        title={`Archive of stories in "${topic.name}"`}
+        title={`Archive of stories in "${topic.name || query.slug}"`}
         pageName={"Archive"}
         isBreadCrumb
       >
