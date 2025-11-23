@@ -222,7 +222,7 @@ export async function getServerSideProps(context) {
       },
     };
   }
-  const user = await usersModel.findOne({ email: validToken.emai||validRefreshToken.emaill });
+  const user = await usersModel.findOne({ email: validToken.email||validRefreshToken.email });
   if (!user) {
     return {
       redirect: {
