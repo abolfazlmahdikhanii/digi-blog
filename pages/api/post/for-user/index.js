@@ -26,26 +26,35 @@ const getForUserPosts = async (req, res) => {
       return res.status(404).json({ message: "User Not Found !" });
     }
     // Check if user has interests
-    if (!currentUser.interests || currentUser.interests.length === 0) {
-      return res.status(200).json({
-        posts: [],
-        hasMore: false,
-        totalPosts: 0,
-        currentPage: 1,
-        message: "No interests set for user",
-      });
-    }
+    // if (!currentUser.interests || currentUser.interests.length === 0) {
+    //   res.status(200).json({
+    //     message: "No interests set for user",
+    //   });
+    // }
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
     const totalPosts = await postModel.countDocuments({
       status: "published",
-      topics: { $in: currentUser.interests },
+      $or: [
+        {
+          topics: { $in: currentUser.interests },
+        },
+        { author: currentUser._id },
+      ],
     });
 
     const posts = await postModel
-      .find({ status: "published", topics: { $in: currentUser.interests } })
+      .find({
+        status: "published",
+        $or: [
+          {
+            topics: { $in: currentUser.interests },
+          },
+          { author: currentUser._id },
+        ],
+      })
       .populate("topics")
       .populate({ path: "comments" })
       .populate({ path: "likes" })
