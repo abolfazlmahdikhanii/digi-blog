@@ -30,6 +30,7 @@ import { verifyRefreshToken, verifyToken } from "@/lib/utils";
 import ShowMoreBtn from "@/components/show-more-btn";
 import FollowItemSkeleton from "@/components/follow-item-skeleton";
 import BadgeSkeleton from "@/components/badge-skeleton";
+import PostsListSkeleton from "@/components/post-card-skeleton";
 
 export default function SearchPage({ stories, people, lists, topics }) {
   const searchParams = useSearchParams();
@@ -121,6 +122,13 @@ const SearchStories = ({ initialStories, query }) => {
       initialPageParam: 1,
     });
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-y-8">
+        <PostsListSkeleton count={5} />
+      </div>
+    );
+  }
   const stories =
     data?.pages.flatMap((page) => page.stories) || initialStories || [];
 
@@ -167,7 +175,7 @@ const SearchTopics = ({ initialTopics, query }) => {
     });
   if (isLoading) {
     return (
-      <div className="flex items-center flex-wrap gap-8">
+      <div className="flex items-center flex-wrap md:gap-8 gap-6">
         {Array(9)
           .fill(0)
           .map((item) => (
@@ -183,7 +191,7 @@ const SearchTopics = ({ initialTopics, query }) => {
     <>
       {topics.length > 0 ? (
         <div className="flex flex-col">
-          <div className="flex items-center flex-wrap gap-8">
+          <div className="flex items-center flex-wrap md:gap-8 gap-6">
             {topics.map((item) => (
               <Link href={`/tags/${item.slug}`} key={item._id}>
                 <Badge
