@@ -2,6 +2,7 @@ import React, { memo, useEffect, useRef, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
 import { getEditorTools } from "@/lib/tools";
 import { useRouter } from "next/router";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const TextEditor = ({
   initialData,
@@ -25,7 +26,7 @@ const TextEditor = ({
   const lastSavedDataRef = useRef(null); // store last saved data for comparison
 
   const [ready, setReady] = useState(false);
-
+  const isMobile = useIsMobile();
   const { query } = useRouter();
 
   const saveDraft = async () => {
@@ -134,10 +135,8 @@ const TextEditor = ({
       if (!holderRef.current) return;
       if (e.key === "F5") {
         await saveDraft();
-      } else {
-        setTimeout(async () => {
-          await saveDraft();
-        }, 1000);
+      } else if (e.key === "Enter" || e.key === "Space") {
+        await saveDraft();
       }
     };
 
@@ -189,12 +188,15 @@ const TextEditor = ({
     };
 
     if (!readOnly || !isPublish) {
-     
-      document.addEventListener("mouseover", handlePointerDown);
-      document.addEventListener("mousedown", handlePointerDown);
-      document.addEventListener("touchstart", handlePointerDown);
-      document.addEventListener("keydown", handleKeyDown);
-   
+      if (!isMobile) {
+        document.addEventListener("mouseover", handlePointerDown, true);
+        document.addEventListener("mousedown", handlePointerDown, true);
+        document.addEventListener("keydown", handleKeyDown);
+      }
+      document.addEventListener("touchstart", handlePointerDown, {
+        passive: true,
+      });
+
       document.addEventListener("visibilitychange", handleVisibilityChange);
     }
 
@@ -204,9 +206,11 @@ const TextEditor = ({
       }
       // document.removeEventListener("focusout", handleWindowBlur);
       document.removeEventListener("touchstart", handlePointerDown);
-      document.removeEventListener("mousedown", handlePointerDown);
-      document.removeEventListener("mouseover", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
+      if (!isMobile) {
+        document.removeEventListener("mousedown", handlePointerDown, true);
+        document.removeEventListener("mouseover", handlePointerDown, true);
+        document.removeEventListener("keydown", handleKeyDown);
+      }
       // document.removeEventListener("blur", handleWindowBlur);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       if (editorRef.current && holderRef.current) {
