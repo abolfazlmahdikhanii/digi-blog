@@ -9,15 +9,17 @@ import { Spinner } from "@/components/ui/spinner";
 import { ChevronDown } from "lucide-react";
 import ShowMoreBtn from "@/components/show-more-btn";
 import usersModel from "@/models/users";
+import { useRouter } from "next/router";
 
 const Author = ({ author, topic }) => {
+  const { query } = useRouter();
   const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ["author", topic],
       queryFn: async ({ pageParam }) => {
         const res = await fetch(
           `/api/topics/author?slug=${encodeURIComponent(
-            topic.name
+            topic.name || query.slug
           )}&page=${pageParam}&limit=10`
         );
         if (!res.ok) throw new Error("Failed to fetch stories");
@@ -33,7 +35,7 @@ const Author = ({ author, topic }) => {
   return (
     <div className="w-11/12 mx-auto mt-8">
       <TopicWrapper
-        title={`Who to author in "${topic.name}"`}
+        title={`Who to author in "${topic.name || query.slug}"`}
         pageName={"Author"}
         isBreadCrumb
       >
