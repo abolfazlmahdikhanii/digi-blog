@@ -36,9 +36,9 @@ export default function PostCard({
   return (
     <div className={`flex flex-col py-4 ${!isCol ? "border-b " : ""}`}>
       <div
-        className={`flex ${
+        className={`flex relative ${
           !isCol
-            ? "flex-row-reverse sm:flex-row gap-8"
+            ? "flex-row sm:gap-8 gap-4"
             : "flex-col-reverse gap-7"
         } `}
       >
@@ -83,7 +83,7 @@ export default function PostCard({
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 absolute right-0 sm:static ">
               <button className="h-8 w-8 text-muted-foreground hover:text-foreground ">
                 <Bookmark
                   className={`h-5 w-5 ${
@@ -105,11 +105,11 @@ export default function PostCard({
             </div>
           </div>
         </div>
-        <div className={`${!isCol ? "sm:w-1/4" : "sm:w-full "}  flex-shrink-0`}>
+        <div className={`${!isCol ? "sm:w-1/4 w-1/3 h-[90px] sm:h-[unset]" : "sm:w-full "}  `}>
           <Link href={`/post/${_id}`} className="block">
             <div
               className={` relative ${
-                !isCol ? "max-w-[200px] aspect-[4/3]" : "w-full h-[380px]"
+                !isCol ? "max-w-[200px] sm:aspect-[4/3] h-[90px] sm:h-[unset]" : "w-full h-[380px]"
               }`}
             >
               <ImageKitProvider urlEndpoint="https://ik.imagekit.io/gv5d2avxy">
@@ -117,7 +117,7 @@ export default function PostCard({
                   src={postCover?.imageUrl || "/images/placeholder.webp"}
                   alt={title}
                   fill
-                  className="object-cover rounded-md aspect-auto   w-full"
+                  className="object-cover rounded-md aspect-auto h-full   w-full"
                
                 />
               </ImageKitProvider>
