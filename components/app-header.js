@@ -10,6 +10,11 @@ import {
   LogOut,
   PenSquare,
   UserCircle2,
+  Home,
+  Library,
+  FileText,
+  ChevronRight,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +45,7 @@ import { SearchPreview } from "./search-preview";
 import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Logo = () => (
   <Link href="/" className="flex items-center gap-2 overflow-hidden">
@@ -50,16 +56,15 @@ const Logo = () => (
       className="object-cover w-[140px] h-[180px]"
       alt="logo"
     />
-  
   </Link>
 );
 
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/recommendations", label: "Recommendations" },
-  { href: "/moderation", label: "Moderation" },
-  { href: "/notifications", label: "Notifications" },
-  { href: "/admin", label: "Admin" },
+  { href: "/", icon: Home, label: "Home" },
+  { href: "/me/lists", icon: Library, label: "Library" },
+  { href: "/@", icon: User, label: "Profile" },
+  { href: "/me/stories", icon: FileText, label: "Stories" },
+  // { href: "#", icon: BarChart2, label: "Stats" },
 ];
 
 const UserMenu = ({ email, name, profileImage = "", logOut }) => (
@@ -114,23 +119,25 @@ const UserMenu = ({ email, name, profileImage = "", logOut }) => (
 const MobileNav = () => (
   <Sheet>
     <SheetTrigger asChild>
-      <Button variant="outline" size="icon" className="shrink-0 md:hidden">
+      <Button variant="ghost" size="icon" className="shrink-0 md:hidden">
         <Menu className="h-5 w-5" />
         <span className="sr-only">Toggle navigation menu</span>
       </Button>
     </SheetTrigger>
     <SheetContent side="left">
-      <nav className="grid gap-6 text-lg font-medium">
+      <nav className="grid text-lg font-medium">
         <Logo />
-        {navLinks.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="flex items-center gap-4 text-muted-foreground hover:text-foreground"
-          >
-            {link.label}
-          </Link>
-        ))}
+        <div className={"px-5 grid gap-6 text-lg font-medium"}>
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="flex items-center gap-4 text-muted-foreground hover:text-foreground"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
       </nav>
     </SheetContent>
   </Sheet>
@@ -144,6 +151,7 @@ export default function AppHeader() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
   const router = useRouter();
+  const isMobile = useIsMobile();
   const searchMutation = useMutation({
     mutationFn: async (term) => {
       const response = await fetch("/api/search", {
@@ -189,12 +197,17 @@ export default function AppHeader() {
     const value = e.target.value;
     setSearchQuery(value);
 
-    if (value.trim().length >= 2) {
+    if (!isMobile) {
+      if (value.trim().length >= 2) {
+        debouncedSearch(value);
+        setIsOpenPreview(true);
+      } else {
+        setSearchResults(null);
+        setIsOpenPreview(false);
+      }
+    } else {
       debouncedSearch(value);
       setIsOpenPreview(true);
-    } else {
-      setSearchResults(null);
-      setIsOpenPreview(false);
     }
   };
   const submitSearchHandler = (e) => {
@@ -204,19 +217,26 @@ export default function AppHeader() {
   };
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ">
-      <div className="container px-8 flex h-16 items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <MobileNav />
-          <Logo />
-          <form className="hidden md:flex ml-4" onSubmit={submitSearchHandler}>
+      <div className="container px-8 flex h-20 md:h-16 items-center justify-between gap-4">
+        <div className="flex items-center md:gap-4  w-[80%] md:w-[unset] justify-between md:justify-[unset]">
+          <div className="flex items-center">
+            <MobileNav />
+            <Logo />
+          </div>
+          <form className="flex ml-4 " onSubmit={submitSearchHandler}>
             <Popover open={isOpenPreview}>
               <PopoverTrigger asChild>
-                <div className="relative w-64">
-                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <div className="relative md:w-64 ">
+                  <Search
+                    className="md:absolute left-3 top-2.5 h-4 w-4 text-muted-foreground cursor-pointer"
+                    onClick={() =>
+                      isMobile ? setIsOpenPreview((prev) => !prev) : null
+                    }
+                  />
                   <Input
                     type="text"
                     placeholder="Search..."
-                    className="w-full rounded-full bg-secondary pl-9.5"
+                    className="w-full rounded-full bg-secondary pl-9.5 hidden md:flex"
                     value={searchQuery}
                     onChange={handleInputChange}
                     onBlur={() => setIsOpenPreview(false)}
@@ -224,11 +244,38 @@ export default function AppHeader() {
                 </div>
               </PopoverTrigger>
               <PopoverContent
-                className="w-[316px] py-[30px] [&>span]:!left-9"
+                className="md:w-[316px] w-screen h-screen md:h-[unset] md:py-[30px] md:[&>span]:!left-9"
                 sideOffset={5}
                 onOpenAutoFocus={(e) => e.preventDefault()}
               >
-                <SearchPreview query={searchQuery} results={searchResults} />
+                <div className="md:hidden mt-4 relative mb-5 md:mb-0 ">
+                  <Input
+                    type="text"
+                    placeholder="Search..."
+                    className="w-full rounded-lg bg-secondary pr-9.5 min-h-10 pl-4 "
+                    value={searchQuery}
+                    onChange={handleInputChange}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        submitSearchHandler(e);
+                      }
+                    }}
+                  />
+                  <button
+                    className={
+                      "rounded-full absolute right-3 top-2 w-6 h-6 bg-primary grid place-items-center"
+                    }
+                    size={"icon"}
+                    onClick={submitSearchHandler}
+                  >
+                    <ArrowRight size={13} />
+                  </button>
+                </div>
+                <SearchPreview
+                  query={searchQuery}
+                  results={searchResults}
+                  onClose={() => (isMobile ? setIsOpenPreview(false) : null)}
+                />
                 <PopoverArrow />
               </PopoverContent>
             </Popover>
