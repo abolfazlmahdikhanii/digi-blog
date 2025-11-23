@@ -17,7 +17,7 @@ const FollowItemSkeleton = () => {
       </div>
 
       {/* Button Skeleton */}
-      <Skeleton className="h-9 w-20 rounded-md" />
+      <Skeleton className="h-9 w-10 sm:w-20 rounded-md" />
     </div>
   );
 };
