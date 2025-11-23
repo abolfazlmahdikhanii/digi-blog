@@ -24,7 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowDown, ChevronRight, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
-import  ProfileInformationModal  from "@/components/profile-information-modal";
+import ProfileInformationModal from "@/components/profile-information-modal";
 import { UsernameAndSubdomainModal } from "@/components/username-subdomain-modal";
 import { EmailAddressModal } from "@/components/email-address-modal";
 import { toast } from "sonner";
@@ -92,21 +92,21 @@ function SettingsItem({
 }) {
   const hasModal = modalContent ? true : false;
   const content = (
-    <div className="flex justify-between items-center py-4 cursor-pointer hover:bg-accent/50 -mx-4 px-4  transition-colors">
-      <div className="flex-grow flex items-center gap-4">
-        <div className="w-full">
+    <div className="flex justify-between items-center py-3 sm:py-4 cursor-pointer hover:bg-accent/50 -mx-2 sm:-mx-4 px-2 sm:px-4 transition-colors">
+      <div className="flex-grow flex items-center gap-3 sm:gap-4 min-w-0">
+        <div className="w-full min-w-0">
           <h3 className="font-semibold text-sm">{title}</h3>
           {description && (
-            <p className="text-xs text-muted-foreground mt-1 max-w-prose whitespace-nowrap">
+            <p className="text-xs text-muted-foreground mt-1 max-w-prose line-clamp-2 sm:line-clamp-none sm:whitespace-nowrap">
               {description}
             </p>
           )}
         </div>
       </div>
-      <div className="flex items-center gap-4.5 ml-4 shrink-0 text-sm">
+      <div className="flex items-center gap-2 sm:gap-4.5 ml-2 sm:ml-4 shrink-0 text-sm">
         {children}
         {isLink && (
-          <ArrowDown className="h-5 w-5 text-muted-foreground -rotate-130" />
+          <ArrowDown className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground -rotate-130" />
         )}
       </div>
     </div>
@@ -116,7 +116,7 @@ function SettingsItem({
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>{content}</DialogTrigger>
-        <DialogContent>
+        <DialogContent className="max-w-[100vw]  sm:max-w-lg">
           {modalContent ? (
             modalContent
           ) : (
@@ -132,9 +132,11 @@ function SettingsItem({
                   This is a placeholder for the settings modal content.
                 </p>
               </div>
-              <DialogFooter>
-                <Button variant="outline">Cancel</Button>
-                <Button>Save Changes</Button>
+              <DialogFooter className="flex-col sm:flex-row gap-2">
+                <Button variant="outline" className="w-full sm:w-auto">
+                  Cancel
+                </Button>
+                <Button className="w-full sm:w-auto">Save Changes</Button>
               </DialogFooter>
             </>
           )}
@@ -145,22 +147,22 @@ function SettingsItem({
 
   if (startContent) {
     return (
-      <div className="flex justify-between items-center py-4 cursor-pointer hover:bg-accent/50 -mx-4 px-4 transition-colors">
-        <div className="flex items-center gap-4">
-          {startContent}
-          <div>
+      <div className="flex justify-between items-center py-3 sm:py-4 cursor-pointer hover:bg-accent/50 -mx-2 sm:-mx-4 px-2 sm:px-4 transition-colors">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+          <div className="shrink-0">{startContent}</div>
+          <div className="min-w-0">
             <h3 className="font-semibold text-sm">{title}</h3>
             {description && (
-              <p className="text-xs text-muted-foreground mt-1 max-w-prose">
+              <p className="text-xs text-muted-foreground mt-1 max-w-prose line-clamp-2 sm:line-clamp-none">
                 {description}
               </p>
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 sm:gap-2.5 ml-2 shrink-0">
           {children}
           {isLink && (
-            <ArrowDown className="h-5 w-5 text-muted-foreground -rotate-130" />
+            <ArrowDown className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground -rotate-130" />
           )}
         </div>
       </div>
@@ -178,87 +180,97 @@ export default function SettingsPage() {
   const [openUserModal, setOpenUserModal] = useState(false);
   const [openInfoModal, setOpenInfoModal] = useState(false);
 
-  const tabs = [
-    { id: "account", label: "Account" },
-    { id: "publishing", label: "Publishing" },
-    { id: "notifications", label: "Notifications" },
-    { id: "membership", label: "Membership & Payment" },
-    { id: "security", label: "Security & Apps" },
-  ];
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-12 gap-16">
+    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+      <div className="grid grid-cols-12 gap-6 sm:gap-8 lg:gap-16">
         <div className="col-span-12 lg:col-span-8">
-          <h1 className="text-4xl font-bold font-headline mb-8">Settings</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-headline mb-4 sm:mb-6 md:mb-8">
+            Settings
+          </h1>
           <Tabs defaultValue="account">
-            <TabsList className="bg-transparent p-0 border-b w-full justify-start rounded-none gap-x-5 ">
+            <TabsList className="bg-transparent p-0 border-b w-full justify-start rounded-none gap-x-3 sm:gap-x-4 md:gap-x-5 overflow-x-auto flex-nowrap">
               <TabsTrigger
                 value="account"
-                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 dark:data-[state=active]:!border-neutral-200 flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3"
               >
                 Account
               </TabsTrigger>
               <TabsTrigger
                 value="publishing"
-                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 w-fit dark:data-[state=active]:!border-neutral-200 flex-0"
+                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 dark:data-[state=active]:!border-neutral-200 flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3"
               >
                 Publishing
               </TabsTrigger>
               <TabsTrigger
                 value="notifications"
-                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 w-fit dark:data-[state=active]:!border-neutral-200 flex-0"
+                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 dark:data-[state=active]:!border-neutral-200 flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3"
               >
                 Notifications
               </TabsTrigger>
               <TabsTrigger
                 value="membership"
-                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 w-fit dark:data-[state=active]:!border-neutral-200 flex-0"
+                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 dark:data-[state=active]:!border-neutral-200 flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3 whitespace-nowrap"
               >
-                Membership & Payment
+                Membership
               </TabsTrigger>
               <TabsTrigger
                 value="security"
-                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 w-fit dark:data-[state=active]:!border-neutral-200 flex-0"
+                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 dark:data-[state=active]:!border-neutral-200 flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3 whitespace-nowrap"
               >
-                Security & Apps
+                Security
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="account" className="mt-6 px-2">
+
+            <TabsContent value="account" className="mt-4 sm:mt-6 px-1 sm:px-2">
               <div className="divide-y">
                 <SettingsItem
                   title="Email address"
                   open={openEmailModal}
                   setOpen={setOpenEmailModal}
                   modalContent={
-                    <EmailAddressModal onClose={() => setOpenEmailModal(false)} />
+                    <EmailAddressModal
+                      onClose={() => setOpenEmailModal(false)}
+                    />
                   }
                 >
-                  <span className="text-muted-foreground">{user?.email}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm truncate max-w-[120px] sm:max-w-none">
+                    {user?.email}
+                  </span>
                 </SettingsItem>
                 <SettingsItem
                   title="Username and subdomain"
                   open={openUserModal}
                   setOpen={setOpenUserModal}
-                  modalContent={<UsernameAndSubdomainModal onClose={() => setOpenUserModal(false)} />}
+                  modalContent={
+                    <UsernameAndSubdomainModal
+                      onClose={() => setOpenUserModal(false)}
+                    />
+                  }
                 >
-                  <span className="text-muted-foreground">@{user?.username}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">
+                    @{user?.username}
+                  </span>
                 </SettingsItem>
                 <SettingsItem
                   title="Profile information"
                   description="Edit your photo, name, pronouns, short bio, etc."
                   open={openInfoModal}
                   setOpen={setOpenInfoModal}
-                  modalContent={<ProfileInformationModal onClose={() => setOpenInfoModal(false)} />}
+                  modalContent={
+                    <ProfileInformationModal
+                      onClose={() => setOpenInfoModal(false)}
+                    />
+                  }
                 >
-                  <div className="flex items-center gap-2.5 text-muted-foreground">
-                    <span className="capitalize">{user?.name}</span>
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage
-                        src={user?.profileImage}
-                        alt="User"
-                      />
-                      <AvatarFallback className={"capitalize text-sm"}>{user?.name.charAt(0)}</AvatarFallback>
+                  <div className="flex items-center gap-2 sm:gap-2.5 text-muted-foreground">
+                    <span className="capitalize text-xs sm:text-sm hidden sm:inline">
+                      {user?.name}
+                    </span>
+                    <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
+                      <AvatarImage src={user?.profileImage} alt="User" />
+                      <AvatarFallback className="capitalize text-xs sm:text-sm">
+                        {user?.name.charAt(0)}
+                      </AvatarFallback>
                     </Avatar>
                   </div>
                 </SettingsItem>
@@ -275,7 +287,9 @@ export default function SettingsPage() {
                   isLink
                 >
                   <span></span>
-                  <span className="text-muted-foreground">None</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">
+                    None
+                  </span>
                 </SettingsItem>
                 <SettingsItem
                   title="Partner Program"
@@ -291,7 +305,7 @@ export default function SettingsPage() {
                   <span></span>
                   <div onClick={(e) => e.stopPropagation()}>
                     <Select defaultValue="daily">
-                      <SelectTrigger className="w-[120px] focus:ring-0">
+                      <SelectTrigger className="w-[100px] sm:w-[120px] focus:ring-0 text-xs sm:text-sm">
                         <SelectValue placeholder="Select frequency" />
                       </SelectTrigger>
                       <SelectContent>
@@ -309,7 +323,7 @@ export default function SettingsPage() {
                 >
                   <span></span>
                   <div onClick={(e) => e.stopPropagation()}>
-                    <Checkbox id="feedback" />
+                    <Checkbox id="feedback" className="h-4 w-4 sm:h-5 sm:w-5" />
                   </div>
                 </SettingsItem>
                 <SettingsItem
@@ -319,7 +333,7 @@ export default function SettingsPage() {
                   <span></span>
                   <div onClick={(e) => e.stopPropagation()}>
                     <Select defaultValue="anyone">
-                      <SelectTrigger className="w-[120px] focus:ring-0">
+                      <SelectTrigger className="w-[100px] sm:w-[120px] focus:ring-0 text-xs sm:text-sm">
                         <SelectValue placeholder="Anyone" />
                       </SelectTrigger>
                       <SelectContent>
@@ -334,7 +348,9 @@ export default function SettingsPage() {
                 </SettingsItem>
                 <SettingsItem title="Connected accounts">
                   <span></span>
-                  <span className="text-muted-foreground">Not connected</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">
+                    Not connected
+                  </span>
                 </SettingsItem>
                 <SettingsItem
                   title="Account and data"
@@ -344,8 +360,12 @@ export default function SettingsPage() {
                 </SettingsItem>
               </div>
             </TabsContent>
-            <TabsContent value="publishing" className="mt-6 px-2">
-              <h2 className="text-2xl font-bold font-headline mb-4">
+
+            <TabsContent
+              value="publishing"
+              className="mt-4 sm:mt-6 px-1 sm:px-2"
+            >
+              <h2 className="text-xl sm:text-2xl font-bold font-headline mb-3 sm:mb-4">
                 Email notifications
               </h2>
               <div className="divide-y">
@@ -355,7 +375,11 @@ export default function SettingsPage() {
                 >
                   <span></span>
                   <div onClick={(e) => e.stopPropagation()}>
-                    <Checkbox id="private-notes" defaultChecked />
+                    <Checkbox
+                      id="private-notes"
+                      defaultChecked
+                      className="h-4 w-4 sm:h-5 sm:w-5"
+                    />
                   </div>
                 </SettingsItem>
                 <SettingsItem
@@ -363,7 +387,9 @@ export default function SettingsPage() {
                   description="Readers can send you tips through the third-party platform of your choice."
                 >
                   <span></span>
-                  <span className="text-muted-foreground">Disabled</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">
+                    Disabled
+                  </span>
                 </SettingsItem>
                 <SettingsItem
                   title="Allow email replies"
@@ -371,7 +397,10 @@ export default function SettingsPage() {
                 >
                   <span></span>
                   <div onClick={(e) => e.stopPropagation()}>
-                    <Checkbox id="email-replies" />
+                    <Checkbox
+                      id="email-replies"
+                      className="h-4 w-4 sm:h-5 sm:w-5"
+                    />
                   </div>
                 </SettingsItem>
                 <SettingsItem
@@ -379,7 +408,7 @@ export default function SettingsPage() {
                   description="Shown to your subscribers when they reply."
                 >
                   <span></span>
-                  <span className="text-muted-foreground">
+                  <span className="text-muted-foreground text-xs sm:text-sm truncate max-w-[150px] sm:max-w-none">
                     mahdikhaniabolfazl@gmail.com
                   </span>
                 </SettingsItem>
@@ -391,11 +420,11 @@ export default function SettingsPage() {
                   <span></span>
                 </SettingsItem>
               </div>
-              <div className="mt-12">
-                <h2 className="text-2xl font-bold font-headline mb-4">
+              <div className="mt-8 sm:mt-12">
+                <h2 className="text-xl sm:text-2xl font-bold font-headline mb-3 sm:mb-4">
                   Promote email subscriptions
                 </h2>
-                <div className="bg-card border rounded-lg p-6 text-sm text-muted-foreground">
+                <div className="bg-card border rounded-lg p-4 sm:p-6 text-xs sm:text-sm text-muted-foreground">
                   <p>
                     We've simplified things. These options are no longer
                     available, as your readers can now opt in for email
@@ -407,13 +436,17 @@ export default function SettingsPage() {
                 </div>
               </div>
             </TabsContent>
-            <TabsContent value="notifications" className="mt-6 px-2">
-              <h2 className="text-2xl font-bold font-headline mb-4">
+
+            <TabsContent
+              value="notifications"
+              className="mt-4 sm:mt-6 px-1 sm:px-2"
+            >
+              <h2 className="text-xl sm:text-2xl font-bold font-headline mb-3 sm:mb-4">
                 Email notifications
               </h2>
               <div className="divide-y">
                 <div>
-                  <h3 className="text-lg font-semibold font-headline mt-6 mb-2">
+                  <h3 className="text-base sm:text-lg font-semibold font-headline mt-4 sm:mt-6 mb-2">
                     Story recommendations
                   </h3>
                   <SettingsItem
@@ -422,7 +455,11 @@ export default function SettingsPage() {
                   >
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
-                      <Checkbox id="digest" defaultChecked />
+                      <Checkbox
+                        id="digest"
+                        defaultChecked
+                        className="h-4 w-4 sm:h-5 sm:w-5"
+                      />
                     </div>
                   </SettingsItem>
                   <SettingsItem
@@ -431,42 +468,58 @@ export default function SettingsPage() {
                   >
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
-                      <Checkbox id="recommended-reading" defaultChecked />
+                      <Checkbox
+                        id="recommended-reading"
+                        defaultChecked
+                        className="h-4 w-4 sm:h-5 sm:w-5"
+                      />
                     </div>
                   </SettingsItem>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold font-headline mt-6 mb-2">
+                  <h3 className="text-base sm:text-lg font-semibold font-headline mt-4 sm:mt-6 mb-2">
                     From writers and publications
                   </h3>
                   <SettingsItem title="New stories added to lists you've saved">
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
-                      <Checkbox id="new-stories-saved" defaultChecked />
+                      <Checkbox
+                        id="new-stories-saved"
+                        defaultChecked
+                        className="h-4 w-4 sm:h-5 sm:w-5"
+                      />
                     </div>
                   </SettingsItem>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold font-headline mt-6 mb-2">
+                  <h3 className="text-base sm:text-lg font-semibold font-headline mt-4 sm:mt-6 mb-2">
                     Social activity
                   </h3>
                   <SettingsItem title="Follows and matching highlights">
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
-                      <Checkbox id="follows" defaultChecked />
+                      <Checkbox
+                        id="follows"
+                        defaultChecked
+                        className="h-4 w-4 sm:h-5 sm:w-5"
+                      />
                     </div>
                   </SettingsItem>
                   <SettingsItem title="Replies to your responses">
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
-                      <Checkbox id="replies" defaultChecked />
+                      <Checkbox
+                        id="replies"
+                        defaultChecked
+                        className="h-4 w-4 sm:h-5 sm:w-5"
+                      />
                     </div>
                   </SettingsItem>
                   <SettingsItem title="Story mentions">
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
                       <Select defaultValue="network">
-                        <SelectTrigger className="w-[140px] focus:ring-0">
+                        <SelectTrigger className="w-[120px] sm:w-[140px] focus:ring-0 text-xs sm:text-sm">
                           <SelectValue placeholder="Select network" />
                         </SelectTrigger>
                         <SelectContent>
@@ -479,59 +532,87 @@ export default function SettingsPage() {
                   </SettingsItem>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold font-headline mt-6 mb-2">
+                  <h3 className="text-base sm:text-lg font-semibold font-headline mt-4 sm:mt-6 mb-2">
                     For writers
                   </h3>
                   <SettingsItem title="Activity on your published stories">
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
-                      <Checkbox id="activity-published" defaultChecked />
+                      <Checkbox
+                        id="activity-published"
+                        defaultChecked
+                        className="h-4 w-4 sm:h-5 sm:w-5"
+                      />
                     </div>
                   </SettingsItem>
                   <SettingsItem title="Activity on your lists">
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
-                      <Checkbox id="activity-lists" defaultChecked />
+                      <Checkbox
+                        id="activity-lists"
+                        defaultChecked
+                        className="h-4 w-4 sm:h-5 sm:w-5"
+                      />
                     </div>
                   </SettingsItem>
                   <SettingsItem title="From editors about featuring your stories">
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
-                      <Checkbox id="editor-features" defaultChecked />
+                      <Checkbox
+                        id="editor-features"
+                        defaultChecked
+                        className="h-4 w-4 sm:h-5 sm:w-5"
+                      />
                     </div>
                   </SettingsItem>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold font-headline mt-6 mb-2">
+                  <h3 className="text-base sm:text-lg font-semibold font-headline mt-4 sm:mt-6 mb-2">
                     For publications
                   </h3>
                   <SettingsItem title="New submissions">
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
-                      <Checkbox id="new-submissions" defaultChecked />
+                      <Checkbox
+                        id="new-submissions"
+                        defaultChecked
+                        className="h-4 w-4 sm:h-5 sm:w-5"
+                      />
                     </div>
                   </SettingsItem>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold font-headline mt-6 mb-2">
+                  <h3 className="text-base sm:text-lg font-semibold font-headline mt-4 sm:mt-6 mb-2">
                     Others from DigiBlog
                   </h3>
                   <SettingsItem title="New product features from DigiBlog">
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
-                      <Checkbox id="product-features" defaultChecked />
+                      <Checkbox
+                        id="product-features"
+                        defaultChecked
+                        className="h-4 w-4 sm:h-5 sm:w-5"
+                      />
                     </div>
                   </SettingsItem>
                   <SettingsItem title="Information about DigiBlog membership">
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
-                      <Checkbox id="membership-info" defaultChecked />
+                      <Checkbox
+                        id="membership-info"
+                        defaultChecked
+                        className="h-4 w-4 sm:h-5 sm:w-5"
+                      />
                     </div>
                   </SettingsItem>
                   <SettingsItem title="Writing updates and announcements">
                     <span></span>
                     <div onClick={(e) => e.stopPropagation()}>
-                      <Checkbox id="writing-updates" defaultChecked />
+                      <Checkbox
+                        id="writing-updates"
+                        defaultChecked
+                        className="h-4 w-4 sm:h-5 sm:w-5"
+                      />
                     </div>
                   </SettingsItem>
                 </div>
@@ -541,22 +622,30 @@ export default function SettingsPage() {
                 >
                   <span></span>
                   <div onClick={(e) => e.stopPropagation()}>
-                    <Checkbox id="allow-all-emails" defaultChecked />
+                    <Checkbox
+                      id="allow-all-emails"
+                      defaultChecked
+                      className="h-4 w-4 sm:h-5 sm:w-5"
+                    />
                   </div>
                 </SettingsItem>
               </div>
 
-              <div className="mt-12">
-                <h2 className="text-2xl font-bold font-headline mb-4">
+              <div className="mt-8 sm:mt-12">
+                <h2 className="text-xl sm:text-2xl font-bold font-headline mb-3 sm:mb-4">
                   Push notifications
                 </h2>
-                <p className="text-muted-foreground">
-                  Open the DigiBlog app from your mobile device to make
-                  changes to push notifications.
+                <p className="text-muted-foreground text-xs sm:text-sm">
+                  Open the DigiBlog app from your mobile device to make changes
+                  to push notifications.
                 </p>
               </div>
             </TabsContent>
-            <TabsContent value="membership" className="mt-6 px-2">
+
+            <TabsContent
+              value="membership"
+              className="mt-4 sm:mt-6 px-1 sm:px-2"
+            >
               <div className="divide-y">
                 <SettingsItem
                   title="Upgrade to a DigiBlog Membership"
@@ -565,7 +654,8 @@ export default function SettingsPage() {
                 ></SettingsItem>
               </div>
             </TabsContent>
-            <TabsContent value="security" className="mt-6 px-2">
+
+            <TabsContent value="security" className="mt-4 sm:mt-6 px-1 sm:px-2">
               <div className="divide-y">
                 <SettingsItem
                   title="Sign out of all other sessions"
@@ -577,21 +667,21 @@ export default function SettingsPage() {
                 ></SettingsItem>
                 <SettingsItem
                   title={
-                    <>
-                      <span className="font-bold">
-                        Create Mastodon account on @me.dm
-                      </span>
-                    </>
+                    <span className="font-bold">
+                      Create Mastodon account on @me.dm
+                    </span>
                   }
                   description="Join our premium instance exclusively for DigiBlog members at me.dm."
                   isLink
-                  startContent={<MastodonIcon className="w-6 h-6" />}
+                  startContent={
+                    <MastodonIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                  }
                 ></SettingsItem>
                 <SettingsItem
                   title="Connect Mastodon"
                   description="Add an existing Mastodon account from another instance."
                   startContent={
-                    <MastodonIcon className="w-6 h-6 text-muted-foreground" />
+                    <MastodonIcon className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground" />
                   }
                 ></SettingsItem>
                 <SettingsItem
@@ -599,13 +689,15 @@ export default function SettingsPage() {
                   description="We will never post to Facebook or message your friends without your permission."
                   isLink
                   startContent={
-                    <FacebookIcon className="w-6 h-6 text-blue-600" />
+                    <FacebookIcon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                   }
                 ></SettingsItem>
                 <SettingsItem
                   title="Connect X"
                   description="We will never post to X or message your followers without your permission."
-                  startContent={<XIcon className="w-5 h-5 text-foreground" />}
+                  startContent={
+                    <XIcon className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
+                  }
                   isLink
                 ></SettingsItem>
                 <SettingsItem
@@ -613,10 +705,12 @@ export default function SettingsPage() {
                     <span className="text-destructive">Disconnect Google</span>
                   }
                   description="You can now sign in to DigiBlog using your Google account."
-                  startContent={<GoogleIcon className="w-5 h-5" />}
+                  startContent={
+                    <GoogleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  }
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="text-muted-foreground">
+                  <div className="flex items-center gap-2 sm:gap-4">
+                    <span className="text-muted-foreground text-xs sm:text-sm truncate max-w-[150px] sm:max-w-none">
                       mahdikhaniabolfazl@gmail.com
                     </span>
                   </div>
@@ -625,6 +719,7 @@ export default function SettingsPage() {
             </TabsContent>
           </Tabs>
         </div>
+
         <div className="hidden lg:block col-span-4">
           <h3 className="font-bold text-lg mb-4 font-headline">
             Suggested help
@@ -657,9 +752,9 @@ export default function SettingsPage() {
   );
 }
 export async function getServerSideProps(context) {
-  const { token ,refreshToken} = context.req.cookies;
-  await connectToDB()
-  if (!token&&!refreshToken) {
+  const { token, refreshToken } = context.req.cookies;
+  await connectToDB();
+  if (!token && !refreshToken) {
     return {
       redirect: {
         destination: "/",
@@ -667,15 +762,17 @@ export async function getServerSideProps(context) {
     };
   }
   const validToken = verifyToken(token);
-   const validRefreshToken = verifyRefreshToken(refreshToken);
-  if (!validToken&&!validRefreshToken) {
+  const validRefreshToken = verifyRefreshToken(refreshToken);
+  if (!validToken && !validRefreshToken) {
     return {
       redirect: {
         destination: "/",
       },
     };
   }
-  const user=await usersModel.findOne({email:validToken.email||validRefreshToken.email})
+  const user = await usersModel.findOne({
+    email: validToken.email || validRefreshToken.email,
+  });
   if (!user) {
     return {
       redirect: {
