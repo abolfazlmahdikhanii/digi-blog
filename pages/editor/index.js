@@ -225,52 +225,66 @@ export default function EditorPage({ id, initContent }) {
       editor?.clear();
     }
   };
-
   return (
     <div className="flex flex-col h-full min-h-[calc(100vh-4rem)]">
-      <header className="py-4 px-7 w-10/12 mx-auto border-b flex items-center justify-between sticky top-16 z-10 bg-[#09090B]">
-        <div className="flex items-center gap-4">
-          <h1 className="font-headline text-2xl font-bold flex items-center gap-1">
-            {query.postId ? "Edit Post" : "New Post"}{" "}
+      <header className="py-3 sm:py-4 px-3 sm:px-5 md:px-7 w-full sm:w-11/12 md:w-10/12 mx-auto border-b flex items-center justify-between sticky top-14 sm:top-16 z-10 bg-[#09090B]">
+        <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+          <h1 className="font-headline text-lg sm:text-xl md:text-2xl font-bold flex items-center gap-1 truncate">
+            <span className="hidden sm:inline">
+              {query.postId ? "Edit Post" : "New Post"}
+            </span>
+            <span className="sm:hidden">{query.postId ? "Edit" : "New"}</span>
             {isDraft && (
-              <span className="text-muted-foreground/80 ml-2.5 mr-1 text-sm font-normal">
+              <span className="text-muted-foreground/80 ml-1.5 sm:ml-2.5 mr-1 text-xs sm:text-sm font-normal hidden md:inline">
                 saved to draft
               </span>
-            )}{" "}
-            {(isLoading || isFetching) && <Spinner />}
+            )}
+            {isDraft && (
+              <span className="text-muted-foreground/80 ml-1 text-xs font-normal md:hidden">
+                saved
+              </span>
+            )}
+            {(isLoading || isFetching) && <Spinner className="h-4 w-4" />}
           </h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
           <Dialog>
             <DialogTrigger asChild>
               <Button
                 variant="outline"
+                size="sm"
+                className="h-8 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm"
                 disabled={
                   !title || !isObject(content) || !content.blocks?.length
                 }
               >
-                <Eye className="h-4 w-4" /> Preview
+                <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline ml-1.5">Preview</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="w-full min-w-4xl h-[90vh] flex flex-col">
-              <DialogHeader className="p-6 border-b">
-                <DialogTitle>Post Preview</DialogTitle>
+            <DialogContent className="w-[95vw] sm:w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl h-[90vh] flex flex-col p-0">
+              <DialogHeader className="p-4 sm:p-6 border-b">
+                <DialogTitle className="text-base sm:text-lg">
+                  Post Preview
+                </DialogTitle>
               </DialogHeader>
-              <div className="flex-grow overflow-y-auto prose dark:prose-invert lg:prose-xl w-full px-2 py-4 n-scroll">
-                <h1 className="font-headline font-bold text-lg">
+              <div className="flex-grow overflow-y-auto prose dark:prose-invert sm:prose-lg lg:prose-xl w-full px-3 sm:px-4 md:px-6 py-3 sm:py-4 n-scroll">
+                <h1 className="font-headline font-bold text-xl sm:text-2xl md:text-3xl">
                   {title || "Your Post Title"}
                 </h1>
-                <div className="flex items-center gap-4 mt-4.5 mb-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
+                <div className="flex items-center gap-3 sm:gap-4 mt-3 sm:mt-4.5 mb-3 sm:mb-4">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                       <AvatarImage src={user?.profileImage} alt="User" />
-                      <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+                      <AvatarFallback className="text-xs sm:text-sm">
+                        {user?.name?.charAt(0)}
+                      </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-semibold text-sm not-prose mb-1.5">
+                      <p className="font-semibold text-xs sm:text-sm not-prose mb-1 sm:mb-1.5">
                         {user?.name}
                       </p>
-                      <p className="text-xs text-muted-foreground not-prose">
+                      <p className="text-[10px] sm:text-xs text-muted-foreground not-prose">
                         Author
                       </p>
                     </div>
@@ -292,10 +306,13 @@ export default function EditorPage({ id, initContent }) {
                 !content.blocks?.length ||
                 publishLoading
               }
-              className="bg-green-600 text-green-100 hover:bg-green-600 hover:text-green-100 "
+              size="sm"
+              className="bg-green-600 text-green-100 hover:bg-green-600 hover:text-green-100 h-8 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm whitespace-nowrap"
               onClick={onSavePublish}
             >
-              Saved To Publish {publishLoading && <Spinner />}
+              <span className="hidden sm:inline">Saved To Publish</span>
+              <span className="sm:hidden">Saved</span>
+              {publishLoading && <Spinner className="ml-1 h-3.5 w-3.5" />}
             </Button>
           ) : (
             <Dialog
@@ -310,12 +327,13 @@ export default function EditorPage({ id, initContent }) {
                     !isObject(content) ||
                     !content.blocks?.length
                   }
-                  className="bg-green-100 text-green-700 hover:bg-green-200 hover:text-green-800"
+                  size="sm"
+                  className="bg-green-100 text-green-700 hover:bg-green-200 hover:text-green-800 h-8 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm"
                 >
                   Publish
                 </Button>
               </DialogTrigger>
-              <DialogContent className="min-w-4xl h-[95%] flex flex-col">
+              <DialogContent className="w-[95vw] sm:w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl h-[95vh] flex flex-col p-0">
                 <PublishingModal
                   title={title}
                   content={content}
@@ -330,19 +348,20 @@ export default function EditorPage({ id, initContent }) {
           )}
         </div>
       </header>
-      <div className="flex-grow container mx-auto px-4 py-8">
-        <div className="w-10/12 mx-auto space-y-6">
+      <div className="flex-grow container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
+        <div className="w-full sm:w-11/12 md:w-10/12 mx-auto space-y-4 sm:space-y-6">
           <Textarea
             placeholder="Post Title..."
-            className="text-3xl md:text-4xl font-headline font-bold p-2 border-0 focus-visible:ring-0 shadow-none focus-visible:outline-0 w-full resize-none !bg-[#09090B] leading-[1.6]"
+            className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold p-2 border-0 focus-visible:ring-0 shadow-none focus-visible:outline-0 w-full resize-none !bg-[#09090B] leading-[1.4] sm:leading-[1.6] min-h-[60px] sm:min-h-[80px]"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onBlur={() => onSubmitDraft(content)}
             dir="auto"
+            rows={1}
           />
 
           <TextEditor
-            key={editorKey} // Use timestamp-based key to force remount with fresh data
+            key={editorKey}
             initialData={content}
             onChange={setContent}
             id={storyId || query.postId}
@@ -360,9 +379,9 @@ export default function EditorPage({ id, initContent }) {
 }
 
 export async function getServerSideProps(context) {
-  const { token,refreshToken } = context.req.cookies;
+  const { token, refreshToken } = context.req.cookies;
   await connectToDB();
-  if (!token&&!refreshToken) {
+  if (!token && !refreshToken) {
     return {
       redirect: {
         destination: "/",
@@ -370,15 +389,17 @@ export async function getServerSideProps(context) {
     };
   }
   const validToken = verifyToken(token);
-   const validRefreshToken = verifyRefreshToken(refreshToken);
-  if (!validToken&&!validRefreshToken) {
+  const validRefreshToken = verifyRefreshToken(refreshToken);
+  if (!validToken && !validRefreshToken) {
     return {
       redirect: {
         destination: "/",
       },
     };
   }
-  const user = await usersModel.findOne({ email: validToken.email||validRefreshToken.email });
+  const user = await usersModel.findOne({
+    email: validToken.email || validRefreshToken.email,
+  });
   if (!user) {
     return {
       redirect: {
