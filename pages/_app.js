@@ -29,11 +29,11 @@ function MyApp({ Component, pageProps }) {
     <QueryClientProvider client={queryClient}>
       <AuthProvider initialUser={pageProps.user}>
         <Head></Head>
-        <div className=" min-h-screen flex flex-col">
+        <div className=" min-h-screen flex flex-col ">
           {showHeader && <AppHeader />}
           <div className="container mx-auto flex flex-1">
             {showSidebars && <LeftSidebar />}
-            <main className="flex-grow py-8">
+            <main className="flex-grow py-8 px-2 md:px-0">
               <Component {...pageProps} />
             </main>
             {showSidebars && isHome && <RightSidebar />}
