@@ -9,15 +9,17 @@ import { Spinner } from "@/components/ui/spinner";
 import { ChevronDown } from "lucide-react";
 import ShowMoreBtn from "@/components/show-more-btn";
 import { verifyRefreshToken } from "@/lib/utils";
+import { useRouter } from "next/router";
 
 const Recommended = ({ posts, topic }) => {
+    const { query } = useRouter();
   const { data, hasNextPage, isLoading, fetchNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ["posts-recommend", topic],
       queryFn: async ({ pageParam }) => {
         const res = await fetch(
           `/api/topics/recommended?slug=${encodeURIComponent(
-            topic.name
+            topic.name||query.slug
           )}&page=${pageParam}&limit=10`
         );
         if (!res.ok) throw new Error("Failed to fetch stories");
@@ -34,7 +36,7 @@ const Recommended = ({ posts, topic }) => {
   return (
     <div className="w-11/12 mx-auto">
       <TopicWrapper
-        title={`Recommended stories in "${topic.name}"`}
+        title={`Recommended stories in "${topic.name||query.slug}"`}
         pageName={"Recommended stories"}
         isBreadCrumb
       >
