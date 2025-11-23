@@ -33,7 +33,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-
 export default function TopicPage({
   topic,
   totalStory,
@@ -46,52 +45,56 @@ export default function TopicPage({
   const { slug } = router.query;
 
   return (
-    <div className="w-11/12 mx-auto px-4 py-8">
-      <div className="flex overflow-x-auto whitespace-nowrap gap-3 mb-16 -mx-4 px-4 pb-5 border-b">
+    <div className="w-full sm:w-11/12 mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
+      {/* Related Topics */}
+      <div className="flex overflow-x-auto whitespace-nowrap gap-2 sm:gap-3 mb-8 sm:mb-12 md:mb-16 -mx-3 sm:-mx-4 px-3 sm:px-4 pb-3 sm:pb-4 md:pb-5 border-b scrollbar-hide">
         {relatedTopics.map((related, index) => (
           <Button
             key={related._id}
             variant={related.name === slug ? "outline" : "secondary"}
-            className="rounded-full px-5.5 py-2.5 capitalize min-h-10"
+            className="rounded-full px-3 sm:px-4 md:px-5.5 py-2 sm:py-2.5 capitalize min-h-9 sm:min-h-10 text-xs sm:text-sm flex-shrink-0"
             asChild
           >
             <Link href={`/tags/${related.slug}`}>{related.name}</Link>
           </Button>
         ))}
       </div>
-      <div className="text-center mb-24">
-        <h1 className="text-4xl md:text-6xl font-bold font-headline capitalize">
+
+      {/* Topic Header */}
+      <div className="text-center mb-12 sm:mb-16 md:mb-24 px-2 sm:px-0">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-headline capitalize leading-tight">
           {topic?.name || slug}
         </h1>
-        <p className="text-muted-foreground mt-6 text-lg">
-          Topic · {totalStory} stories
+        <p className="text-muted-foreground mt-3 sm:mt-4 md:mt-6 text-base sm:text-lg">
+          Topic · {totalStory} {totalStory === 1 ? 'story' : 'stories'}
         </p>
-        <div className="mt-7">
+        <div className="mt-4 sm:mt-5 md:mt-7">
           <FollowTopicBtn slug={slug || topic?.slug} />
         </div>
       </div>
 
+      {/* Recommended Stories */}
       {recommendedPosts.length > 0 && (
-        <section className="mb-16 border-b pb-20">
-          <h2 className="text-2xl font-bold font-headline mb-8">
+        <section className="mb-8 sm:mb-12 md:mb-16 border-b pb-10 sm:pb-14 md:pb-20">
+          <h2 className="text-xl sm:text-2xl font-bold font-headline mb-4 sm:mb-6 md:mb-8">
             Recommended stories
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-4 sm:mb-6 md:mb-8">
             {recommendedPosts.slice(0, 2).map((story) => (
               <PostCard key={story._id} id={story._id} {...story} isCol />
             ))}
           </div>
           {recommendedPosts.length > 2 && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
               {recommendedPosts.slice(2, 5).map((story) => (
                 <PostCard key={story._id} id={story._id} {...story} isCol />
               ))}
             </div>
           )}
-          <div className=" mt-12">
+          <div className="mt-6 sm:mt-8 md:mt-12 text-center sm:text-left">
             <Button
               variant="outline"
-              className="rounded-full min-h-10 px-6"
+              className="rounded-full min-h-10 px-4 sm:px-6 text-sm w-full sm:w-auto"
               asChild
             >
               <Link href={`/tags/${slug}/recommended`}>
@@ -102,32 +105,44 @@ export default function TopicPage({
         </section>
       )}
 
-      <section className="mb-16 border-b pb-20">
-        <h2 className="text-2xl font-bold font-headline mb-8">Who to follow</h2>
-        <Carousel opts={{ align: "start", slidesToScroll: 2 }}>
-          <CarouselContent className="-ml-4">
-            {whoFollow.map((user) => (
-              <CarouselItem
-                key={user._id}
-                className="md:basis-1/3 lg:basis-1/4 pl-4"
-              >
-                <WhoToFollowCard {...user} />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="hidden sm:flex" />
-          <CarouselNext className="hidden sm:flex" />
-        </Carousel>
-        <div className="mt-12">
-          <Button
-            variant="outline"
-            className="rounded-full min-h-10 px-6"
-            asChild
+      {/* Who to Follow */}
+      {whoFollow && whoFollow.length > 0 && (
+        <section className="mb-8 sm:mb-12 md:mb-16 border-b pb-10 sm:pb-14 md:pb-20">
+          <h2 className="text-xl sm:text-2xl font-bold font-headline mb-4 sm:mb-6 md:mb-8">
+            Who to follow
+          </h2>
+          <Carousel 
+            opts={{ 
+              align: "start", 
+              slidesToScroll: 1,
+            }}
           >
-            <Link href={`/tags/${slug}/author`}>See more</Link>
-          </Button>
-        </div>
-      </section>
+            <CarouselContent className="-ml-2 sm:-ml-3 md:-ml-4">
+              {whoFollow.map((user) => (
+                <CarouselItem
+                  key={user._id}
+                  className="pl-2 sm:pl-3 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+                >
+                  <WhoToFollowCard {...user} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
+          <div className="mt-6 sm:mt-8 md:mt-12 text-center sm:text-left">
+            <Button
+              variant="outline"
+              className="rounded-full min-h-10 px-4 sm:px-6 text-sm w-full sm:w-auto"
+              asChild
+            >
+              <Link href={`/tags/${slug}/author`}>See more</Link>
+            </Button>
+          </div>
+        </section>
+      )}
+
+      {/* Latest Stories */}
       {latestPosts.length > 0 && (
         <section>
           <TopicWrapper title={"last stories"}>
@@ -135,10 +150,10 @@ export default function TopicPage({
               <PostCard key={story._id} id={story._id} {...story} />
             ))}
           </TopicWrapper>
-          <div className="text-center mt-20">
+          <div className="text-center mt-10 sm:mt-14 md:mt-20">
             <Button
               variant="outline"
-              className="rounded-full min-h-10 px-6"
+              className="rounded-full min-h-10 px-4 sm:px-6 text-sm w-full sm:w-auto max-w-xs sm:max-w-none"
               asChild
             >
               <Link href={`/tags/${slug}/archive`}>See more stories</Link>
@@ -146,6 +161,16 @@ export default function TopicPage({
           </div>
         </section>
       )}
+
+      <style jsx global>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 }
@@ -154,7 +179,7 @@ export async function getServerSideProps(context) {
   await connectToDB();
   try {
     const { slug } = context.query;
-    const { token,refreshToken } = context.req.cookies;
+    const { token, refreshToken } = context.req.cookies;
 
     const topic = await topicModel.findOne({ slug });
     if (!topic) {
@@ -163,10 +188,12 @@ export async function getServerSideProps(context) {
       };
     }
     const validToken = verifyToken(token);
-       const validRefreshToken = verifyRefreshToken(refreshToken);
+    const validRefreshToken = verifyRefreshToken(refreshToken);
     let currentUser = null;
-    if (validToken||validRefreshToken) {
-      currentUser = await usersModel.findOne({ email: validToken.email ||validRefreshToken.email});
+    if (validToken || validRefreshToken) {
+      currentUser = await usersModel.findOne({
+        email: validToken.email || validRefreshToken.email,
+      });
     }
 
     // Get all posts for this topic
