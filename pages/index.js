@@ -17,7 +17,7 @@ import PostsListSkeleton from "@/components/post-card-skeleton";
 
 export default function Home({ initialPosts, initialUsersPosts }) {
   return (
-    <div className="w-[87%] mx-auto px-4 mt-3">
+    <div className="sm:w-[87%] w-[94%] mx-auto px-4 mt-3">
       <Tabs defaultValue="for-you">
         <TabsList className="bg-transparent p-0  border-b w-full justify-start rounded-none gap-x-6">
           <TabsTrigger
@@ -72,14 +72,14 @@ const FeaturedPosts = ({ initialPosts }) => {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
   if (isLoading) {
     return (
-      <div className="px-4">
+      <div className="md:px-4">
         <PostsListSkeleton count={5} isCol={false} />
       </div>
     );
   }
   const posts = data?.pages.flatMap((page) => page.posts) || initialPosts || [];
   return (
-    <div className=" px-4">
+    <div className=" md:px-4">
       <main>
         <div className="space-y-7">
           {posts.length > 0 ? (
@@ -89,7 +89,7 @@ const FeaturedPosts = ({ initialPosts }) => {
           ) : (
             <div className="flex flex-col items-center justify-center gap-y-3 mt-24 ">
               <p className="font-bold text-lg">No featured stories</p>
-              <p className="text-gray-300">
+              <p className="text-gray-300 text-center">
                 Featured stories from the publications you follow will appear
                 here.
               </p>
@@ -141,25 +141,26 @@ const UsersPosts = ({ initialUsersPosts }) => {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
   if (isLoading) {
     return (
-      <div className="px-4">
+      <div className="md:px-4">
         <PostsListSkeleton count={5} isCol={false} />
       </div>
     );
   }
   const posts =
     data?.pages.flatMap((page) => page.posts) || initialUsersPosts || [];
+
   return (
-    <div className=" px-4">
+    <div className=" md:px-4">
       <main>
         <div className="space-y-7">
-          {posts.length > 0 ? (
+          {posts&&posts.length > 0 ? (
             posts.map((post, index) => (
-              <PostCard key={`${post._id}-${index}`} id={post._id} {...post} />
+              <PostCard key={`${post?._id}-${index}`} id={post?._id} {...post} />
             ))
           ) : (
             <div className="flex flex-col items-center justify-center gap-y-3 mt-24 ">
               <p className="font-bold text-lg">No for you stories</p>
-              <p className="text-gray-300">
+              <p className="text-gray-300 text-center">
                 for you stories from the topics you follow will appear here.
               </p>
             </div>
@@ -197,7 +198,7 @@ export async function getServerSideProps(context) {
     }
     const validToken = verifyToken(token);
     const validRefreshToken = verifyRefreshToken(refreshToken);
-    
+
     if (!validToken && !validRefreshToken) {
       return {
         redirect: {
@@ -205,7 +206,9 @@ export async function getServerSideProps(context) {
         },
       };
     }
-    currentUser = await usersModel.findOne({ email: validToken.email||validRefreshToken.email });
+    currentUser = await usersModel.findOne({
+      email: validToken.email || validRefreshToken.email,
+    });
     if (!currentUser) {
       return {
         redirect: {
@@ -213,6 +216,30 @@ export async function getServerSideProps(context) {
         },
       };
     }
+
+    // const existingPostIds = posts.map((post) => post._id.toString());
+
+    const usersPosts = await postModel
+      .find({
+        status: "published",
+        $or: [
+          {
+            topics: { $in: currentUser.interests },
+          },
+          { author: currentUser._id },
+        ],
+      })
+      .populate("topics")
+      .populate({ path: "comments" })
+      .populate({ path: "likes" })
+      .populate({ path: "save", match: { userId: currentUser?._id } })
+      .populate("author", "_id name username")
+      .populate("postCover")
+      .limit(10)
+      .lean({ virtuals: true })
+      .sort({ updatedAt: -1 });
+ 
+    const usersPostIds = usersPosts.map((post) => post._id.toString());
     const following = await followModel.find({ follower: currentUser._id });
     // Check if user has interests
     if (!following || following.length === 0) {
@@ -221,26 +248,6 @@ export async function getServerSideProps(context) {
       };
     }
     const followingUserIds = following.map((follow) => follow.following);
-
-    // const existingPostIds = posts.map((post) => post._id.toString());
-
-    const usersPosts = await postModel
-      .find({
-        status: "published",
-        topics: { $in: currentUser.interests },
-      })
-      .populate("topics")
-      .populate({ path: "comments" })
-      .populate({ path: "likes" })
-      .populate({ path: "save", match: { userId: currentUser?._id } })
-      .populate("author", "name username")
-      .populate("postCover")
-      .limit(10)
-      .lean({ virtuals: true })
-      .sort({ updatedAt: -1 });
-
-    const usersPostIds = usersPosts.map((post) => post._id.toString());
-
     // featured posts
     const posts = await postModel
       .find({
