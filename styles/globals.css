@@ -133,10 +133,10 @@
     @apply !max-w-[unset];
   }
   .ce-toolbar__actions {
-    @apply !right-[unset] !-left-9.5;
+    @apply !right-[unset] sm:!-left-9.5 !left-2;
   }
   .ce-toolbar__actions > * {
-    @apply !text-blue-500 hover:!bg-blue-500/20;
+    @apply !text-blue-500 hover:!bg-blue-500/20 !shadow-none !w-[unset] !h-[unset]  !border-none !bg-transparent ;
   }
   .ce-popover__container {
     @apply dark:!border-neutral-800 dark:!bg-[#121215] dark:!text-white;
