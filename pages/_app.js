@@ -30,7 +30,15 @@ function MyApp({ Component, pageProps }) {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider initialUser={pageProps.user}>
-        <Head></Head>
+        <Head>
+          <title>Digi Blog</title>
+          <meta
+            name="description"
+            content="On DigiBlog, anyone can share insightful perspectives, useful knowledge, and life wisdom with the world."
+          />
+          <meta name="author" content="Abolfazl Mahdikhani" />
+          <meta property="og:site_name" content="DigiBlog" />
+        </Head>
         <ThemeProvider
           attribute={"class"}
           enableSystem={false}
