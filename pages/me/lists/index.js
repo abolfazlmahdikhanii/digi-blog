@@ -49,31 +49,61 @@ export default function LibraryPage() {
         <TabsList className="bg-transparent p-0 border-b w-full justify-start rounded-none gap-x-5 ">
           <TabsTrigger
             value="your-lists"
-            className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+            className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
           >
             Your lists
           </TabsTrigger>
           <TabsTrigger
             value="saved-lists"
-            className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+            className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
           >
             Saved lists
           </TabsTrigger>
           <TabsTrigger
             value="highlights"
-            className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+            className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
           >
             Highlights
           </TabsTrigger>
           <TabsTrigger
             value="reading-history"
-            className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+            className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
           >
             Reading history
           </TabsTrigger>
           <TabsTrigger
             value="responses"
-            className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+            className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
           >
             Responses
           </TabsTrigger>
@@ -156,9 +186,9 @@ export default function LibraryPage() {
   );
 }
 export async function getServerSideProps(context) {
-  const { token,refreshToken } = context.req.cookies;
+  const { token, refreshToken } = context.req.cookies;
   await connectToDB();
-  if (!token&&!refreshToken) {
+  if (!token && !refreshToken) {
     return {
       redirect: {
         destination: "/",
@@ -166,15 +196,17 @@ export async function getServerSideProps(context) {
     };
   }
   const validToken = verifyToken(token);
-   const validRefreshToken = verifyRefreshToken(refreshToken);
-  if (!validToken&&!validRefreshToken) {
+  const validRefreshToken = verifyRefreshToken(refreshToken);
+  if (!validToken && !validRefreshToken) {
     return {
       redirect: {
         destination: "/",
       },
     };
   }
-  const user = await usersModel.findOne({ email: validToken.email||validRefreshToken.email });
+  const user = await usersModel.findOne({
+    email: validToken.email || validRefreshToken.email,
+  });
   if (!user) {
     return {
       redirect: {
