@@ -9,7 +9,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { relativeTimeFormat, verifyRefreshToken, verifyToken } from "@/lib/utils";
+import {
+  relativeTimeFormat,
+  verifyRefreshToken,
+  verifyToken,
+} from "@/lib/utils";
 import { MoreHorizontal, Link as LinkIcon, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -62,14 +66,19 @@ export default function StoriesPage() {
     <div className="container mx-auto px-4 max-w-6xl">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold font-headline">Stories</h1>
-       
       </div>
 
       <Tabs defaultValue="drafts">
         <TabsList className="bg-transparent p-0 border-b w-full justify-start rounded-none gap-x-5 ">
           <TabsTrigger
             value="drafts"
-            className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+            className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
           >
             Drafts{" "}
             {drafts.length > 0 && (
@@ -80,7 +89,13 @@ export default function StoriesPage() {
           </TabsTrigger>
           <TabsTrigger
             value="published"
-            className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+            className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
           >
             Published{" "}
             {publishes.length > 0 && (
@@ -91,13 +106,25 @@ export default function StoriesPage() {
           </TabsTrigger>
           <TabsTrigger
             value="unlisted"
-            className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+            className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
           >
             Unlisted
           </TabsTrigger>
           <TabsTrigger
             value="submissions"
-            className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+            className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
           >
             Submissions
           </TabsTrigger>
@@ -204,7 +231,7 @@ export default function StoriesPage() {
   );
 }
 export async function getServerSideProps(context) {
-  const { token,refreshToken } = context.req.cookies;
+  const { token, refreshToken } = context.req.cookies;
   await connectToDB();
   if (!token) {
     return {
@@ -214,15 +241,17 @@ export async function getServerSideProps(context) {
     };
   }
   const validToken = verifyToken(token);
-   const validRefreshToken = verifyRefreshToken(refreshToken);
-  if (!validToken&&!validRefreshToken) {
+  const validRefreshToken = verifyRefreshToken(refreshToken);
+  if (!validToken && !validRefreshToken) {
     return {
       redirect: {
         destination: "/",
       },
     };
   }
-  const user = await usersModel.findOne({ email: validToken.email||validRefreshToken.email });
+  const user = await usersModel.findOne({
+    email: validToken.email || validRefreshToken.email,
+  });
   if (!user) {
     return {
       redirect: {
