@@ -73,7 +73,7 @@ export function SearchPreview({ query, results, onClose }) {
                   href={`/tags/${topic.name}`}
                   key={topic._id}
                   className="flex items-center gap-3 p-2 -mx-2 rounded-md hover:bg-accent"
-                  onClick={() => onClose()}
+                  onClick={(e) => {onClose()}}
                 >
                   <FileText className="w-4 h-4 text-muted-foreground" />
 
