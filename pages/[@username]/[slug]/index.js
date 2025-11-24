@@ -100,19 +100,25 @@ export default function PostPage({ post, totalComments, comments, likes }) {
       toast.error(error.message);
     }
   };
-  
+
   return (
-    <div className="container mx-auto px-4 pt-2 pb-12 max-w-4xl">
-      <article className="prose dark:prose-invert lg:prose-xl mx-auto">
-        <h1 className="font-headline font-bold text-3xl leading-[1.5] mb-2.5">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-12 max-w-4xl">
+      <article className="prose dark:prose-invert prose-sm sm:prose-base lg:prose-xl mx-auto">
+        <h1 className="font-headline font-bold text-2xl sm:text-3xl lg:text-4xl leading-[1.5] mb-2.5">
           {post?.title}
         </h1>
-        <p className="text-neutral-400">{post?.shortDescription}</p>
-        <div className="flex items-center gap-4 my-8">
-          <div className="flex items-center gap-x-3">
-            <HoverProfile author={post?.author} size="lg" />
-            <FollowBtn username={query["@username"].replace("@", "")} />
-            <p className="text-sm text-muted-foreground not-prose flex items-center gap-x-2.5">
+        <p className="text-neutral-400 text-sm sm:text-base">
+          {post?.shortDescription}
+        </p>
+
+        {/* Author info - responsive layout */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 my-6 sm:my-8">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex items-center gap-x-3">
+              <HoverProfile author={post?.author} size="lg" />
+              <FollowBtn username={query["@username"].replace("@", "")} />
+            </div>
+            <p className="text-xs sm:text-sm text-muted-foreground not-prose flex items-center gap-x-2.5">
               <span>{post?.readTime} min read</span> ·{" "}
               <span className="">
                 {post?.createdAt && relativeTimeFormat(post?.createdAt)}
@@ -121,38 +127,40 @@ export default function PostPage({ post, totalComments, comments, likes }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-5 border-y py-4 my-8">
-          <div className="flex items-center gap-2.5">
+        {/* Action buttons - responsive */}
+        <div className="flex items-center gap-3 sm:gap-5 border-y py-3 sm:py-4 my-6 sm:my-8 overflow-x-auto">
+          <div className="flex items-center gap-2 sm:gap-2.5">
             <button
-              className=" text-muted-foreground hover:text-foreground "
+              className="text-muted-foreground hover:text-foreground"
               onClick={likeHandler}
             >
               <ThumbsUp
-                className={`h-4.5 w-4.5 ${
+                className={`h-4 w-4 sm:h-4.5 sm:w-4.5 ${
                   likesData?.isCurrentUserLike ? "text-blue-600 " : ""
                 }`}
               />
             </button>
-            <span className="font-bold text-sm">
+            <span className="font-bold text-xs sm:text-sm">
               {likesData.likes ?? likes ?? 0}
             </span>
           </div>
-          <Sheet className="">
+
+          <Sheet>
             <SheetTrigger asChild>
-              <button className=" text-muted-foreground hover:text-foreground flex items-center gap-2.5">
-                <MessageCircle className="h-4.5 w-4.5" />
-                <span className="font-bold text-sm text-white">
+              <button className="text-muted-foreground hover:text-foreground flex items-center gap-2 sm:gap-2.5">
+                <MessageCircle className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+                <span className="font-bold text-xs sm:text-sm text-white">
                   {newTotalComment || totalComments}
                 </span>
               </button>
             </SheetTrigger>
-            <SheetContent>
-              <SheetHeader className={"border-b w-11/12 mx-auto"}>
-                <SheetTitle className={"text-2xl font-bold font-headline"}>
+            <SheetContent className="w-full sm:w-[400px] md:w-[540px]">
+              <SheetHeader className="border-b w-11/12 mx-auto pb-4">
+                <SheetTitle className="text-xl sm:text-2xl font-bold font-headline">
                   Response ({totalComments})
                 </SheetTitle>
               </SheetHeader>
-              <div className="w-[88%] mx-auto">
+              <div className="w-[88%] mx-auto mt-4">
                 {Boolean(post.isShowComment) && (
                   <CommentsSection
                     comments={newComments || comments}
@@ -167,34 +175,42 @@ export default function PostPage({ post, totalComments, comments, likes }) {
           </Sheet>
 
           <div className="flex-grow" />
+
           <SaveToList postId={post?._id} />
+
           <Button
             variant="ghost"
             size="icon"
-            className="h-10 w-10 text-muted-foreground hover:text-foreground [&_svg]:!size-5"
+            className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground hover:text-foreground"
           >
-            <Share className="h-5 w-5" />
+            <Share className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
+
           <Button
             variant="ghost"
             size="icon"
-            className="h-10 w-10 text-muted-foreground hover:text-foreground [&_svg]:!size-5"
+            className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground hover:text-foreground"
           >
-            <MoreHorizontal className="h-5 w-5" />
+            <MoreHorizontal className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </div>
 
-        <div className="post">
+        {/* Content */}
+        <div className="post w-full overflow-x-hidden">
           <TextEditor initialData={post?.content} readOnly />
         </div>
       </article>
+
+      {/* Comments section - hidden on mobile when in sheet */}
       {Boolean(post.isShowComment) && (
-        <CommentsSection
-          comments={newComments || comments}
-          total={totalComments}
-          refetch={refetchComments}
-          postId={post._id}
-        />
+        <div className="mt-8 sm:mt-12">
+          <CommentsSection
+            comments={newComments || comments}
+            total={totalComments}
+            refetch={refetchComments}
+            postId={post._id}
+          />
+        </div>
       )}
     </div>
   );
@@ -205,7 +221,6 @@ export async function getServerSideProps(context) {
   try {
     const { slug } = context.query;
 
-  
     const detail = await postModel
       .findOne({ slug: slug })
       .populate("topics")
