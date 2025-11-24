@@ -56,9 +56,7 @@ const HoverProfile = ({ author, size = "sm" }) => {
                 follower
               </p>
               <p className="text-xs leading-[1.7] text-neutral-400">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores
-                praesentium aperiam sequi ad nesciunt odio expedita nam rem,
-                voluptates
+               {author?.bio}
               </p>
             </div>
           </HoverCardContent>
