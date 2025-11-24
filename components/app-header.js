@@ -15,6 +15,8 @@ import {
   FileText,
   ChevronRight,
   ArrowRight,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +48,7 @@ import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTheme } from "next-themes";
 
 const Logo = () => (
   <Link href="/" className="flex items-center gap-2 overflow-hidden">
@@ -152,7 +155,14 @@ export default function AppHeader() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
   const isMobile = useIsMobile();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const searchMutation = useMutation({
     mutationFn: async (term) => {
       const response = await fetch("/api/search", {
@@ -177,6 +187,7 @@ export default function AppHeader() {
       setSearchResults([]);
     },
   });
+
   useEffect(() => {
     if (router.pathname.startsWith("/search") && query) setSearchQuery(query);
     else {
@@ -194,6 +205,7 @@ export default function AppHeader() {
     }, 400),
     []
   );
+
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
@@ -211,23 +223,29 @@ export default function AppHeader() {
       setIsOpenPreview(true);
     }
   };
+
   const submitSearchHandler = (e) => {
     e.preventDefault();
     router.push(`/search?q=${searchQuery}`);
     setIsOpenPreview(false);
   };
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ">
+    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="xl:container px-3 pt-5 md:pt-0 md:px-8 flex h-20 md:h-16 items-center justify-between gap-4">
-        <div className="flex items-center md:gap-4  w-[80%] md:w-[unset] justify-between md:justify-[unset]">
-          <div className="flex items-center">
+        <div className="flex items-center md:gap-4 w-[80%] md:w-[unset] justify-between md:justify-[unset]">
+          <div className="flex items-center gap-2">
             <MobileNav />
             <Logo />
           </div>
-          <form className="flex ml-4 " onSubmit={submitSearchHandler}>
+          <form className="flex ml-4" onSubmit={submitSearchHandler}>
             <Popover open={isOpenPreview}>
               <PopoverTrigger asChild>
-                <div className="relative md:w-64 ">
+                <div className="relative md:w-64">
                   <Search
                     className="md:absolute left-3 top-2.5 h-4 w-4 text-muted-foreground cursor-pointer"
                     onClick={() =>
@@ -250,11 +268,11 @@ export default function AppHeader() {
                 onFocusOutside={() => setIsOpenPreview(false)}
                 onInteractOutside={() => setIsOpenPreview(false)}
               >
-                <div className="md:hidden mt-4 relative mb-5 md:mb-0 ">
+                <div className="md:hidden mt-4 relative mb-5 md:mb-0">
                   <Input
                     type="text"
                     placeholder="Search..."
-                    className="w-full rounded-lg bg-secondary pr-9.5 min-h-10 pl-4 "
+                    className="w-full rounded-lg bg-secondary pr-9.5 min-h-10 pl-4"
                     value={searchQuery}
                     onChange={handleInputChange}
                     onKeyDown={(e) => {
@@ -264,10 +282,8 @@ export default function AppHeader() {
                     }}
                   />
                   <button
-                    className={
-                      "rounded-full absolute right-3 top-2 w-6 h-6 bg-primary grid place-items-center"
-                    }
-                    size={"icon"}
+                    className="rounded-full absolute right-3 top-2 w-6 h-6 bg-primary grid place-items-center"
+                    size="icon"
                     onClick={submitSearchHandler}
                   >
                     <ArrowRight size={13} />
@@ -291,11 +307,25 @@ export default function AppHeader() {
               Write
             </Button>
           </Link>
+          {/* Theme Toggle Button */}
+          {mounted && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="flex"
+              aria-label="Toggle theme"
+            >
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            </Button>
+          )}
           <Link href="/notifications">
             <Button variant="ghost" size="icon" className="hidden md:flex">
               <Bell className="h-5 w-5" />
             </Button>
           </Link>
+
           {user ? (
             <UserMenu {...user} logOut={logoutHandler} />
           ) : (
