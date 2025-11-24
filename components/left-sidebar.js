@@ -34,7 +34,7 @@ const LeftSidebar = () => {
           <Button
             key={item.label}
             variant="ghost"
-            className={`justify-start text-lg font-normal ${
+            className={`justify-start text-lg font-normal [&>svg]:!w-5 [&>svg]:!h-5 ${
               item.label !== "Home" && item.label !== "Profile"
                 ? router.pathname.startsWith(item.href)
                   ? "text-neutral-100"
