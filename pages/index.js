@@ -22,13 +22,25 @@ export default function Home({ initialPosts, initialUsersPosts }) {
         <TabsList className="bg-transparent p-0  border-b w-full justify-start rounded-none gap-x-6">
           <TabsTrigger
             value="for-you"
-            className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 text-sm "
+            className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
           >
             For you
           </TabsTrigger>
           <TabsTrigger
             value="featured"
-            className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 text-sm "
+            className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
           >
             Featured
           </TabsTrigger>
@@ -89,7 +101,7 @@ const FeaturedPosts = ({ initialPosts }) => {
           ) : (
             <div className="flex flex-col items-center justify-center gap-y-3 mt-24 ">
               <p className="font-bold text-lg">No featured stories</p>
-              <p className="text-gray-300 text-center">
+              <p className="text-muted-foreground text-center">
                 Featured stories from the publications you follow will appear
                 here.
               </p>
@@ -153,14 +165,18 @@ const UsersPosts = ({ initialUsersPosts }) => {
     <div className=" md:px-4">
       <main>
         <div className="space-y-7">
-          {posts&&posts.length > 0 ? (
+          {posts && posts.length > 0 ? (
             posts.map((post, index) => (
-              <PostCard key={`${post?._id}-${index}`} id={post?._id} {...post} />
+              <PostCard
+                key={`${post?._id}-${index}`}
+                id={post?._id}
+                {...post}
+              />
             ))
           ) : (
             <div className="flex flex-col items-center justify-center gap-y-3 mt-24 ">
               <p className="font-bold text-lg">No for you stories</p>
-              <p className="text-gray-300 text-center">
+              <p className="text-muted-foreground text-center">
                 for you stories from the topics you follow will appear here.
               </p>
             </div>
@@ -238,7 +254,7 @@ export async function getServerSideProps(context) {
       .limit(10)
       .lean({ virtuals: true })
       .sort({ updatedAt: -1 });
- 
+
     const usersPostIds = usersPosts.map((post) => post._id.toString());
     const following = await followModel.find({ follower: currentUser._id });
     // Check if user has interests
