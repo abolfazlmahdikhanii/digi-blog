@@ -136,7 +136,7 @@
     @apply !right-[unset] sm:!-left-9.5 !left-2;
   }
   .ce-toolbar__actions > * {
-    @apply !text-blue-500 hover:!bg-blue-500/20 !shadow-none !w-[unset] !h-[unset]  !border-none !bg-transparent ;
+    @apply !text-blue-500 hover:!bg-blue-500/20 !shadow-none !w-[unset] !h-[unset]  !border-none !bg-transparent;
   }
   .ce-popover__container {
     @apply dark:!border-neutral-800 dark:!bg-[#121215] dark:!text-white;
@@ -174,7 +174,10 @@
   .ce-code__textarea {
     @apply dark:!bg-[#121215] dark:!border-neutral-800;
   }
-  .image-tool--caption .image-tool__caption,.inline-image__caption,.post .cdx-input.image-tool__caption,.post .cdx-input.image-tool__alt {
+  .image-tool--caption .image-tool__caption,
+  .inline-image__caption,
+  .post .cdx-input.image-tool__caption,
+  .post .cdx-input.image-tool__alt {
     @apply hidden;
   }
   .ce-block__content a {
@@ -183,7 +186,11 @@
   .ce-block__content .cdx-list__item-content a {
     @apply font-bold text-white;
   }
-  .cdx-button.image-tool__button.image-tool__button--active,.cdx-block.image-tool.image-tool--loading .image-tool__image{
-   @apply dark:!bg-[#121215] dark:!text-gray-200 dark:!border-neutral-800
+  .cdx-button.image-tool__button.image-tool__button--active,
+  .cdx-block.image-tool.image-tool--loading .image-tool__image {
+    @apply dark:!bg-[#121215] dark:!text-gray-200 dark:!border-neutral-800;
+  }
+  .tabs {
+    @apply  data-[state=active]:shadow-none data-[state=active]:border-b-2  data-[state=active]:text-foreground data-[state=active]:bg-transparent;
   }
 }
