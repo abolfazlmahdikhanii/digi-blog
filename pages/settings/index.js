@@ -191,31 +191,61 @@ export default function SettingsPage() {
             <TabsList className="bg-transparent p-0 border-b w-full justify-start rounded-none gap-x-3 sm:gap-x-4 md:gap-x-5 overflow-x-auto flex-nowrap">
               <TabsTrigger
                 value="account"
-                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 dark:data-[state=active]:!border-neutral-200 flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3"
+                className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
               >
                 Account
               </TabsTrigger>
               <TabsTrigger
                 value="publishing"
-                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 dark:data-[state=active]:!border-neutral-200 flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3"
+                className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
               >
                 Publishing
               </TabsTrigger>
               <TabsTrigger
                 value="notifications"
-                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 dark:data-[state=active]:!border-neutral-200 flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3"
+                className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
               >
                 Notifications
               </TabsTrigger>
               <TabsTrigger
                 value="membership"
-                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 dark:data-[state=active]:!border-neutral-200 flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3 whitespace-nowrap"
+                className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
               >
                 Membership
               </TabsTrigger>
               <TabsTrigger
                 value="security"
-                className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 dark:data-[state=active]:!border-neutral-200 flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3 whitespace-nowrap"
+                className="rounded-none border-0 flex-0 text-sm transition-all
+              text-muted-foreground hover:text-foreground
+              data-[state=active]:shadow-none 
+              data-[state=active]:border-b-2 
+              data-[state=active]:!border-b-foreground 
+              data-[state=active]:text-foreground
+              data-[state=active]:bg-transparent"
               >
                 Security
               </TabsTrigger>
