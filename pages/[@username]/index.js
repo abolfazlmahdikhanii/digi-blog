@@ -92,13 +92,25 @@ export default function AuthorProfilePage({
                 <TabsList className="bg-transparent p-0 border-b w-full justify-start rounded-none gap-x-5 ">
                   <TabsTrigger
                     value="home"
-                    className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 text-base "
+                    className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
                   >
                     Home
                   </TabsTrigger>
                   <TabsTrigger
                     value="about"
-                    className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0 w-fit dark:data-[state=active]:!border-neutral-200 flex-0 text-base"
+                    className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
                   >
                     About
                   </TabsTrigger>
