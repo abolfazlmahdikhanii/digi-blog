@@ -27,7 +27,7 @@ const createNewPost = async (req, res) => {
       postId,
       imgId,
     } = req.body;
-    console.log(req.body);
+   
     if (!token) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -91,7 +91,7 @@ const createNewPost = async (req, res) => {
       counter++;
     }
 
-    const user = await usersModel.findOne({ email: validToken.email }, "_id");
+    const user = await usersModel.findOne({ email: validToken.email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
