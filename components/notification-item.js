@@ -57,7 +57,7 @@ const NotificationItem = ({
       break;
   }
   return (
-    <Alert className={`py-4 bg-[#121215] ${isRead ? "opacity-60" : ""}`}>
+    <Alert className={`py-4 bg-accent ${isRead ? "opacity-60" : ""}`}>
       {icon}
       <div className="flex items-center justify-between">
         {metadata.url ? (
