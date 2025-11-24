@@ -37,12 +37,12 @@ const LeftSidebar = () => {
             className={`justify-start text-lg font-normal [&>svg]:!w-5 [&>svg]:!h-5 ${
               item.label !== "Home" && item.label !== "Profile"
                 ? router.pathname.startsWith(item.href)
-                  ? "text-neutral-100"
-                  : "text-neutral-400"
+                  ? "text-accent-foreground"
+                  : "text-muted-foreground"
                 : router.pathname === item.href ||
                   (item.label === "Profile" && router.pathname.includes("@"))
-                ? "text-neutral-100"
-                : "text-neutral-400"
+                ? "text-accent-foreground"
+                : "text-muted-foreground"
             }`}
             asChild
           >
@@ -55,7 +55,7 @@ const LeftSidebar = () => {
                   : "#"
               }
             >
-              <item.icon className="mr-4 h-8 w-8" />
+              <item.icon className="mr-4 h-5 w-5" />
               {item.label}
             </Link>
           </Button>
@@ -64,28 +64,29 @@ const LeftSidebar = () => {
       <div className="mt-8">
         <h3 className="font-semibold text-base mb-4 px-4">Following</h3>
         <nav className="flex flex-col gap-2 ">
-          {follower?.follower && follower?.follower.length > 0 ? (
-            follower.follower.map((userInfo) => (
-              <Button
-                key={userInfo?.follower._id}
-                variant="ghost"
-                className="justify-start h-auto mb-12"
-                asChild
-              >
-                <Link href={`/@${userInfo?.follower?.username}`}>
-                  <Avatar className="h-6 w-6 mr-1">
-                    <AvatarImage src={userInfo?.follower.profileImage} alt={userInfo?.follower.name} />
-                    <AvatarFallback className={"capitalize"}>
-                      {userInfo?.follower?.name?.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="truncate">{userInfo?.follower?.name}</span>
-                </Link>
-              </Button>
-            ))
-          ) : (
-          null
-          )}
+          {follower?.follower && follower?.follower.length > 0
+            ? follower.follower.map((userInfo) => (
+                <Button
+                  key={userInfo?.follower._id}
+                  variant="ghost"
+                  className="justify-start h-auto mb-12"
+                  asChild
+                >
+                  <Link href={`/@${userInfo?.follower?.username}`}>
+                    <Avatar className="h-6 w-6 mr-1">
+                      <AvatarImage
+                        src={userInfo?.follower.profileImage}
+                        alt={userInfo?.follower.name}
+                      />
+                      <AvatarFallback className={"capitalize"}>
+                        {userInfo?.follower?.name?.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="truncate">{userInfo?.follower?.name}</span>
+                  </Link>
+                </Button>
+              ))
+            : null}
         </nav>
       </div>
       <div className="">
