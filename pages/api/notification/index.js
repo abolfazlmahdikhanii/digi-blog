@@ -1,7 +1,6 @@
 import connectToDB from "@/configs/db";
 import { verifyToken } from "@/lib/utils";
 import notifyModel from "@/models/notifications";
-
 import usersModel from "@/models/users";
 import { subDays } from "date-fns/subDays";
 

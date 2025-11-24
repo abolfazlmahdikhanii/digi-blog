@@ -1,14 +1,8 @@
 const { default: connectToDB } = require("@/configs/db");
 import { verifyToken } from "@/lib/utils";
-import notifyModel from "@/models/notifications";
 import postModel from "@/models/posts";
-import postImagesModel from "@/models/potsImages";
-import topicModel from "@/models/topics";
 import usersModel from "@/models/users";
-import postSchema from "@/validations/post";
-import { isValidObjectId } from "mongoose";
-import slugify from "slugify";
-import { z } from "zod";
+
 const getForUserPosts = async (req, res) => {
   try {
     const { token } = req.cookies;

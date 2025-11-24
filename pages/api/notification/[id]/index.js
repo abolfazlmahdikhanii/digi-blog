@@ -1,9 +1,6 @@
 const { default: connectToDB } = require("@/configs/db");
 import { verifyToken } from "@/lib/utils";
 import notifyModel from "@/models/notifications";
-import postModel from "@/models/posts";
-import saveModel from "@/models/save";
-import saveListModel from "@/models/saveList";
 import usersModel from "@/models/users";
 
 import { isValidObjectId } from "mongoose";

@@ -1,10 +1,9 @@
 const { default: connectToDB } = require("@/configs/db");
 import { verifyToken } from "@/lib/utils";
-import followModel from "@/models/follows";
 import postModel from "@/models/posts";
 import usersModel from "@/models/users";
 
-const getFeaturedPosts = async (req, res) => {
+const getAllPosts = async (req, res) => {
   try {
     const { token } = req.cookies;
     if (!token) {
@@ -20,51 +19,38 @@ const getFeaturedPosts = async (req, res) => {
     if (!currentUser) {
       return res.status(404).json({ message: "User Not Found !" });
     }
-    const following = await followModel.find({ follower: currentUser._id });
-    // Check if user has interests
-    if (!following || following.length === 0) {
-      return res.status(200).json({
-        posts: [],
-        hasMore: false,
-        totalPosts: 0,
-        currentPage: 1,
-        message: "No featured set for user",
-      });
+    if (currentUser.role !== "ADMIN") {
+      return res.status(403).json({ message: "Access Denied! Admin Only." });
     }
-    const followingUserIds = following.map((follow) => follow.following);
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    // Build query to exclude posts that match user's interests
-    const query = {
+    const totalPosts = await postModel.countDocuments({
       status: "published",
-      author: { $in: followingUserIds },
-    };
-
-    // If user has interests, exclude posts with those topics
-    if (currentUser.interests && currentUser.interests.length > 0) {
-      query.topics = { $nin: currentUser.interests };
-    }
-    const totalPosts = await postModel.countDocuments(query);
-
+    });
     const posts = await postModel
-      .find(query)
+      .find({ status: "published" })
       .populate("topics")
       .populate({ path: "comments" })
       .populate({ path: "likes" })
       .populate({ path: "save", match: { userId: currentUser?._id } })
       .populate("author", "name username")
       .populate("postCover")
-       .skip(skip)
-      .limit(limit)
+      .skip(skip)
       .lean({ virtuals: true })
       .sort({ updatedAt: -1 });
-
-    const hasMore = skip + posts.length < totalPosts;
-
+    const totalPages = Math.max(1, Math.ceil(totalPosts / limit));
+    const hasNext = page < totalPages;
+    const hasPrev = page > 1;
+    // hasMore true when there are pages after current
+    const hasMore = page < totalPages;
+    const nextPage = hasNext ? page + 1 : null;
+    const prevPage = hasPrev ? page - 1 : null;
     return res.status(200).json({
       posts: JSON.parse(JSON.stringify(posts)),
       hasMore,
+      nextPage,
+      prevPage,
       totalPosts: totalPosts,
       currentPage: page,
     });
@@ -78,9 +64,9 @@ const handler = async (req, res) => {
   await connectToDB();
 
   if (req.method === "GET") {
-    await getFeaturedPosts(req, res);
+    await getAllPosts(req, res);
     return;
-  } else return res.status(405).end();
+  } else return res.status(405).json({ message: "Method Not Allowed" });
 };
 
 export default handler;

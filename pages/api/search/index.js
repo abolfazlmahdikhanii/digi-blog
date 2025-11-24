@@ -1,5 +1,4 @@
 import connectToDB from "@/configs/db";
-
 import postModel from "@/models/posts";
 import topicModel from "@/models/topics";
 import usersModel from "@/models/users";

@@ -6,7 +6,6 @@ import otpModel from "@/models/userOtp";
 import usersModel from "@/models/users";
 import { authSchema } from "@/validations/auth";
 import { serialize } from "cookie";
-
 import { z } from "zod";
 
 const saveNewUser = async (email) => {

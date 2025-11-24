@@ -1,10 +1,6 @@
 import connectToDB from "@/configs/db";
 import { generateToken, verifyToken } from "@/lib/utils";
-import followModel from "@/models/follows";
-import saveModel from "@/models/save";
 import usersModel from "@/models/users";
-import userSchema from "@/validations/user";
-import { serialize } from "cookie";
 import { isValidObjectId } from "mongoose";
 import z from "zod";
 const updateHandler = async (req, res) => {

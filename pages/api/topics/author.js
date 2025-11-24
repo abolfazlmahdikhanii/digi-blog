@@ -1,3 +1,9 @@
+const { default: connectToDB } = require("@/configs/db");
+const { verifyToken } = require("@/lib/utils");
+const { default: postModel } = require("@/models/posts");
+const { default: topicModel } = require("@/models/topics");
+const { default: usersModel } = require("@/models/users");
+
 const handler = async (req, res) => {
   if (req.method !== "GET")
     return res.status(405).json({ message: "Method Not Allowed" });

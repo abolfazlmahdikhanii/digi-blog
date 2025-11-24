@@ -19,59 +19,76 @@ import {
 import { MoreHorizontal, PlusCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import AdminLayout from "@/components/admin-layout";
-
-const posts = [
-  {
-    id: 1,
-    title: "The Future of Artificial Intelligence",
-    author: "Jane Doe",
-    status: "Published",
-    comments: 128,
-    date: "2024-05-20",
-  },
-  {
-    id: 2,
-    title: "A Deep Dive into Sustainable Living",
-    author: "John Appleseed",
-    status: "Published",
-    comments: 72,
-    date: "2024-05-18",
-  },
-  {
-    id: 3,
-    title: "Mastering the Art of Modern Web Design",
-    author: "Emily White",
-    status: "Draft",
-    comments: 0,
-    date: "2024-05-15",
-  },
-  {
-    id: 4,
-    title: "The Unseen World of Urban Exploration",
-    author: "Alex Johnson",
-    status: "Published",
-    comments: 23,
-    date: "2024-05-12",
-  },
-  {
-    id: 5,
-    title: "The Psychology of Color in Branding",
-    author: "Samantha Green",
-    status: "In Review",
-    comments: 5,
-    date: "2024-05-10",
-  },
-  {
-    id: 6,
-    title: "An Introduction to Quantum Computing",
-    author: "Ben Carter",
-    status: "Published",
-    comments: 45,
-    date: "2024-05-08",
-  },
-];
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { formatDate, relativeTimeFormat } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function AdminContentPage() {
+  const {
+    data,
+    isLoading,
+    refetch,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchPreviousPage,
+    isFetchingPreviousPage,
+  } = useInfiniteQuery({
+    queryKey: ["admin-posts"],
+    queryFn: ({ pageParam }) =>
+      fetch(`/api/admin/posts?page=${pageParam}&limit=10`).then((res) =>
+        res.json()
+      ),
+    getNextPageParam: (lastPage) => {
+      return lastPage.nextPage ?? undefined;
+    },
+    getPreviousPageParam: (firstPage) => {
+      return firstPage.prevPage ?? undefined;
+    },
+    initialPageParam: 1,
+  });
+  const [isDelete, setIsDelete] = useState(false);
+  const [removeId, setRemoveId] = useState(null);
+  if (isLoading) {
+    return (
+      <div className="fixed top-1/2 left-1/2 -translate-1/2">
+        <Spinner className={"w-8 h-8"} />
+      </div>
+    );
+  }
+
+  const removePostHandler = async (id) => {
+    try {
+      const res = await fetch(`/api/user/post/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to remove post");
+      }
+
+      toast.success("Post removed successfully :)");
+      setIsDelete(false);
+      refetch();
+    } catch (error) {
+      toast.error("Failed to create post");
+    }
+  };
+  const allPosts = data?.pages.flatMap((page) => page.posts) || [];
+  const dataPosts = data?.pages.flatMap((page) => page) || [];
+
   return (
     <AdminLayout>
       <div className="space-y-4 w-full flex-1">
@@ -80,84 +97,130 @@ export default function AdminContentPage() {
             Content Management
           </h2>
           <div className="flex items-center gap-2">
-            <Input placeholder="Search posts..." className="w-64" />
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              New Post
-            </Button>
+            {/* <Input placeholder="Search posts..." className="w-64" /> */}
+            
           </div>
         </div>
-        <div className="border rounded-lg">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Author</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Comments</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>
-                  <span className="sr-only">Actions</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {posts.map((post) => (
-                <TableRow key={post.id}>
-                  <TableCell className="font-medium">{post.title}</TableCell>
-                  <TableCell>{post.author}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        post.status === "Published"
-                          ? "default"
-                          : post.status === "Draft"
-                          ? "secondary"
-                          : "outline"
-                      }
-                    >
-                      {post.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{post.comments}</TableCell>
-                  <TableCell>{post.date}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup="true"
-                          size="icon"
-                          variant="ghost"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>View</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive">
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+        {allPosts.length > 0 ? (
+          <div className="border rounded-lg">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Author</TableHead>
+                  <TableHead>Status</TableHead>
+
+                  <TableHead>Date</TableHead>
+                  <TableHead>
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <Button variant="outline" size="sm">
-            Previous
-          </Button>
-          <Button variant="outline" size="sm">
-            Next
-          </Button>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {allPosts.map((post) => (
+                  <TableRow key={post._id}>
+                    <TableCell className="font-medium">{post.title}</TableCell>
+                    <TableCell>{post.author.name}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          post.status === "published"
+                            ? "default"
+                            : post.status === "Draft"
+                            ? "secondary"
+                            : "outline"
+                        }
+                      >
+                        {post.status}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell>{formatDate(post.createdAt)}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuItem>View</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => {
+                              setRemoveId(post._id);
+                              setIsDelete(true);
+                            }}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-center py-12">
+            You haven’t published any public stories yet.
+          </p>
+        )}
+        {dataPosts && dataPosts.hasMore && (
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fetchPreviousPage()}
+              disabled={!dataPosts.prevPage || isFetchingPreviousPage}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fetchNextPage()}
+              disabled={!dataPosts.nextPage || isFetchingNextPage}
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </div>
+      {isDelete && (
+        <AlertDialog open={isDelete} onOpenChange={setIsDelete}>
+          {" "}
+          <AlertDialogContent className={"h-[200px]"}>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete story</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this post? This action cannot be
+                undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="rounded-full">
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive hover:bg-destructive/90 rounded-full"
+                onClick={() => removePostHandler(removeId)}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </AdminLayout>
   );
 }

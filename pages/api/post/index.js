@@ -9,52 +9,7 @@ import postSchema from "@/validations/post";
 import { isValidObjectId } from "mongoose";
 import slugify from "slugify";
 import { z } from "zod";
-const getAllPosts = async (req, res) => {
-  try {
-    const { token } = req.cookies;
-    if (!token) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
 
-    const validToken = verifyToken(token);
-    if (!validToken) {
-      return res.status(401).json({ message: "Invalid Token" });
-    }
-
-    const currentUser = await usersModel.findOne({ email: validToken.email });
-    if (!currentUser) {
-      return res.status(404).json({ message: "User Not Found !" });
-    }
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-    const totalPosts = await postModel.countDocuments({
-      status: "published",
-    });
-    const posts = await postModel
-      .find({ status: "published" })
-      .populate("topics")
-      .populate({ path: "comments" })
-      .populate({ path: "likes" })
-      .populate({ path: "save", match: { userId: currentUser?._id } })
-      .populate("author", "name username")
-      .populate("postCover")
-      .lean({ virtuals: true })
-      .sort({ updatedAt: -1 });
-
-    const hasMore = skip + posts.length < totalPosts;
-
-    return res.status(200).json({
-      posts: JSON.parse(JSON.stringify(posts)),
-      hasMore,
-      totalPosts: totalPosts,
-      currentPage: page,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Internal ServerError" });
-  }
-};
 
 const createNewPost = async (req, res) => {
   try {
@@ -300,10 +255,7 @@ const handler = async (req, res) => {
       await createNewPost(req, res);
       return;
     }
-  } else if (req.method === "GET") {
-    await getAllPosts(req, res);
-    return;
-  }
+  } 
 };
 
 export default handler;
