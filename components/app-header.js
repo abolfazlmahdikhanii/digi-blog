@@ -130,10 +130,11 @@ const MobileNav = () => (
         <div className={"px-5 grid gap-6 text-lg font-medium"}>
           {navLinks.map((link) => (
             <Link
-              key={link.href}
+              key={link.label}
               href={link.href}
               className="flex items-center gap-4 text-muted-foreground hover:text-foreground"
             >
+              <link.icon className="mr-4 h-6 w-6" />
               {link.label}
             </Link>
           ))}
@@ -217,7 +218,7 @@ export default function AppHeader() {
   };
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ">
-      <div className="container px-8 flex h-20 md:h-16 items-center justify-between gap-4">
+      <div className="xl:container px-3 pt-5 md:pt-0 md:px-8 flex h-20 md:h-16 items-center justify-between gap-4">
         <div className="flex items-center md:gap-4  w-[80%] md:w-[unset] justify-between md:justify-[unset]">
           <div className="flex items-center">
             <MobileNav />
@@ -239,14 +240,15 @@ export default function AppHeader() {
                     className="w-full rounded-full bg-secondary pl-9.5 hidden md:flex"
                     value={searchQuery}
                     onChange={handleInputChange}
-                    onBlur={() => setIsOpenPreview(false)}
                   />
                 </div>
               </PopoverTrigger>
               <PopoverContent
-                className="md:w-[316px] w-screen h-screen md:h-[unset] md:py-[30px] md:[&>span]:!left-9"
+                className="md:w-[316px] w-screen h-screen md:h-[unset] md:py-[30px] md:[&>span]:!left-9 z-20"
                 sideOffset={5}
                 onOpenAutoFocus={(e) => e.preventDefault()}
+                onFocusOutside={() => setIsOpenPreview(false)}
+                onInteractOutside={() => setIsOpenPreview(false)}
               >
                 <div className="md:hidden mt-4 relative mb-5 md:mb-0 ">
                   <Input
@@ -274,7 +276,7 @@ export default function AppHeader() {
                 <SearchPreview
                   query={searchQuery}
                   results={searchResults}
-                  onClose={() => (isMobile ? setIsOpenPreview(false) : null)}
+                  onClose={() => setIsOpenPreview(false)}
                 />
                 <PopoverArrow />
               </PopoverContent>
