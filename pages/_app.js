@@ -8,6 +8,7 @@ import LeftSidebar from "@/components/left-sidebar";
 import "../styles/globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes";
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const { pathname } = router;
@@ -21,7 +22,7 @@ function MyApp({ Component, pageProps }) {
   const isHome = pathname === "/";
   const showSidebars =
     !isAuthPage && !isAdminPage && !isEditorPage && !isWelcome && !isStarted;
-  const showHeader = !isAuthPage && !isStarted&&!isWelcome;
+  const showHeader = !isAuthPage && !isStarted && !isWelcome;
 
   const queryClient = new QueryClient();
 
@@ -29,17 +30,19 @@ function MyApp({ Component, pageProps }) {
     <QueryClientProvider client={queryClient}>
       <AuthProvider initialUser={pageProps.user}>
         <Head></Head>
-        <div className=" min-h-screen flex flex-col ">
-          {showHeader && <AppHeader />}
-          <div className="container mx-auto flex flex-1">
-            {showSidebars && <LeftSidebar />}
-            <main className="flex-grow py-8 px-2 md:px-0">
-              <Component {...pageProps} />
-            </main>
-            {showSidebars && isHome && <RightSidebar />}
+        <ThemeProvider attribute={"class"} enableSystem={false} defaultTheme="dark">
+          <div className=" min-h-screen flex flex-col ">
+            {showHeader && <AppHeader />}
+            <div className="container mx-auto flex flex-1">
+              {showSidebars && <LeftSidebar />}
+              <main className="flex-grow py-8 px-2 md:px-0">
+                <Component {...pageProps} />
+              </main>
+              {showSidebars && isHome && <RightSidebar />}
+            </div>
+            <Toaster richColors  />
           </div>
-          <Toaster richColors />
-        </div>
+        </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
