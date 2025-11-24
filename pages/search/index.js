@@ -60,26 +60,50 @@ export default function SearchPage({ stories, people, lists, topics }) {
           <TabsList className="bg-transparent p-0 border-b w-full justify-start rounded-none gap-x-6">
             <TabsTrigger
               value="stories"
-              className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+             className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
             >
               Stories
             </TabsTrigger>
             <TabsTrigger
               value="people"
-              className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+              className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
             >
               People
             </TabsTrigger>
 
             <TabsTrigger
               value="topics"
-              className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+              className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
             >
               Topics
             </TabsTrigger>
             <TabsTrigger
               value="lists"
-              className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+                  className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
             >
               Lists
             </TabsTrigger>
@@ -196,7 +220,7 @@ const SearchTopics = ({ initialTopics, query }) => {
               <Link href={`/tags/${item.slug}`} key={item._id}>
                 <Badge
                   variant="secondary"
-                  className="bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 cursor-pointer py-[9px] px-5 rounded-full capitalize text-sm"
+                  className=" cursor-pointer py-[9px] px-5 rounded-full capitalize text-sm"
                 >
                   {item.name}
                 </Badge>
