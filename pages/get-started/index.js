@@ -9,16 +9,23 @@ import usersModel from "@/models/users";
 import { verifyRefreshToken, verifyToken } from "@/lib/utils";
 import connectToDB from "@/configs/db";
 import { toast } from "sonner";
+import Image from "next/image";
 
-const MediumLogo = () => (
-  <span className=" text-3xl font-medium tracking-tight">Digi Blog</span>
+const DigiBlogLogo = () => (
+   <Image
+        width={150}
+        height={140}
+        src={"/images/logo.png"}
+        className="object-cover w-[140px] h-[180px]"
+        alt="logo"
+      />
 );
 
 export default function FullNamePage({ userInfo }) {
   const { user } = useAuth();
   const [fullName, setFullName] = useState(userInfo?.name || user?.name || "");
   const router = useRouter();
-  console.log(userInfo);
+
   const handleUpdateName = async (e) => {
     e.preventDefault();
     if (!fullName.trim()) {
@@ -44,7 +51,7 @@ export default function FullNamePage({ userInfo }) {
   return (
     <div className="bg-background text-foreground min-h-screen flex flex-col">
       <header className="p-4 flex justify-center py-4">
-        <MediumLogo />
+        <DigiBlogLogo />
       </header>
       <main className="flex mt-24 items-center justify-center">
         <div className="text-center max-w-lg w-full">

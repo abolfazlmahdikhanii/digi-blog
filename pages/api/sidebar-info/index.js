@@ -21,7 +21,7 @@ const handler = async (req, res) => {
     if (validToken) {
       currentUser = await usersModel.findOne({ email: validToken.email });
     }
-    const topics = await topicModel.find().sort({ createdAt: -1 }).limit(10);
+    const topics = await topicModel.find({}).sort({ createdAt: -1 }).limit(10);
     const userFilter = currentUser ? { _id: { $ne: currentUser._id } } : {};
     const users = await usersModel
       .find(userFilter)

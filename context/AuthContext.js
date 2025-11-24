@@ -8,6 +8,7 @@ const {
 } = require("react");
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { _null } from "zod/v4/core";
 
 const AuthContext = createContext();
 
@@ -17,9 +18,11 @@ export const AuthProvider = ({ children, initialUser }) => {
   const refresh = async () => {
     try {
       const res = await fetch("/api/auth/refresh", { method: "POST" });
-      if (!res.ok) return null;
+      if (!res.ok) {
+        return null;
+      }
       return res.json();
-    } catch {
+    } catch (err) {
       return null;
     }
   };
@@ -34,7 +37,8 @@ export const AuthProvider = ({ children, initialUser }) => {
         if (refreshed) {
           return fetch("/api/auth/me").then((r) => r.json());
         }
-        return { user: null };
+    
+        return null;
       }
 
       return res.json();

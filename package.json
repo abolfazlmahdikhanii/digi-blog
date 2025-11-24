@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@bprogress/next": "^3.2.12",
     "@ckeditor/ckeditor5-react": "^11.0.0",
     "@editorjs/code": "^2.9.3",
     "@editorjs/delimiter": "^1.4.2",

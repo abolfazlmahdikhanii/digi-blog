@@ -20,7 +20,7 @@ import { MoreHorizontal, PlusCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import AdminLayout from "@/components/admin-layout";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
-import { formatDate, relativeTimeFormat } from "@/lib/utils";
+import { formatDate, relativeTimeFormat, verifyRefreshToken, verifyToken } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
 import {
   AlertDialog,
@@ -34,6 +34,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
 import { toast } from "sonner";
+import usersModel from "@/models/users";
+import connectToDB from "@/configs/db";
 
 export default function AdminContentPage() {
   const {
@@ -98,7 +100,6 @@ export default function AdminContentPage() {
           </h2>
           <div className="flex items-center gap-2">
             {/* <Input placeholder="Search posts..." className="w-64" /> */}
-            
           </div>
         </div>
         {allPosts.length > 0 ? (
@@ -223,4 +224,42 @@ export default function AdminContentPage() {
       )}
     </AdminLayout>
   );
+}
+export async function getServerSideProps(context) {
+  const { token, refreshToken } = context.req.cookies;
+  await connectToDB();
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  const validToken = verifyToken(token);
+  const validRefreshToken = verifyRefreshToken(refreshToken);
+  if (!validToken && !validRefreshToken) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  const user = await usersModel.findOne({
+    email: validToken.email || validRefreshToken.email,
+  });
+  if (!user) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  if (user.role !== "ADMIN") {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  return { props: {} };
 }

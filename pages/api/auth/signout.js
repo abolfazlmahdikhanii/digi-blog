@@ -12,8 +12,7 @@ const handler = async (req, res) => {
       await refreshTokenModel.deleteOne({ token: refreshToken });
     }
     res
-      .setHeader(
-        "Set-Cookie",
+      .setHeader("Set-Cookie", [
         serialize("token", "", {
           path: "/",
           maxAge: 0,
@@ -22,8 +21,8 @@ const handler = async (req, res) => {
           httpOnly: true,
           path: "/",
           maxAge: 0,
-        })
-      )
+        }),
+      ])
       .status(200)
       .json({ message: "user successfully signout" });
   } catch (error) {

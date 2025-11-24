@@ -17,7 +17,7 @@ export function RightSidebar() {
         <h3 className="font-bold mb-4 font-headline">Recommended topics</h3>
         <div className="flex flex-wrap gap-2">
           {data &&
-            data?.topics.map((topic) => (
+            data?.topics?.map((topic) => (
               <Link href={`/tags/${topic.slug}`} key={topic._id}>
                 <Badge
                   

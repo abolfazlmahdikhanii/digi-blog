@@ -8,8 +8,8 @@ import Link from "next/link";
 import { useEffect } from "react";
 
 const LoggedOutHeader = () => (
-  <header className="fixed top-0 left-0 right-0 z-50 bg-[#F2F2F2] dark:bg-[#1A1A1A] border-b border-zinc-200 dark:border-zinc-800 max-h-[120px]">
-    <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+  <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-b-accent ">
+    <div className="container mx-auto px-6 py-4 flex justify-between items-center self-start max-h-[100px]">
       <div className="flex items-center">
         <Image
           width={150}
@@ -19,22 +19,22 @@ const LoggedOutHeader = () => (
           alt="logo"
         />
       </div>
-      <nav className="hidden md:flex items-center space-x-6 text-sm text-zinc-600 dark:text-zinc-400">
-        <Link href="#" className="hover:text-black dark:hover:text-white">
+      <nav className="hidden md:flex items-center space-x-6 text-sm text-muted-foreground">
+        <Link href="#" className="hover:text-muted-foreground ">
           Our story
         </Link>
-        <Link href="#" className="hover:text-black dark:hover:text-white">
+        <Link href="#" className="hover:text-muted-foreground ">
           Membership
         </Link>
-        <Link href="/editor" className="hover:text-black dark:hover:text-white">
+        <Link href="/editor" className="hover:text-muted-foreground ">
           Write
         </Link>
-        <Link href="/auth" className="hover:text-black dark:hover:text-white">
+        <Link href="/auth" className="hover:text-muted-foreground">
           Sign in
         </Link>
         <Button
           asChild
-          className="rounded-full bg-black text-white dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+          className="rounded-full "
         >
           <Link href="/auth">Get started</Link>
         </Button>
@@ -42,7 +42,7 @@ const LoggedOutHeader = () => (
       <div className="md:hidden">
         <Button
           asChild
-          className="rounded-full bg-black text-white dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+          className="rounded-full "
         >
           <Link href="/auth">Get started</Link>
         </Button>
@@ -52,34 +52,34 @@ const LoggedOutHeader = () => (
 );
 
 const LoggedOutFooter = () => (
-  <footer className=" border-t border-zinc-200 dark:border-zinc-800">
+  <footer className=" border-t border-accent">
     <div className="container mx-auto px-6 pt-8 pb-3 flex justify-center items-center">
-      <div className="flex flex-wrap justify-center space-x-6 text-sm text-zinc-500 dark:text-zinc-400">
-        <Link href="#" className="hover:text-black dark:hover:text-white">
+      <div className="flex flex-wrap justify-center space-x-6 text-sm text-muted-foreground">
+        <Link href="#" className="hover:text-muted-foreground ">
           Help
         </Link>
-        <Link href="#" className="hover:text-black dark:hover:text-white">
+        <Link href="#" className="hover:text-muted-foreground ">
           Status
         </Link>
-        <Link href="#" className="hover:text-black dark:hover:text-white">
+        <Link href="#" className="hover:text-muted-foreground ">
           About
         </Link>
-        <Link href="#" className="hover:text-black dark:hover:text-white">
+        <Link href="#" className="hover:text-muted-foreground ">
           Careers
         </Link>
-        <Link href="#" className="hover:text-black dark:hover:text-white">
+        <Link href="#" className="hover:text-muted-foreground ">
           Press
         </Link>
-        <Link href="#" className="hover:text-black dark:hover:text-white">
+        <Link href="#" className="hover:text-muted-foreground ">
           Blog
         </Link>
-        <Link href="#" className="hover:text-black dark:hover:text-white">
+        <Link href="#" className="hover:text-muted-foreground ">
           Privacy
         </Link>
-        <Link href="#" className="hover:text-black dark:hover:text-white">
+        <Link href="#" className="hover:text-muted-foreground ">
           Terms
         </Link>
-        <Link href="#" className="hover:text-black dark:hover:text-white">
+        <Link href="#" className="hover:text-muted-foreground ">
           Text to speech
         </Link>
       </div>
@@ -89,7 +89,7 @@ const LoggedOutFooter = () => (
 
 export default function WelcomePage() {
   return (
-    <div className=" text-black dark:text-white min-h-screen flex flex-col">
+    <div className="  min-h-screen flex flex-col">
       <LoggedOutHeader />
       <main className="flex-grow flex items-center">
         <div className="w-11/12 mx-auto px-6 grid md:grid-cols-2 items-center gap-8">
@@ -97,14 +97,10 @@ export default function WelcomePage() {
             <h1 className="font-serif text-6xl md:text-8xl font-medium tracking-tighter !leading-[1.1]">
               Human stories & ideas
             </h1>
-            <p className="text-xl md:text-2xl text-zinc-700 dark:text-zinc-300 font-sans">
+            <p className="text-xl md:text-2xl  font-sans">
               A place to read, write, and deepen your understanding
             </p>
-            <Button
-              asChild
-              size="lg"
-              className="rounded-full bg-zinc-900 text-white dark:bg-white dark:text-black text-lg px-8 py-6 hover:bg-zinc-700 dark:hover:bg-zinc-200"
-            >
+            <Button asChild size="lg" className="rounded-full ">
               <Link href="/auth">Start reading</Link>
             </Button>
           </div>
@@ -176,6 +172,7 @@ export async function getServerSideProps(context) {
         };
       }
     }
+    return { props: {} };
   } catch (error) {
     return {
       props: {},

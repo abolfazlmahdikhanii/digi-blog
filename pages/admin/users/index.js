@@ -22,9 +22,9 @@ import { Input } from "@/components/ui/input";
 import AdminLayout from "@/components/admin-layout";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/ui/spinner";
-import { formatDate } from "@/lib/utils";
-
-
+import { formatDate, verifyRefreshToken, verifyToken } from "@/lib/utils";
+import connectToDB from "@/configs/db";
+import usersModel from "@/models/users";
 
 export default function AdminUsersPage() {
   const {
@@ -110,11 +110,7 @@ export default function AdminUsersPage() {
                     <TableCell>{user.username}</TableCell>
                     <TableCell>{user.role}</TableCell>
                     <TableCell>
-                      <Badge
-                        variant={
-                         "secondary"
-                        }
-                      >
+                      <Badge variant={"secondary"}>
                         {formatDate(user.createdAt)}
                       </Badge>
                     </TableCell>
@@ -175,4 +171,42 @@ export default function AdminUsersPage() {
       </div>
     </AdminLayout>
   );
+}
+export async function getServerSideProps(context) {
+  const { token, refreshToken } = context.req.cookies;
+  await connectToDB();
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  const validToken = verifyToken(token);
+  const validRefreshToken = verifyRefreshToken(refreshToken);
+  if (!validToken && !validRefreshToken) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  const user = await usersModel.findOne({
+    email: validToken.email || validRefreshToken.email,
+  });
+  if (!user) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  if (user.role !== "ADMIN") {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  return { props: {} };
 }

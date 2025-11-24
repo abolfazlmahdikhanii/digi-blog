@@ -23,7 +23,9 @@ import { Badge } from "@/components/ui/badge";
 import AdminLayout from "@/components/admin-layout";
 import { useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/ui/spinner";
-import { relativeTimeFormat } from "@/lib/utils";
+import { relativeTimeFormat, verifyRefreshToken, verifyToken } from "@/lib/utils";
+import connectToDB from "@/configs/db";
+import usersModel from "@/models/users";
 
 export default function AdminDashboardPage() {
   const { data, isLoading, isError } = useQuery({
@@ -33,7 +35,7 @@ export default function AdminDashboardPage() {
   if (isLoading) {
     return (
       <div className="fixed top-1/2 left-1/2 -translate-1/2">
-        <Spinner className={"w-8 h-8"}/>
+        <Spinner className={"w-8 h-8"} />
       </div>
     );
   }
@@ -238,4 +240,42 @@ export default function AdminDashboardPage() {
       </div>
     </AdminLayout>
   );
+}
+export async function getServerSideProps(context) {
+  const { token, refreshToken } = context.req.cookies;
+  await connectToDB();
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  const validToken = verifyToken(token);
+  const validRefreshToken = verifyRefreshToken(refreshToken);
+  if (!validToken && !validRefreshToken) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  const user = await usersModel.findOne({
+    email: validToken.email || validRefreshToken.email,
+  });
+  if (!user) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  if (user.role!=="ADMIN") {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  return { props: {} };
 }

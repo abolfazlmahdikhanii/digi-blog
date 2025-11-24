@@ -1,5 +1,6 @@
 import connectToDB from "@/configs/db";
 import { generateToken, verifyToken } from "@/lib/utils";
+import topicModel from "@/models/topics";
 import usersModel from "@/models/users";
 import { isValidObjectId } from "mongoose";
 import z from "zod";
@@ -52,12 +53,17 @@ const updateHandler = async (req, res) => {
         message: "User full name updated successfully!",
       });
     } else if (topics) {
+      const allTopics = await topicModel.find({});
       if (!Array.isArray(topics)) {
         return res.status(400).json({
           message: "Topics must be an array!",
         });
       }
-      if (topics.length < 3)
+      if (allTopics.length > 1 && topics.length < 1)
+        return res
+          .status(402)
+          .json({ message: "Topic length is less then 1!" });
+      if (allTopics.length > 3 && topics.length < 3)
         return res
           .status(402)
           .json({ message: "Topic length is less then 3!" });

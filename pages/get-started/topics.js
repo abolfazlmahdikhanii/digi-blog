@@ -13,8 +13,14 @@ import usersModel from "@/models/users";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 
-const MediumLogo = () => (
-  <span className="font-serif text-3xl font-medium tracking-tight">Medium</span>
+const DigiBlogLogo = () => (
+   <Image
+        width={150}
+        height={140}
+        src={"/images/logo.png"}
+        className="object-cover w-[140px] h-[180px]"
+        alt="logo"
+      />
 );
 
 export default function TopicSelectionPage({ topics, userInfo }) {
@@ -25,6 +31,7 @@ export default function TopicSelectionPage({ topics, userInfo }) {
     queryFn: () => fetch("/api/topics").then((res) => res.json()),
     initialData: topics,
   });
+    const topicsList = data?.data ?? [];
   const [selectedTopics, setSelectedTopics] = useState([]);
   const router = useRouter();
 
@@ -36,10 +43,17 @@ export default function TopicSelectionPage({ topics, userInfo }) {
 
   const handleUpdateInterest = async (e) => {
     e.preventDefault();
-    if (selectedTopics.length < 3) {
-      toast.error("Choose three or more topics !");
+    const required = topicsList.length > 3 ? 3 : topicsList.length > 1 ? 1 : 0;
+
+    if (selectedTopics.length < required) {
+      toast.error(
+        required === 1
+          ? "Choose one or more topics!"
+          : `Choose ${required} or more topics!`
+      );
       return;
     }
+
     try {
       const res = await fetch(`/api/auth/${user ? user._id : userInfo._id}`, {
         method: "PUT",
@@ -60,15 +74,15 @@ export default function TopicSelectionPage({ topics, userInfo }) {
   return (
     <div className="bg-background text-foreground min-h-screen flex flex-col items-center">
       <header className="p-4 flex justify-center py-4">
-        <MediumLogo />
+        <DigiBlogLogo />
       </header>
       <main className="flex mt-24 items-center justify-center">
         <div className="text-center max-w-lg w-full">
           <h1 className="text-4xl  mb-8">What are you interested in?</h1>
           <p className="text-muted-foreground mb-12">Choose three or more.</p>
           <div className="flex flex-wrap justify-center gap-3.5 mb-8">
-            {data &&
-              data?.data?.map((topic) => {
+            {topicsList.length>0 &&
+              topicsList.map((topic) => {
                 const isSelected = selectedTopics.includes(topic);
                 return (
                   <Button
@@ -85,7 +99,10 @@ export default function TopicSelectionPage({ topics, userInfo }) {
           <Button
             onClick={handleUpdateInterest}
             className="w-full max-w-xs rounded-full mt-12 min-h-10.5  disabled:opacity-50"
-            disabled={selectedTopics.length < 3}
+            disabled={
+              selectedTopics.length <
+              (topicsList.length > 3 ? 3 : topicsList.length > 1 ? 1 : 0)
+            }
           >
             Continue
           </Button>
@@ -95,7 +112,7 @@ export default function TopicSelectionPage({ topics, userInfo }) {
   );
 }
 export async function getServerSideProps(context) {
-  const { token,refreshToken } = context.req.cookies;
+  const { token, refreshToken } = context.req.cookies;
   await connectToDB();
 
   // No token - redirect to home/login
@@ -132,7 +149,9 @@ export async function getServerSideProps(context) {
   }
 
   // User not found - redirect to home/login
-  const user = await usersModel.findOne({ email: validToken.email||validRefreshToken.email });
+  const user = await usersModel.findOne({
+    email: validToken.email || validRefreshToken.email,
+  });
   if (!user) {
     return {
       redirect: {
