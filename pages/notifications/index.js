@@ -57,13 +57,25 @@ export default function NotificationsPage() {
         <TabsList className="bg-transparent p-0 border-b w-full justify-start rounded-none gap-x-3">
           <TabsTrigger
             value="all"
-            className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+            className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
           >
             All
           </TabsTrigger>
           <TabsTrigger
             value="responses"
-            className="rounded-none data-[state=active]:shadow-none data-[state=active]:border-b-1 border-0  dark:data-[state=active]:!border-neutral-200 flex-0 "
+            className="rounded-none border-0 flex-0 text-sm transition-all
+  text-muted-foreground hover:text-foreground
+  data-[state=active]:shadow-none 
+  data-[state=active]:border-b-2 
+  data-[state=active]:!border-b-foreground 
+  data-[state=active]:text-foreground
+  data-[state=active]:bg-transparent"
           >
             Responses
           </TabsTrigger>
