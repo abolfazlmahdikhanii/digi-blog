@@ -227,7 +227,7 @@ export default function EditorPage({ id, initContent }) {
   };
   return (
     <div className="flex flex-col h-full min-h-[calc(100vh-4rem)]">
-      <header className="py-3 sm:py-4 px-3 sm:px-5 md:px-7 w-full sm:w-11/12 md:w-10/12 mx-auto border-b flex items-center justify-between sticky top-14 sm:top-16 z-10 bg-[#09090B]">
+      <header className="py-3 sm:py-4 px-3 sm:px-5 md:px-7 w-full sm:w-11/12 md:w-10/12 mx-auto border-b flex items-center justify-between sticky top-14 sm:top-16 z-10 bg-background">
         <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
           <h1 className="font-headline text-lg sm:text-xl md:text-2xl font-bold flex items-center gap-1 truncate">
             <span className="hidden sm:inline">
@@ -352,7 +352,7 @@ export default function EditorPage({ id, initContent }) {
         <div className="w-full sm:w-11/12 md:w-10/12 mx-auto space-y-4 sm:space-y-6">
           <Textarea
             placeholder="Post Title..."
-            className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold p-2 border-0 focus-visible:ring-0 shadow-none focus-visible:outline-0 w-full resize-none !bg-[#09090B] leading-[1.4] sm:leading-[1.6] min-h-[60px] sm:min-h-[80px]"
+            className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold p-2 border-0 focus-visible:ring-0 shadow-none focus-visible:outline-0 w-full resize-none !bg-transparent leading-[1.4] sm:leading-[1.6] min-h-[60px] sm:min-h-[80px]"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onBlur={() => onSubmitDraft(content)}
