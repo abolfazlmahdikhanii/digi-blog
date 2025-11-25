@@ -8,7 +8,7 @@ const getTransporter = () => {
   }
 
   return createTransport({
-    host: process.env.ZOHO_SMTP_HOST || "smtp.zoho.com",
+    host: process.env.ZOHO_SMTP_HOST || "smtp.zohomail.com",
     port: 465,
     secure: true,
     auth: {
