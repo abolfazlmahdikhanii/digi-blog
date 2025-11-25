@@ -69,7 +69,7 @@ const addLike = async (req, res) => {
       return res.status(200).json({ message: "Remove Like Successfully :)" });
     }
   } catch (error) {
-    console.log(error);
+   
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };
@@ -109,7 +109,7 @@ const getLike = async (req, res) => {
       isCurrentUserLike: isCurrentUserLike ? true : false,
     });
   } catch (error) {
-    console.log(error);
+   
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };

@@ -119,7 +119,7 @@ export default function ProfileInformationModal({ onClose }) {
       });
 
       if (!validUser.success) {
-        console.log("Validation errors:", validUser.error);
+       
 
         // Show validation errors to user
         validUser.error.forEach((err) => {
@@ -154,7 +154,7 @@ export default function ProfileInformationModal({ onClose }) {
       setBio("");
       setProfileImage("");
     } catch (error) {
-      console.log("Error:", error);
+      
       setIsProfileLoading(false);
       if (fid) {
         await removeProfileImage(fid).catch(console.error);

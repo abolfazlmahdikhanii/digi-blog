@@ -15,6 +15,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Lock } from "lucide-react";
+import Head from "next/head";
 
 export default function Home({ userInfo, saveList }) {
   const { saveItems, userId, createdAt, isPrivate, name } = saveList;
@@ -22,6 +23,7 @@ export default function Home({ userInfo, saveList }) {
 
   return (
     <div className="w-8/12 mx-auto px-4">
+      
       <div className=" border-b  my-4 pb-8">
         <div className="flex items-center gap-5 ">
           <Avatar className="h-14 w-14">
@@ -86,13 +88,15 @@ export default function Home({ userInfo, saveList }) {
             </p>
           </div>
         </div>
-        <h2 className="capitalize mt-11 px-3 font-bold text-4xl">{name} List</h2>
+        <h2 className="capitalize mt-11 px-3 font-bold text-4xl">
+          {name} List
+        </h2>
       </div>
 
       <main>
         <div className="space-y-12">
           {saveItems &&
-            saveItems.length>0 &&
+            saveItems.length > 0 &&
             saveItems?.map((post) => (
               <PostCard
                 key={post.postId._id}
@@ -111,7 +115,7 @@ export async function getServerSideProps(context) {
   await connectToDB();
   try {
     const query = context.query;
-    const { token,refreshToken } = context.req.cookies;
+    const { token, refreshToken } = context.req.cookies;
 
     const decodeUsernameUrl = decodeURIComponent(query["@username"]).replace(
       "@",
@@ -151,7 +155,7 @@ export async function getServerSideProps(context) {
 
     if (saveList.isPrivate) {
       // No token = redirect immediately
-      if (!token&&!refreshToken) {
+      if (!token && !refreshToken) {
         return {
           redirect: {
             destination: `/${query["@username"]}`,
@@ -195,7 +199,7 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (error) {
-    console.log(error);
+
     return {
       props: {
         userInfo: [],

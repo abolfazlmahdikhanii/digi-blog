@@ -72,7 +72,7 @@ export function PublishingModal({ title, content, onClose, storyId, clear }) {
         }
       }
     } catch (error) {
-      console.log(error);
+      
       toast.error("Failed to create topic. Please try again.");
     }
   };
@@ -191,7 +191,7 @@ export function PublishingModal({ title, content, onClose, storyId, clear }) {
       });
 
       if (!validPost.success) {
-        console.log("Validation errors:", validPost.error);
+      
 
         // Show validation errors to user
         validPost.error.forEach((err) => {
@@ -235,7 +235,7 @@ export function PublishingModal({ title, content, onClose, storyId, clear }) {
 
       router.replace("/editor");
     } catch (error) {
-      console.log("Error:", error);
+    
       setIsPostLoading(false);
       if (fid) {
         await removePostCover(fid).catch(console.error);

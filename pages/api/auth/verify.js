@@ -45,7 +45,7 @@ const saveNewUser = async (email) => {
     }
     return { success: true, isNew: false };
   } catch (error) {
-    console.log(error);
+  
     return { success: true, isNew: false };
   }
 };
@@ -140,7 +140,7 @@ const handler = async (req, res) => {
       .status(200)
       .json({ message: "successfully signin:)" });
   } catch (error) {
-    console.log(error);
+    
     if (error instanceof z.ZodError) {
       return res
         .status(400)

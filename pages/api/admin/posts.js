@@ -55,7 +55,7 @@ const getAllPosts = async (req, res) => {
       currentPage: page,
     });
   } catch (error) {
-    console.log(error);
+  
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };

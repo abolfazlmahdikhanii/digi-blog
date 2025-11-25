@@ -36,7 +36,7 @@ export function CommentsSection({
       }
 
       refetch([`post-${postId}-comment`]);
-      console.log(comments);
+     
     } catch (error) {
       toast.error(error.message);
     }

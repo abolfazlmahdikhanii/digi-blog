@@ -28,6 +28,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Head from "next/head";
 
 export default function AuthorProfilePage({
   userInfo,
@@ -45,6 +46,10 @@ export default function AuthorProfilePage({
 
   return (
     <div>
+      <Head>
+        <title>{user.name} on DigiBlog</title>
+        <meta name="description" content={`Read writing from ${user.name} on DigiBlog.`} />
+      </Head>
       <div className="relative h-48 md:h-64 w-full">
         <Image src={"/images/profile-bg.jpg"} alt={"profile background"} fill />
       </div>
@@ -275,7 +280,7 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (error) {
-    console.log(error);
+   
     return {
       redirect: {
         destination: "/500",

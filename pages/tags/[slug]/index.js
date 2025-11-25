@@ -30,6 +30,7 @@ import {
   Bookmark,
   MoreHorizontal,
 } from "lucide-react";
+import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -46,6 +47,17 @@ export default function TopicPage({
 
   return (
     <div className="w-full sm:w-11/12 mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
+      <Head>
+        <title>
+          The most insightful stories about {slug || topic.name} - DigiBlog
+        </title>
+        <meta
+          name="description"
+          content={`Read stories about ${
+            slug || topic.name
+          } on DigiBlog. Discover smart, unique perspectives on Hh and the topics that matter most to you like Crypto, Ethereum, Staking Rewards, Cdc, Rewards, Passive Income, Blockchain, Who, BlackLivesMatter, and more.`}
+        />
+      </Head>
       {/* Related Topics */}
       <div className="flex overflow-x-auto whitespace-nowrap gap-2 sm:gap-3 mb-8 sm:mb-12 md:mb-16 -mx-3 sm:-mx-4 px-3 sm:px-4 pb-3 sm:pb-4 md:pb-5 border-b scrollbar-hide">
         {relatedTopics.map((related, index) => (
@@ -66,7 +78,7 @@ export default function TopicPage({
           {topic?.name || slug}
         </h1>
         <p className="text-muted-foreground mt-3 sm:mt-4 md:mt-6 text-base sm:text-lg">
-          Topic · {totalStory} {totalStory === 1 ? 'story' : 'stories'}
+          Topic · {totalStory} {totalStory === 1 ? "story" : "stories"}
         </p>
         <div className="mt-4 sm:mt-5 md:mt-7">
           <FollowTopicBtn slug={slug || topic?.slug} />
@@ -111,9 +123,9 @@ export default function TopicPage({
           <h2 className="text-xl sm:text-2xl font-bold font-headline mb-4 sm:mb-6 md:mb-8">
             Who to follow
           </h2>
-          <Carousel 
-            opts={{ 
-              align: "start", 
+          <Carousel
+            opts={{
+              align: "start",
               slidesToScroll: 1,
             }}
           >

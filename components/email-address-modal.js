@@ -56,7 +56,7 @@ export function EmailAddressModal({ onClose }) {
         setTimer(120);
       }
     } catch (error) {
-      console.log(error);
+      
       toast.error("Email Is Not Valid !");
     }
   };

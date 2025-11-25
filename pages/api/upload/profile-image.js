@@ -63,7 +63,7 @@ const handler = async (req, res) => {
         });
       }
     } catch (error) {
-      console.log("Upload error:", error);
+     
       return res.status(500).json({
         message: "Internal Server Error",
         error: error.message,
@@ -104,7 +104,7 @@ const handler = async (req, res) => {
         });
       }
     } catch (error) {
-      console.log("Upload error:", error);
+    
       return res.status(500).json({
         message: "Internal Server Error",
         error: error.message,

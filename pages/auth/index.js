@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/router";
 import { formatTime } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+import { Spinner } from "@/components/ui/spinner";
 
 const GoogleIcon = () => (
   <svg
@@ -62,6 +63,7 @@ export default function LoginPage() {
   const [step, setStep] = useState("EMAIL");
   const [email, setEmail] = useState("");
   const [timer, setTimer] = useState(120);
+  const [isLoading, setIsLoading] = useState(false);
   const { refetch } = useAuth();
   const [otp, setOtp] = useState("");
   const router = useRouter();
@@ -113,11 +115,12 @@ export default function LoginPage() {
   };
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
-    if (!otp) {
-      toast.error(err);
+    if (!otp || otp.length !== 4) {
+      toast.error("Fill The Otp");
       return;
     }
     try {
+      setIsLoading(true);
       const res = await fetch("/api/auth/verify", {
         method: "POST",
         headers: {
@@ -129,13 +132,16 @@ export default function LoginPage() {
       if (!res.ok) {
         throw new Error("Failed Verify Otp!");
       }
+      
       refetch();
       if (data.isProfileComplete) {
         router.replace("/");
       } else {
         router.replace("/get-started");
       }
+      setIsLoading(false)
     } catch (error) {
+      setIsLoading(false);
       toast.error(error.message);
     }
   };
@@ -235,8 +241,9 @@ export default function LoginPage() {
                 type="submit"
                 className="w-full"
                 onClick={handleVerifyOtp}
+                disabled={otp.length < 4 || isLoading}
               >
-                Continue
+                Continue {isLoading && <Spinner />}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">

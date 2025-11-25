@@ -32,7 +32,7 @@ const removeTopic = async (req, res) => {
       message: "Successfully Remove",
     });
   } catch (error) {
-    console.log(error);
+ 
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };

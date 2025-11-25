@@ -40,7 +40,7 @@ const addSaveList = async (req, res) => {
       .status(200)
       .json({ message: "Create Save List Successfully :)" });
   } catch (error) {
-    console.log(error);
+   
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };
@@ -85,7 +85,7 @@ const getSaveList = async (req, res) => {
       lists: saveLists,
     });
   } catch (error) {
-    console.log(error);
+    
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };

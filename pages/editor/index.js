@@ -25,6 +25,7 @@ import { redirect } from "next/navigation";
 import usersModel from "@/models/users";
 import { email } from "zod";
 import connectToDB from "@/configs/db";
+import Head from "next/head";
 
 // Import editor dynamically with no SSR
 const TextEditor = dynamic(() => import("@/components/text-editor"), {
@@ -227,6 +228,9 @@ export default function EditorPage({ id, initContent }) {
   };
   return (
     <div className="flex flex-col h-full min-h-[calc(100vh-4rem)]">
+       <Head>
+        <title>New story-DigiBlog</title>
+      </Head>
       <header className="py-3 sm:py-4 px-3 sm:px-5 md:px-7 w-full sm:w-11/12 md:w-10/12 mx-auto border-b flex items-center justify-between sticky top-14 sm:top-16 z-10 bg-background">
         <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
           <h1 className="font-headline text-lg sm:text-xl md:text-2xl font-bold flex items-center gap-1 truncate">

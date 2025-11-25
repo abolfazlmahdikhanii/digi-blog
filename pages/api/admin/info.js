@@ -149,7 +149,7 @@ const getAdminInfo = async (req, res) => {
       recentPosts,
     });
   } catch (error) {
-    console.log("Admin Info Error:", error);
+   
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

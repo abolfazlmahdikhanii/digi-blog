@@ -7,6 +7,7 @@ import NotificationItem from "@/components/notification-item";
 import { Spinner } from "@/components/ui/spinner";
 import ShowMoreBtn from "@/components/show-more-btn";
 import { toast } from "sonner";
+import Head from "next/head";
 
 export default function NotificationsPage() {
   const {
@@ -52,6 +53,9 @@ export default function NotificationsPage() {
 
   return (
     <div className="w-11/12 mx-auto px-4 mt-6 ">
+       <Head>
+              <title>Notifications-DigiBlog</title>
+            </Head>
       <h1 className="text-4xl font-bold font-headline mb-12">Notifications</h1>
       <Tabs defaultValue="all">
         <TabsList className="bg-transparent p-0 border-b w-full justify-start rounded-none gap-x-3">

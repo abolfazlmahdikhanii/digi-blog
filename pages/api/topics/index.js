@@ -59,7 +59,7 @@ const createNewTopics = async (req, res) => {
         .json({ message: "Validation error", errors: error.errors });
     }
 
-    console.log(error);
+ 
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };
@@ -94,7 +94,7 @@ const getAllTopic = async (req, res) => {
       data: topics,
     });
   } catch (error) {
-    console.log(error);
+    
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };

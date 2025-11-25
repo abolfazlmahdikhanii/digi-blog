@@ -43,6 +43,7 @@ import useFollow from "@/hooks/useFollow";
 import { Spinner } from "@/components/ui/spinner";
 import FollowBtn from "@/components/FollowBtn";
 import HoverProfile from "@/components/hover-profile";
+import Head from "next/head";
 
 const TextEditor = dynamic(() => import("@/components/text-editor"), {
   ssr: false,
@@ -103,6 +104,10 @@ export default function PostPage({ post, totalComments, comments, likes }) {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-12 max-w-4xl">
+      <Head>
+        <title>{post.title}</title>
+        <meta name="description" content={post?.shortDescription} />
+      </Head>
       <article className="prose dark:prose-invert prose-sm sm:prose-base lg:prose-xl mx-auto">
         <h1 className="font-headline font-bold text-2xl sm:text-3xl lg:text-4xl leading-[1.5] mb-2.5">
           {post?.title}

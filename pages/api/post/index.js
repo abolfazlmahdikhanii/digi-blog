@@ -163,7 +163,6 @@ const createNewPost = async (req, res) => {
         .json({ message: "Validation error", errors: error.errors });
     }
 
-    console.log(error);
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };
@@ -238,7 +237,7 @@ const createDraftPost = async (req, res) => {
         .json({ message: "Created Post Successfully:)", id: newPost._id });
     }
   } catch (error) {
-    console.log(error);
+    
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };

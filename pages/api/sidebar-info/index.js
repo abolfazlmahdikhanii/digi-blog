@@ -36,7 +36,7 @@ const handler = async (req, res) => {
       whoFollow: users || [],
     });
   } catch (error) {
-    console.log(error);
+
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",

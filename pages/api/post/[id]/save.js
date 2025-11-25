@@ -54,7 +54,7 @@ const addSave = async (req, res) => {
       return res.status(200).json({ message: "Remove Save Successfully :)" });
     }
   } catch (error) {
-    console.log(error);
+    
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };
@@ -92,7 +92,7 @@ const getSave = async (req, res) => {
       isUserSave: saves.length ? true : false,
     });
   } catch (error) {
-    console.log(error);
+  
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };

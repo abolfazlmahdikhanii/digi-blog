@@ -57,7 +57,7 @@ const followHandler = async (req, res) => {
       return res.status(200).json({ message: "Unfollowed topic successfully" });
     }
   } catch (error) {
-    console.log(error);
+    
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };
@@ -90,7 +90,7 @@ const getFollow = async (req, res) => {
       isFollow: !!isFollow,
     });
   } catch (error) {
-    console.log(error);
+   
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };

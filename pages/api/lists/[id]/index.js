@@ -39,7 +39,7 @@ const removeList = async (req, res) => {
     }
     return res.status(200).json({ message: "List  Remove" });
   } catch (error) {
-    console.log(error);
+    
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };
@@ -82,7 +82,7 @@ const updateStatus = async (req, res) => {
     }
     return res.status(200).json({ message: "List  update" });
   } catch (error) {
-    console.log(error);
+    
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };

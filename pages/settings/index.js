@@ -33,6 +33,7 @@ import { useAuth } from "@/context/AuthContext";
 import usersModel from "@/models/users";
 import { verifyRefreshToken, verifyToken } from "@/lib/utils";
 import connectToDB from "@/configs/db";
+import Head from "next/head";
 
 const MastodonIcon = ({ className }) => (
   <svg
@@ -182,6 +183,9 @@ export default function SettingsPage() {
 
   return (
     <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+       <Head>
+        <title>Setting</title>
+      </Head>
       <div className="grid grid-cols-12 gap-6 sm:gap-8 lg:gap-16">
         <div className="col-span-12 lg:col-span-8">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-headline mb-4 sm:mb-6 md:mb-8">

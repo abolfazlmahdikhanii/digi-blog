@@ -67,7 +67,7 @@ const followHandler = async (req, res) => {
       return res.status(200).json({ message: "unFollow Successfully :)" });
     }
   } catch (error) {
-    console.log(error);
+    
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };
@@ -102,7 +102,7 @@ const getFollow = async (req, res) => {
       isFollow: follow ? true : false,
     });
   } catch (error) {
-    console.log(error);
+    
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };

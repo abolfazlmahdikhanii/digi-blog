@@ -39,7 +39,7 @@ const handler = async (req, res) => {
     }
     return res.status(200).json({ message: "Post  found", post: draftPost });
   } catch (error) {
-    console.log(error);
+    
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };

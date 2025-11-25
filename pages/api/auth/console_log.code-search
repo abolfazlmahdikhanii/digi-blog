@@ -1,0 +1,7 @@
+# Query: console.log
+
+45 results - 33 files
+
+configs\db.js:
+   8:     console.log("Connection Successfully:)");
+  10:     console.log("Connection Has Problem!!");

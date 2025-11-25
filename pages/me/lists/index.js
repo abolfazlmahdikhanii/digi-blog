@@ -12,6 +12,7 @@ import connectToDB from "@/configs/db";
 import usersModel from "@/models/users";
 import { Spinner } from "@/components/ui/spinner";
 import ShowMoreBtn from "@/components/show-more-btn";
+import Head from "next/head";
 
 export default function LibraryPage() {
   const {
@@ -36,6 +37,9 @@ export default function LibraryPage() {
 
   return (
     <div className="container mx-auto px-4 max-w-3xl mt-6 ">
+      <Head>
+        <title>Your library</title>
+      </Head>
       <div className="flex justify-between items-center mb-16">
         <h1 className="text-4xl font-bold font-headline">Your library</h1>
         <CreateList listRefetch={refetch}>

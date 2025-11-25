@@ -29,7 +29,7 @@ import { useRouter } from "next/router";
 export default function AdminLayout({ children }) {
   const { user } = useAuth();
   const { pathname } = useRouter();
-  console.log(pathname);
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">

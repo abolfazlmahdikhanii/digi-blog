@@ -31,7 +31,7 @@ export function UsernameAndSubdomainModal({ onClose }) {
       });
 
       if (!validUser.success) {
-        console.log("Validation errors:", validUser.error);
+       
 
         // Show validation errors to user
         validUser.error.forEach((err) => {
@@ -62,7 +62,7 @@ export function UsernameAndSubdomainModal({ onClose }) {
       refetch();
       setUsername("");
     } catch (error) {
-      console.log("Error:", error);
+  
       setLoading(false);
 
       if (error.message) {

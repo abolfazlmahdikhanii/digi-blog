@@ -35,7 +35,7 @@ const handler = async (req, res) => {
       postId,
       userId: user._id,
     });
-    console.log(isLikeUser);
+   
     if (!isLikeUser) {
       const newLike = likesModel.create({
         commentId: id,
@@ -55,7 +55,7 @@ const handler = async (req, res) => {
       return res.status(200).json({ message: "Remove Like Successfully :)" });
     }
   } catch (error) {
-    console.log(error);
+   
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };
