@@ -64,6 +64,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [timer, setTimer] = useState(120);
   const [isLoading, setIsLoading] = useState(false);
+  const [isOtpLoading, setIsOtpLoading] = useState(false);
   const { refetch ,user} = useAuth();
   const [otp, setOtp] = useState("");
   const router = useRouter();
@@ -83,6 +84,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
+      setIsOtpLoading(true)
       const validEmail = authSchema.parse({ email });
       if (validEmail.email) {
         fetch("/api/auth/send", {
@@ -97,6 +99,7 @@ export default function LoginPage() {
               toast.success("Email Sent Succesfully:)");
               setStep("OTP");
               setTimer(120);
+              setIsOtpLoading(false)
             }
           })
           .catch((err) => {
@@ -253,6 +256,7 @@ export default function LoginPage() {
                   variant="link"
                   className="p-0 h-auto"
                   onClick={handleSendOtp}
+                  disabled={isOtpLoading}
                 >
                   Resend code
                 </Button>
