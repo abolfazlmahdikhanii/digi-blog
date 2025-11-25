@@ -5,6 +5,7 @@ import { verifyRefreshToken, verifyToken } from "@/lib/utils";
 import usersModel from "@/models/users";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { useEffect } from "react";
 
 const LoggedOutHeader = () => (
@@ -175,6 +176,7 @@ export async function getServerSideProps(context) {
     return { props: {} };
   } catch (error) {
     return {
+      notFound:true,
       props: {},
     };
   }

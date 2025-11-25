@@ -234,9 +234,7 @@ export async function getServerSideProps(context) {
 
     if (!detail) {
       return {
-        redirect: {
-          notFound: true,
-        },
+        notFound: true,
       };
     }
 

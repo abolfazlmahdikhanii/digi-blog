@@ -70,13 +70,13 @@ const navLinks = [
   // { href: "#", icon: BarChart2, label: "Stats" },
 ];
 
-const UserMenu = ({ email, name, profileImage = "", logOut }) => (
+const UserMenu = ({ email, name,username, profileImage = "", logOut }) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <Button variant="ghost" className="relative h-9 w-9 rounded-full">
         <Avatar className="h-9 w-9">
           <AvatarImage src={profileImage} alt="User" />
-          <AvatarFallback>{name?.toUpperCase().charAt(0)}</AvatarFallback>
+          <AvatarFallback className={"capitalize"}>{name.charAt(0)}</AvatarFallback>
         </Avatar>
       </Button>
     </DropdownMenuTrigger>
@@ -91,7 +91,7 @@ const UserMenu = ({ email, name, profileImage = "", logOut }) => (
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <Link href="/profile/johndoe">
+        <Link href={`/@${username}`}>
           <DropdownMenuItem>
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>

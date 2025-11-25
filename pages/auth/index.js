@@ -64,7 +64,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [timer, setTimer] = useState(120);
   const [isLoading, setIsLoading] = useState(false);
-  const { refetch } = useAuth();
+  const { refetch ,user} = useAuth();
   const [otp, setOtp] = useState("");
   const router = useRouter();
   useEffect(() => {
@@ -134,12 +134,13 @@ export default function LoginPage() {
       }
       
       refetch();
+      console.log(user);
       if (data.isProfileComplete) {
         router.replace("/");
       } else {
         router.replace("/get-started");
       }
-      setIsLoading(false)
+    
     } catch (error) {
       setIsLoading(false);
       toast.error(error.message);

@@ -232,6 +232,13 @@ export async function getServerSideProps(context) {
         },
       };
     }
+    // if (!currentUser.isProfileComplete) {
+    //   return {
+    //     redirect: {
+    //       destination: "/get-started",
+    //     },
+    //   };
+    // }
 
     // const existingPostIds = posts.map((post) => post._id.toString());
 

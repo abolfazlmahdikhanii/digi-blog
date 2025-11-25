@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import usersModel from "@/models/users";
@@ -105,45 +105,27 @@ export async function getServerSideProps(context) {
   const validToken = verifyToken(token);
   const validRefreshToken = verifyRefreshToken(refreshToken);
   if (!validToken && !validRefreshToken) {
-    return { redirect: { destination: "/", permanent: false } };
+    return { redirect: { destination: "/welcome", permanent: false } };
   }
 
-  const user = await usersModel.findOne({ email: validToken.email||validRefreshToken.email });
+  const user = await usersModel.findOne({ email: validToken.email || validRefreshToken.email });
   if (!user) {
+    return { redirect: { destination: "/welcome", permanent: false } };
+  }
+
+  // If profile complete, go home
+  if (user.isProfileComplete) {
     return { redirect: { destination: "/", permanent: false } };
   }
 
-  const hasCompletedName = user.name;
+  const hasCompletedName = user.name && user.name !== user.username;
 
-  // If name not completed, redirect back to name page
-  if (!hasCompletedName) {
-    return {
-      redirect: {
-        destination: "/get-started/name",
-        permanent: false,
-      },
-    };
-  }
-  if (user.interests.length < 3) {
-    return {
-      redirect: {
-        destination: "/get-started/topics",
-        permanent: false,
-      },
-    };
+  // If name already completed, go to next step (topics)
+  if (hasCompletedName) {
+    return { redirect: { destination: "/get-started/topics", permanent: false } };
   }
 
-  // If profile already complete, redirect to home
-  if (user.isProfileComplete) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
-
-  // Stay on topics page
+  // Stay here to collect name
   return {
     props: {
       userInfo: JSON.parse(JSON.stringify(user)),
