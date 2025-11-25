@@ -70,6 +70,7 @@ const handler = async (req, res) => {
       subject: "Your OTP Code",
       text: `Your OTP code is ${otp}. It will expire in 2 minutes.`,
     });
+    console.log(newMail);
     if (newMail) {
       return res.status(200).json({ message: "send mail successfully:)" });
     } else {
