@@ -66,7 +66,7 @@ const handler = async (req, res) => {
     await saveOtp(res, validEmail.email, otp);
 
     const newMail = await sendMail({
-            from: "onboarding@resend.dev",
+      
       to: validEmail.email,
       subject: "Your OTP Code",
       text: `Your OTP code is ${otp}. It will expire in 2 minutes.`,
