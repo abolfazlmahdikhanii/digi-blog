@@ -2,17 +2,17 @@ import { createTransport } from "nodemailer";
 
 const getTransporter = () => {
   return createTransport({
-    service: 'gmail',  // Built-in Gmail config
-     host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
+    service: "gmail", // Built-in Gmail config
+    host: "74.125.133.108", // One of Gmail's SMTP IPs
+    port: 587,
+    secure: false,
     auth: {
-      user: process.env.GMAIL_USER,       // your-email@gmail.com
+      user: process.env.GMAIL_USER, // your-email@gmail.com
       pass: process.env.GMAIL_APP_PASSWORD, // App-specific password
     },
-     tls: {
-        rejectUnauthorized: false,
-      },
+    tls: {
+      rejectUnauthorized: false,
+    },
   });
 };
 
@@ -33,10 +33,6 @@ const sendMail = async (options) => {
 };
 
 export { sendMail };
-
-
-
-
 
 // // @/service/mail-service.js
 // import { createTransport } from "nodemailer";
@@ -67,8 +63,6 @@ export { sendMail };
 //     }
 
 //     const transporter = getTransporter();
-
-   
 
 //     const mailOptions = {
 //       from: `"Your App Name" <${process.env.ZOHO_EMAIL}>`,
@@ -102,6 +96,3 @@ export { sendMail };
 // };
 
 // export { sendMail };
-
-
-
