@@ -3,10 +3,16 @@ import { createTransport } from "nodemailer";
 const getTransporter = () => {
   return createTransport({
     service: 'gmail',  // Built-in Gmail config
+     host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
     auth: {
       user: process.env.GMAIL_USER,       // your-email@gmail.com
       pass: process.env.GMAIL_APP_PASSWORD, // App-specific password
     },
+     tls: {
+        rejectUnauthorized: false,
+      },
   });
 };
 
