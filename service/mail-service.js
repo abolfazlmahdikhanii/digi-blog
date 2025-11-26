@@ -8,12 +8,12 @@ const getTransporter = () => {
     );
   }
 
-  const smtpPort = Number(process.env.ZOHO_SMTP_PORT) || 587; // Changed default to 587
+
   
   const transportOptions = {
-    host: process.env.ZOHO_SMTP_HOST || "smtp.zoho.com",
-    port: smtpPort,
-    secure: smtpPort === 465, // true for 465, false for 587
+    host:  "smtp.zoho.com",
+    port: 465,
+    secure: true,
     auth: {
       user: process.env.ZOHO_EMAIL,
       pass: process.env.ZOHO_PASSWORD,
