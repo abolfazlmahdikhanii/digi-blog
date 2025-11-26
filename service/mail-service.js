@@ -1,5 +1,5 @@
 // @/service/mail-service.js
-import axios from 'axios';
+import axios from "axios";
 
 const sendMail = async (options) => {
   try {
@@ -8,15 +8,17 @@ const sendMail = async (options) => {
     }
 
     // Calculate expiration time if not provided
-    const expirationTime = options.time || (() => {
-      const now = new Date();
-      now.setMinutes(now.getMinutes() + 15);
-      return now.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
-    })();
+    const expirationTime =
+      options.time ||
+      (() => {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + 15);
+        return now.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+      })();
 
     const templateParams = {
       to_email: options.to,
@@ -29,22 +31,22 @@ const sendMail = async (options) => {
       template_id: process.env.EMAILJS_TEMPLATE_ID,
       to: options.to,
       passcode: options.passcode,
-      time: expirationTime
+      time: expirationTime,
     });
 
-    const url = 'https://api.emailjs.com/api/v1.0/email/send';
+    const url = "https://api.emailjs.com/api/v1.0/email/send";
 
     const data = {
-      service_id: process.env.EMAILJS_SERVICE_ID,
+      service_id:process.env.EMAILJS_SERVICE_ID,
       template_id: process.env.EMAILJS_TEMPLATE_ID,
-      public_key: process.env.EMAILJS_PUBLIC_KEY, // Updated field
-      template_params: templateParams,
+      user_id: process.env.EMAILJS_PUBLIC_KEY,
+      template_params:templateParams
     };
 
     const response = await axios.post(url, data, {
       headers: {
-        'Content-Type': 'application/json',
-      }
+        "Content-Type": "application/json",
+      },
     });
 
     console.log("Email sent successfully:", response.data);
