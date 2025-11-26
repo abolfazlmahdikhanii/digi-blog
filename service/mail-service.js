@@ -1,6 +1,5 @@
 import { createTransport } from "nodemailer";
 
-
 const getTransporter = () => {
   if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
     throw new Error(
@@ -8,25 +7,25 @@ const getTransporter = () => {
     );
   }
 
-
-  
   const transportOptions = {
-    host:  "smtp.zoho.com",
+    host: "smtp.zoho.com",
     port: 465,
     secure: true,
+
     auth: {
       user: process.env.ZOHO_EMAIL,
       pass: process.env.ZOHO_PASSWORD,
     },
     // Add these for better Vercel compatibility
-    debug: process.env.NODE_ENV === 'development', // Enable debug in dev
-    logger: process.env.NODE_ENV === 'development', // Enable logging in dev
+    debug: process.env.NODE_ENV === "development", // Enable debug in dev
+    logger: process.env.NODE_ENV === "development", // Enable logging in dev
     connectionTimeout: 15000, // 15 seconds
     greetingTimeout: 15000,
     socketTimeout: 20000, // 20 seconds
     tls: {
       rejectUnauthorized: false,
-    }
+    },
+    requireTLS: true,
   };
 
   return createTransport(transportOptions);
@@ -48,7 +47,7 @@ const sendMail = async (options) => {
     }
 
     const transporter = getTransporter();
-    
+
     // Verify connection configuration
     try {
       console.log("Verifying SMTP connection...");
@@ -66,45 +65,54 @@ const sendMail = async (options) => {
       text: options.text,
       html: options.html || `<p>${options.text}</p>`,
       headers: {
-        'X-Priority': '1',
-        'X-MSMail-Priority': 'High',
-        'Importance': 'high'
-      }
+        "X-Priority": "1",
+        "X-MSMail-Priority": "High",
+        Importance: "high",
+      },
     };
 
     console.log(`Sending email to: ${options.to}`);
-    console.log("Mail options:", JSON.stringify({
-      from: mailOptions.from,
-      to: mailOptions.to,
-      subject: mailOptions.subject,
-    }, null, 2));
+    console.log(
+      "Mail options:",
+      JSON.stringify(
+        {
+          from: mailOptions.from,
+          to: mailOptions.to,
+          subject: mailOptions.subject,
+        },
+        null,
+        2
+      )
+    );
 
     const info = await transporter.sendMail(mailOptions);
-    
+
     console.log("✓ Email sent successfully:", {
       messageId: info.messageId,
       accepted: info.accepted,
       rejected: info.rejected,
-      response: info.response
+      response: info.response,
     });
 
     // Check if email was accepted
     if (info.rejected && info.rejected.length > 0) {
-      throw new Error(`Email rejected by server for: ${info.rejected.join(', ')}`);
+      throw new Error(
+        `Email rejected by server for: ${info.rejected.join(", ")}`
+      );
     }
-    
-    return { 
-      success: true, 
+
+    return {
+      success: true,
       messageId: info.messageId,
       accepted: info.accepted,
-      response: info.response 
+      response: info.response,
     };
   } catch (error) {
     console.error("✗ Email sending failed:", {
       message: error.message,
       code: error.code,
       command: error.command,
-      response: error.response
+      response: error.response,
     });
 
     throw new Error(`Email sending failed: ${error.message}`);
