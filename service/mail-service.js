@@ -9,8 +9,8 @@ const getTransporter = () => {
 
   return createTransport({
     host: process.env.ZOHO_SMTP_HOST || "smtp.zoho.com",
-    port: 587,
-    secure: false,
+    port: 465,
+    secure: true,
     auth: {
       user: process.env.ZOHO_EMAIL,
       pass: process.env.ZOHO_PASSWORD,
@@ -32,6 +32,11 @@ const sendMail = async (options) => {
       subject: options.subject,
       text: options.text,
       html: options.html || `<p>${options.text}</p>`,
+         headers: {
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+        'Importance': 'high'
+      }
     };
 
     const info = await transporter.sendMail(mailOptions);
