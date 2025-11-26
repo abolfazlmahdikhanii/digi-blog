@@ -6,25 +6,24 @@ const getTransporter = () => {
     throw new Error("Zoho email credentials not configured");
   }
 
-  return createTransport({
-    host: "smtp.zoho.com",
-    port: 587,                // ← CHANGE TO 587 (this is the key!)
-    secure: false,            // ← Must be false when using port 587
-    auth: {
-      user: process.env.ZOHO_EMAIL,
-      pass: process.env.ZOHO_PASSWORD, // Must be Zoho App Password!
-    },
-    tls: {
-      ciphers: "SSLv3",
-      // rejectUnauthorized: false, // Only if you're having cert issues (rare)
-    },
-    // Optional: Increase timeout (helps on cold starts)
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
-  });
-};
-
+return createTransport({
+  host: "smtp.zoho.eu",           // ← THIS IS THE MAGIC LINE (use .eu, not .com)
+  port: 587,
+  secure: false,                  // MUST be false on 587
+  auth: {
+    user: process.env.ZOHO_EMAIL,        // e.g. hello@yourdomain.com
+    pass: process.env.ZOHO_PASSWORD,     // ← MUST be 16-char App Password
+  },
+  tls: {
+    ciphers: "SSLv3",
+    rejectUnauthorized: false,
+  },
+  // Critical for Vercel cold starts
+  connectionTimeout: 8000,
+  greetingTimeout: 8000,
+  socketTimeout: 9000,
+});
+}
 const sendMail = async (options) => {
   try {
     if (!options?.to || !options?.subject || !options?.text) {
