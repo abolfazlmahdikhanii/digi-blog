@@ -1,5 +1,5 @@
 import { createTransport } from "nodemailer";
-import type SMTPTransport from "nodemailer/lib/smtp-transport";
+
 
 const getTransporter = () => {
   if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
@@ -10,7 +10,7 @@ const getTransporter = () => {
 
   const smtpPort = Number(process.env.ZOHO_SMTP_PORT) || 587; // Changed default to 587
   
-  const transportOptions: SMTPTransport.Options = {
+  const transportOptions = {
     host: process.env.ZOHO_SMTP_HOST || "smtp.zoho.com",
     port: smtpPort,
     secure: smtpPort === 465, // true for 465, false for 587
