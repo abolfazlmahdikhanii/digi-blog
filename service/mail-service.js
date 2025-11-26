@@ -2,16 +2,12 @@ import { createTransport } from "nodemailer";
 
 const getTransporter = () => {
   return createTransport({
-    service: "gmail", // Built-in Gmail config
-    host: "74.125.133.108", // One of Gmail's SMTP IPs
-    port: 587,
-    secure: false,
+    host: "smtp.resend.com", // One of Gmail's SMTP IPs
+    port: 465,
+    secure: true,
     auth: {
-      user: process.env.GMAIL_USER, // your-email@gmail.com
-      pass: process.env.GMAIL_APP_PASSWORD, // App-specific password
-    },
-    tls: {
-      rejectUnauthorized: false,
+      user: "resend", // your-email@gmail.com
+      pass: process.env.RESEND_API_KEY, // App-specific password
     },
   });
 };
@@ -20,7 +16,7 @@ const sendMail = async (options) => {
   try {
     const transporter = getTransporter();
     const info = await transporter.sendMail({
-      from: process.env.GMAIL_USER,
+      from: "Digiblog",
       to: options.to,
       subject: options.subject,
       text: options.text,
