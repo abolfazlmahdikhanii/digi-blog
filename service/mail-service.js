@@ -25,10 +25,8 @@ const sendMail = async (options) => {
 
     // Prepare template parameters
     const templateParams = {
-      to_email: options.to,
-      subject: options.subject,
-      message: options.text,
-      html_content: options.html || `<p>${options.text}</p>`,
+      to_email: options.to, // Recipient email
+      passcode: options.passcode, // OTP code
       ...options.templateParams, // Spread any additional params
     };
 
