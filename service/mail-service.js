@@ -1,122 +1,70 @@
+// @/service/mail-service.js
 import { createTransport } from "nodemailer";
 
 const getTransporter = () => {
   if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
-    throw new Error(
-      "Zoho email credentials not configured in environment variables"
-    );
+    throw new Error("Zoho email credentials not configured");
   }
 
-  const transportOptions = {
-    service: "zoho",
+  return createTransport({
     host: "smtp.zoho.com",
-    port: 587,
-    // secure: true,
-
+    port: 587,                // ← CHANGE TO 587 (this is the key!)
+    secure: false,            // ← Must be false when using port 587
     auth: {
       user: process.env.ZOHO_EMAIL,
-      pass: process.env.ZOHO_PASSWORD,
+      pass: process.env.ZOHO_PASSWORD, // Must be Zoho App Password!
     },
-    // Add these for better Vercel compatibility
-    debug: process.env.NODE_ENV === "development", // Enable debug in dev
-    logger: process.env.NODE_ENV === "development", // Enable logging in dev
-    connectionTimeout: 15000, // 15 seconds
-    greetingTimeout: 15000,
-    socketTimeout: 20000, // 20 seconds
     tls: {
-      rejectUnauthorized: false,
+      ciphers: "SSLv3",
+      // rejectUnauthorized: false, // Only if you're having cert issues (rare)
     },
-    requireTLS: true,
-  };
-
-  return createTransport(transportOptions);
+    // Optional: Increase timeout (helps on cold starts)
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
+  });
 };
 
 const sendMail = async (options) => {
   try {
-    console.log("Starting email send process");
-    console.log("Email configuration:", {
-      hasEmail: !!process.env.ZOHO_EMAIL,
-      hasPassword: !!process.env.ZOHO_PASSWORD,
-      smtpHost: process.env.ZOHO_SMTP_HOST || "smtp.zoho.com",
-      smtpPort: process.env.ZOHO_SMTP_PORT || 587,
-    });
-
-    // Validate inputs
     if (!options?.to || !options?.subject || !options?.text) {
-      throw new Error("Missing required email fields (to, subject, or text)");
+      throw new Error("Missing required email fields");
     }
 
     const transporter = getTransporter();
 
-    // Verify connection configuration
-    try {
-      console.log("Verifying SMTP connection...");
-      const verification = await transporter.verify();
-      console.log("✓ SMTP connection verified:", verification);
-    } catch (error) {
-      console.error("✗ SMTP verification failed:", error);
-      throw new Error(`SMTP verification failed: ${error.message}`);
-    }
+    // Optional: Verify connection (uncomment to debug once)
+    // await transporter.verify();
+    // console.log("SMTP connection verified");
 
     const mailOptions = {
-      from: `"Your App Name" <${process.env.ZOHO_EMAIL}>`, // Add display name
+      from: `"Your App Name" <${process.env.ZOHO_EMAIL}>`,
       to: options.to,
       subject: options.subject,
       text: options.text,
       html: options.html || `<p>${options.text}</p>`,
-      headers: {
-        "X-Priority": "1",
-        "X-MSMail-Priority": "High",
-        Importance: "high",
-      },
     };
-
-    console.log(`Sending email to: ${options.to}`);
-    console.log(
-      "Mail options:",
-      JSON.stringify(
-        {
-          from: mailOptions.from,
-          to: mailOptions.to,
-          subject: mailOptions.subject,
-        },
-        null,
-        2
-      )
-    );
 
     const info = await transporter.sendMail(mailOptions);
 
-    console.log("✓ Email sent successfully:", {
-      messageId: info.messageId,
-      accepted: info.accepted,
-      rejected: info.rejected,
-      response: info.response,
-    });
-
-    // Check if email was accepted
-    if (info.rejected && info.rejected.length > 0) {
-      throw new Error(
-        `Email rejected by server for: ${info.rejected.join(", ")}`
-      );
-    }
+    console.log("Email sent:", info.messageId);
 
     return {
       success: true,
       messageId: info.messageId,
       accepted: info.accepted,
-      response: info.response,
     };
   } catch (error) {
-    console.error("✗ Email sending failed:", {
+    console.error("Failed to send email:", {
       message: error.message,
       code: error.code,
-      command: error.command,
       response: error.response,
     });
 
-    throw new Error(`Email sending failed: ${error.message}`);
+    return {
+      success: false,
+      error: error.message,
+    };
   }
 };
 
