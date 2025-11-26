@@ -1,79 +1,65 @@
 // @/service/mail-service.js
-import { Resend } from "resend";
+import emailjs from '@emailjs/browser';
 
-const getResendClient = () => {
-  if (!process.env.RESEND_API_KEY) {
-    throw new Error("Resend API key not configured");
+
+
+// Initialize EmailJS with your public key
+const initEmailJS = () => {
+  if (!EMAILJS_PUBLIC_KEY) {
+    throw new Error("EmailJS public key not configured");
   }
-  return new Resend(process.env.RESEND_API_KEY);
+  
+  emailjs.init(EMAILJS_PUBLIC_KEY);
 };
 
+
+ 
 const sendMail = async (options) => {
   try {
-    // Validate required fields
-    if (!options?.to || !options?.subject || !options?.text) {
-      throw new Error("Missing required email fields (to, subject, text)");
+    if (!options?.subject || !options?.text) {
+      throw new Error("Missing required email fields");
     }
 
-    if (!options?.from) {
-      throw new Error("Missing required from email address");
-    }
+    // Initialize EmailJS
+    initEmailJS();
 
-    const resend = getResendClient();
-
-    // Prepare email body
-    const emailBody = {
-      from: options.from,
-      to: options.to,
+    // Prepare template parameters
+    const templateParams = {
+      to_email: options.to,
       subject: options.subject,
+      message: options.text,
+      html_content: options.html || `<p>${options.text}</p>`,
+      ...options.templateParams, // Spread any additional params
     };
 
-    // Handle text/html content
-    if (options.html) {
-      emailBody.html = options.html;
-    } else {
-      emailBody.text = options.text;
-      // Auto-generate HTML from text if not provided
-      emailBody.html = `<p>${options.text.replace(/\n/g, "<br>")}</p>`;
-    }
+    // Send email using EmailJS with your service and template
+    const response = await emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      templateParams
+    );
 
-
-
-    // Send email
-    const response = await resend.emails.send(emailBody);
-
-    // Check for errors
-    if (response.error) {
-      throw new Error(response.error.message);
-    }
-
-    console.log("Email sent successfully:", {
-      messageId: response.data.id,
-      from: options.from,
-      to: options.to,
-    });
+    console.log("Email sent successfully:", response);
 
     return {
       success: true,
-      messageId: response.data.id,
-      from: options.from,
-      to: options.to,
+      messageId: response.text,
+      status: response.status,
     };
   } catch (error) {
     console.error("Failed to send email:", {
-      message: error.message,
-      timestamp: new Date().toISOString(),
+      message: error.message || error.text,
+      status: error.status,
     });
 
     return {
       success: false,
-      error: error.message,
+      error: error.message || error.text || "Unknown error",
     };
   }
 };
 
 export { sendMail };
-
 
 // // @/service/mail-service.js
 // import { createTransport } from "nodemailer";
