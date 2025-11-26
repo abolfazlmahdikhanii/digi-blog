@@ -3,7 +3,7 @@ import emailjs from '@emailjs/browser';
 
 
 
-// Initialize EmailJS with your public key
+// Initialize EmailJS with your public ke
 const initEmailJS = () => {
   if (!EMAILJS_PUBLIC_KEY) {
     throw new Error("EmailJS public key not configured");
