@@ -29,7 +29,7 @@ const sendMail = async (options) => {
     console.log("Sending email with params:", {
       service_id: process.env.EMAILJS_SERVICE_ID,
       template_id: process.env.EMAILJS_TEMPLATE_ID,
-      to: options.to,
+      to_email: options.to,
       passcode: options.passcode,
       time: expirationTime,
     });
