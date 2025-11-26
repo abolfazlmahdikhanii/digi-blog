@@ -1,12 +1,8 @@
-import emailjs from "@emailjs/browser";
+// @/service/mail-service.js
+import axios from 'axios';
 
-/**
- * Send email using EmailJS (Server-side compatible)
- * @param {Object} options - Email options
- * @param {string} options.to - Recipient email
- * @param {string} options.passcode - OTP code to send
- * @param {string} options.time - Expiration time for the OTP (optional)
- */
+
+ 
 const sendMail = async (options) => {
   try {
     if (!options?.to || !options?.passcode) {
@@ -14,17 +10,15 @@ const sendMail = async (options) => {
     }
 
     // Calculate expiration time if not provided
-    const expirationTime =
-      options.time ||
-      (() => {
-        const now = new Date();
-        now.setMinutes(now.getMinutes() + 15);
-        return now.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        });
-      })();
+    const expirationTime = options.time || (() => {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() + 15);
+      return now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+      });
+    })();
 
     // Prepare template parameters matching your EmailJS template
     const templateParams = {
@@ -33,15 +27,30 @@ const sendMail = async (options) => {
       time: expirationTime, // Expiration time
     };
 
+    console.log("Sending email with params:", {
+      service_id: process.env.EMAILJS_SERVICE_ID,
+      template_id: process.env.EMAILJS_TEMPLATE_ID,
+      to: options.to,
+      passcode: options.passcode,
+      time: expirationTime
+    });
+
+    // EmailJS REST API endpoint
+    const url = 'https://api.emailjs.com/api/v1.0/email/send';
+    
+    const data = {
+      service_id: process.env.EMAILJS_SERVICE_ID,
+      template_id: process.env.EMAILJS_TEMPLATE_ID,
+      user_id: process.env.EMAILJS_PUBLIC_KEY,
+      template_params: templateParams
+    };
+
     // Send email using EmailJS REST API
-    const response = await emailjs.send(
-      process.env.EMAILJS_SERVICE_ID,
-      process.env.EMAILJS_TEMPLATE_ID,
-      templateParams,
-      {
-        publicKey: process.env.EMAILJS_PUBLIC_KEY,
+    const response = await axios.post(url, data, {
+      headers: {
+        'Content-Type': 'application/json',
       }
-    );
+    });
 
     console.log("Email sent successfully:", response.data);
 
