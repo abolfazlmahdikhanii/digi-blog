@@ -8,9 +8,10 @@ const getTransporter = () => {
   }
 
   const transportOptions = {
+    service: "zoho",
     host: "smtp.zoho.com",
-    port: 465,
-    secure: true,
+    port: 587,
+    // secure: true,
 
     auth: {
       user: process.env.ZOHO_EMAIL,
