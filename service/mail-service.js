@@ -34,7 +34,7 @@ const sendMail = async (options) => {
     };
 
     // Send email using EmailJS REST API
-    const response = await email.send(
+    const response = await emailjs.send(
       process.env.EMAILJS_SERVICE_ID,
       process.env.EMAILJS_TEMPLATE_ID,
       templateParams,
