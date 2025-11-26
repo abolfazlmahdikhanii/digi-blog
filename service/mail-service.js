@@ -1,127 +1,78 @@
 // @/service/mail-service.js
-import emailjs from '@emailjs/browser';
+import axios from 'axios';
 
+// Your EmailJS credentials
+const EMAILJS_SERVICE_ID = 'your_service_id'; // Replace with your actual service ID
+const EMAILJS_TEMPLATE_ID = 'your_template_id'; // Replace with your actual template ID
+const EMAILJS_PUBLIC_KEY = 'your_public_key'; // Replace with your actual public key
 
-
-// Initialize EmailJS with your public ke
-const initEmailJS = () => {
-  if (!EMAILJS_PUBLIC_KEY) {
-    throw new Error("EmailJS public key not configured");
-  }
-  
-  emailjs.init(EMAILJS_PUBLIC_KEY);
-};
-
-
- 
+/**
+ * Send email using EmailJS (Server-side compatible)
+ * @param {Object} options - Email options
+ * @param {string} options.to - Recipient email
+ * @param {string} options.passcode - OTP code to send
+ * @param {string} options.time - Expiration time for the OTP (optional)
+ */
 const sendMail = async (options) => {
   try {
-    if (!options?.subject || !options?.text) {
-      throw new Error("Missing required email fields");
+    if (!options?.to || !options?.passcode) {
+      throw new Error("Missing required email fields (to, passcode)");
     }
 
-    // Initialize EmailJS
-    initEmailJS();
+    // Calculate expiration time if not provided
+    const expirationTime = options.time || (() => {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() + 15);
+      return now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+      });
+    })();
 
-    // Prepare template parameters
+    // Prepare template parameters matching your EmailJS template
     const templateParams = {
       to_email: options.to, // Recipient email
       passcode: options.passcode, // OTP code
-      ...options.templateParams, // Spread any additional params
+      time: expirationTime, // Expiration time
     };
 
-    // Send email using EmailJS with your service and template
-    const response = await emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID,
-      templateParams
-    );
+    // EmailJS REST API endpoint
+    const url = 'https://api.emailjs.com/api/v1.0/email/send';
+    
+    const data = {
+      service_id: EMAILJS_SERVICE_ID,
+      template_id: EMAILJS_TEMPLATE_ID,
+      user_id: EMAILJS_PUBLIC_KEY,
+      template_params: templateParams
+    };
 
-    console.log("Email sent successfully:", response);
+    // Send email using EmailJS REST API
+    const response = await axios.post(url, data, {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    console.log("Email sent successfully:", response.data);
 
     return {
       success: true,
-      messageId: response.text,
+      messageId: response.data,
       status: response.status,
     };
   } catch (error) {
     console.error("Failed to send email:", {
-      message: error.message || error.text,
-      status: error.status,
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
     });
 
     return {
       success: false,
-      error: error.message || error.text || "Unknown error",
+      error: error.response?.data || error.message || "Unknown error",
     };
   }
 };
 
 export { sendMail };
-
-// // @/service/mail-service.js
-// import { createTransport } from "nodemailer";
-
-// const getTransporter = () => {
-//   if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
-//     throw new Error("Zoho email credentials not configured");
-//   }
-
-//   return createTransport({
-//     service: "zoho",
-//     host: "smtp.zoho.com", // ← THIS IS THE MAGIC LINE (use .eu, not .com)
-//     port: 465,
-//     secure: true, // MUST be false on 587
-//     auth: {
-//       user: process.env.ZOHO_EMAIL, // e.g. hello@yourdomain.com
-//       pass: process.env.ZOHO_PASSWORD, // ← MUST be 16-char App Password
-//     },
-//     tls: {
-//       rejectUnauthorized: true,
-//     },
-//   });
-// };
-// const sendMail = async (options) => {
-//   try {
-//     if (!options?.to || !options?.subject || !options?.text) {
-//       throw new Error("Missing required email fields");
-//     }
-
-//     const transporter = getTransporter();
-
-//     // Optional: Verify connection (uncomment to debug once)
-//     // await transporter.verify();
-//     // console.log("SMTP connection verified");
-
-//     const mailOptions = {
-//       from: `"Your App Name" <${process.env.ZOHO_EMAIL}>`,
-//       to: options.to,
-//       subject: options.subject,
-//       text: options.text,
-//       html: options.html || `<p>${options.text}</p>`,
-//     };
-
-//     const info = await transporter.sendMail(mailOptions);
-
-//     console.log("Email sent:", info.messageId);
-
-//     return {
-//       success: true,
-//       messageId: info.messageId,
-//       accepted: info.accepted,
-//     };
-//   } catch (error) {
-//     console.error("Failed to send email:", {
-//       message: error.message,
-//       code: error.code,
-//       response: error.response,
-//     });
-
-//     return {
-//       success: false,
-//       error: error.message,
-//     };
-//   }
-// };
-
-// export { sendMail };
