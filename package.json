@@ -72,6 +72,7 @@
     "react-intersection-observer": "^10.0.0",
     "react-textarea-autosize": "^8.5.9",
     "recharts": "^2.15.4",
+    "resend": "^6.5.2",
     "slugify": "^1.6.6",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",

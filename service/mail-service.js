@@ -1,34 +1,79 @@
-import { createTransport } from "nodemailer";
+// @/service/mail-service.js
+import { Resend } from "resend";
 
-const getTransporter = () => {
-  return createTransport({
-    host: "smtp.resend.com", // One of Gmail's SMTP IPs
-    port: 465,
-    secure: true,
-    auth: {
-      user: "resend", // your-email@gmail.com
-      pass: process.env.RESEND_API_KEY, // App-specific password
-    },
-  });
+const getResendClient = () => {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error("Resend API key not configured");
+  }
+  return new Resend(process.env.RESEND_API_KEY);
 };
 
 const sendMail = async (options) => {
   try {
-    const transporter = getTransporter();
-    const info = await transporter.sendMail({
-      from: "Digiblog",
+    // Validate required fields
+    if (!options?.to || !options?.subject || !options?.text) {
+      throw new Error("Missing required email fields (to, subject, text)");
+    }
+
+    if (!options?.from) {
+      throw new Error("Missing required from email address");
+    }
+
+    const resend = getResendClient();
+
+    // Prepare email body
+    const emailBody = {
+      from: options.from,
       to: options.to,
       subject: options.subject,
-      text: options.text,
-      html: options.html || `<p>${options.text}</p>`,
+    };
+
+    // Handle text/html content
+    if (options.html) {
+      emailBody.html = options.html;
+    } else {
+      emailBody.text = options.text;
+      // Auto-generate HTML from text if not provided
+      emailBody.html = `<p>${options.text.replace(/\n/g, "<br>")}</p>`;
+    }
+
+
+
+    // Send email
+    const response = await resend.emails.send(emailBody);
+
+    // Check for errors
+    if (response.error) {
+      throw new Error(response.error.message);
+    }
+
+    console.log("Email sent successfully:", {
+      messageId: response.data.id,
+      from: options.from,
+      to: options.to,
     });
-    return { success: true, messageId: info.messageId };
+
+    return {
+      success: true,
+      messageId: response.data.id,
+      from: options.from,
+      to: options.to,
+    };
   } catch (error) {
-    throw new Error(`Email failed: ${error.message}`);
+    console.error("Failed to send email:", {
+      message: error.message,
+      timestamp: new Date().toISOString(),
+    });
+
+    return {
+      success: false,
+      error: error.message,
+    };
   }
 };
 
 export { sendMail };
+
 
 // // @/service/mail-service.js
 // import { createTransport } from "nodemailer";
@@ -59,6 +104,10 @@ export { sendMail };
 //     }
 
 //     const transporter = getTransporter();
+
+//     // Optional: Verify connection (uncomment to debug once)
+//     // await transporter.verify();
+//     // console.log("SMTP connection verified");
 
 //     const mailOptions = {
 //       from: `"Your App Name" <${process.env.ZOHO_EMAIL}>`,
