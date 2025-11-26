@@ -23,7 +23,7 @@ const sendMail = async (options) => {
 
     // Prepare email body
     const emailBody = {
-      from: "onboarding@resend.dev",
+      from: options.from,
       to: options.to,
       subject: options.subject,
     };
@@ -36,6 +36,8 @@ const sendMail = async (options) => {
       // Auto-generate HTML from text if not provided
       emailBody.html = `<p>${options.text.replace(/\n/g, "<br>")}</p>`;
     }
+
+
 
     // Send email
     const response = await resend.emails.send(emailBody);
@@ -71,6 +73,7 @@ const sendMail = async (options) => {
 };
 
 export { sendMail };
+
 
 // // @/service/mail-service.js
 // import { createTransport } from "nodemailer";
