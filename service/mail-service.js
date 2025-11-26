@@ -1,10 +1,4 @@
-// @/service/mail-service.js
-import axios from 'axios';
-
-// Your EmailJS credentials
-const EMAILJS_SERVICE_ID = 'your_service_id'; // Replace with your actual service ID
-const EMAILJS_TEMPLATE_ID = 'your_template_id'; // Replace with your actual template ID
-const EMAILJS_PUBLIC_KEY = 'your_public_key'; // Replace with your actual public key
+import emailjs from "@emailjs/browser";
 
 /**
  * Send email using EmailJS (Server-side compatible)
@@ -20,15 +14,17 @@ const sendMail = async (options) => {
     }
 
     // Calculate expiration time if not provided
-    const expirationTime = options.time || (() => {
-      const now = new Date();
-      now.setMinutes(now.getMinutes() + 15);
-      return now.toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        hour12: true 
-      });
-    })();
+    const expirationTime =
+      options.time ||
+      (() => {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + 15);
+        return now.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+      })();
 
     // Prepare template parameters matching your EmailJS template
     const templateParams = {
@@ -37,22 +33,15 @@ const sendMail = async (options) => {
       time: expirationTime, // Expiration time
     };
 
-    // EmailJS REST API endpoint
-    const url = 'https://api.emailjs.com/api/v1.0/email/send';
-    
-    const data = {
-      service_id: EMAILJS_SERVICE_ID,
-      template_id: EMAILJS_TEMPLATE_ID,
-      user_id: EMAILJS_PUBLIC_KEY,
-      template_params: templateParams
-    };
-
     // Send email using EmailJS REST API
-    const response = await axios.post(url, data, {
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await email.send(
+      process.env.EMAILJS_SERVICE_ID,
+      process.env.EMAILJS_TEMPLATE_ID,
+      templateParams,
+      {
+        publicKey: process.env.EMAILJS_PUBLIC_KEY,
       }
-    });
+    );
 
     console.log("Email sent successfully:", response.data);
 
