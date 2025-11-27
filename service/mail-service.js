@@ -1,8 +1,4 @@
-// /service/mail-service.js
-import { MailerooClient, EmailAddress } from "maileroo-sdk";
-import { NextResponse } from "next/server";
-
-const client = new MailerooClient(process.env.MAILEROO_API_KEY, 20000);
+import axios from "axios";
 
 /**
  * options: { to: string, passcode: string, subject?: string, html?: string, plain?: string }
@@ -15,49 +11,55 @@ const sendMail = async (options) => {
 
     const subject = options.subject || "Your Verification Code";
 
-    // Clean, modern English OTP template
-    const html = `<p>Your OTP is: <strong>${options.passcode}</strong></p>`;
-    const plain = `Your OTP is: ${options.passcode}`;
+    const html =
+      options.html ||
+      `<p>Your OTP is: <strong>${options.passcode}</strong></p>`;
+    const plain = options.plain || `Your OTP is: ${options.passcode}`;
 
-    const from = new EmailAddress(process.env.MAILEROO_FROM, "Digiblog");
-    const to = [new EmailAddress(options.to)];
-
-    console.log("Sending OTP email (Maileroo) to:", options.to);
-
-    const referenceId = await client.sendBasicEmail({
-      from,
-      to,
+    const data = {
+      from: {
+        address: process.env.MAILEROO_FROM,
+        display_name: "Digiblog",
+      },
+      to: [{ address: options.to }],
       subject,
       html,
       plain,
-    });
+      tracking: true,
+    };
 
-    console.log("Email sent successfully, reference ID:", referenceId);
-    NextResponse.json({
-      messageId: "Email sent successfully, reference ID:",
-      referenceId,
-    });
+    console.log("Sending OTP email (Maileroo) to:", options.to);
 
-    if (referenceId) {
-      return {
-        success: true,
-        messageId: referenceId,
-      };
-    } else {
-      return {
-        success: false,
-        messageId: "error",
-      };
-    }
+    const response = await axios.post(
+      "https://smtp.maileroo.com/api/v2/emails",
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.MAILEROO_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        timeout: 20000, // 20 ثانیه
+      }
+    );
+
+    console.log(
+      "Email sent successfully, reference ID:",
+      response.data?.reference_id
+    );
+
+    return {
+      success: true,
+      messageId: response.data?.reference_id,
+    };
   } catch (error) {
     console.error("Failed to send OTP email (Maileroo):", {
       message: error.message,
-      details: error?.response,
+      details: error.response?.data,
     });
 
     return {
       success: false,
-      error: error?.response || error.message || "Unknown error",
+      error: error.response?.data || error.message || "Unknown error",
     };
   }
 };
