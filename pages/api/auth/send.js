@@ -67,8 +67,8 @@ const handler = async (req, res) => {
 
     const newMail = await sendMail({
       to: validEmail.email,
-      passcode: otp,
-      // time will be auto-calculated as 15 minutes from now
+      subject: "Your OTP Code",
+      text: `Your OTP code is ${otp}. It will expire in 2 minutes.`,
     });
 
     if (newMail.success) {
