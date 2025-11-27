@@ -101,9 +101,13 @@ export default function LoginPage() {
               setTimer(120);
               setIsOtpLoading(false)
             }
+            else {
+              throw Error
+            }
           })
           .catch((err) => {
             console.log(err);
+            setIsOtpLoading(false)
             toast.error(err);
           });
       }
@@ -172,8 +176,8 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              <Button type="submit" className="w-full" onClick={handleSendOtp}>
-                Continue
+              <Button type="submit" className="w-full" onClick={handleSendOtp} disabled={isOtpLoading}>
+                Continue {isOtpLoading&&<Spinner/>}
               </Button>
             </form>
             <div className="relative my-4">
