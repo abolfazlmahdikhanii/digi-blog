@@ -1,5 +1,6 @@
 // /service/mail-service.js
 import { MailerooClient, EmailAddress } from "maileroo-sdk";
+import { NextResponse } from "next/server";
 
 const client = new MailerooClient(process.env.MAILEROO_API_KEY,20000 );
 
@@ -92,6 +93,7 @@ If you did not request this code, please ignore this message.
     });
 
     console.log("Email sent successfully, reference ID:", referenceId);
+    NextResponse.json({messageId:"Email sent successfully, reference ID:", referenceId});
 
    if(referenceId){
      return {
