@@ -3,7 +3,7 @@ import { z, safeParse } from "zod";
 import { authSchema } from "@/validations/auth";
 import connectToDB from "@/configs/db";
 import otpModel from "@/models/userOtp";
-import { sendMail } from "@/service/mail-service";
+
 
 const saveOtp = async (res, email, otp) => {
   try {
@@ -65,17 +65,23 @@ const handler = async (req, res) => {
     const otp = generateOTP();
     await saveOtp(res, validEmail.email, otp);
 
-    const newMail = await sendMail({
-      to: validEmail.email,
-      passcode: otp,
-      // time will be auto-calculated as 15 minutes from now
-    });
+    import("../../service/mail-service").then(async ({ sendMail }) => {
+      try {
+        const newMail = await sendMail({
+          to: validEmail.email,
+          passcode: otp,
+          // time will be auto-calculated as 15 minutes from now
+        });
 
-    if (newMail.success) {
-      return res.status(200).json({ message: "send mail successfully:)" });
-    } else {
-      return res.status(400).json({ message: "send mail has problem!" });
-    }
+        if (newMail.success) {
+          return res.status(200).json({ message: "send mail successfully:)" });
+        } else {
+          return res.status(400).json({ message: "send mail has problem!" });
+        }
+      } catch (err) {
+        console.error("Background email error:", err);
+      }
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res
