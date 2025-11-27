@@ -3,7 +3,7 @@
 A modern, full-featured blog application built with Next.js, designed for creating and sharing engaging content with a seamless user experience.
 
 ## Demo
-- [Digiblog](https://digiiblog.runflare.run/)
+- **[Digiblog](https://digiiblog.runflare.run/)
 
 ## ✨ Features
 
