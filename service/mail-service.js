@@ -1,67 +1,46 @@
-import axios from "axios";
+import { createTransport } from "nodemailer";
 
-/**
- * options: { to: string, passcode: string, subject?: string, html?: string, plain?: string }
- */
-const sendMail = async (options) => {
-  try {
-    if (!options?.to || !options?.passcode) {
-      throw new Error("Missing required email fields (to, passcode)");
-    }
-
-    const subject = options.subject || "Your Verification Code";
-
-    const html =
-      options.html ||
-      `<p>Your OTP is: <strong>${options.passcode}</strong></p>`;
-    const plain = options.plain || `Your OTP is: ${options.passcode}`;
-
-    const data = {
-      from: {
-        address: process.env.MAILEROO_FROM,
-        display_name: "Digiblog",
-      },
-      to: [{ address: options.to }],
-      subject,
-      html,
-      plain,
-      tracking: true,
-    };
-
-    console.log("Sending OTP email (Maileroo) to:", options.to);
-
-    const response = await axios.post(
-      "https://smtp.maileroo.com/api/v2/emails",
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.MAILEROO_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        timeout: 20000, // 20 ثانیه
-      }
+const getTransporter = () => {
+  if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
+    throw new Error(
+      "Zoho email credentials not configured in environment variables"
     );
-
-    console.log(
-      "Email sent successfully, reference ID:",
-      response.data?.reference_id
-    );
-
-    return {
-      success: true,
-      messageId: response.data?.reference_id,
-    };
-  } catch (error) {
-    console.error("Failed to send OTP email (Maileroo):", {
-      message: error.message,
-      details: error.response?.data,
-    });
-
-    return {
-      success: false,
-      error: error.response?.data || error.message || "Unknown error",
-    };
   }
+
+  return createTransport({
+    host: process.env.ZOHO_SMTP_HOST || "smtp.zoho.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.ZOHO_EMAIL,
+      pass: process.env.ZOHO_PASSWORD,
+    },
+  });
 };
 
-export { sendMail };
+const sendMail = async (options) => {
+  try {
+    // Validate inputs
+    if (!options?.to || !options?.subject || !options?.text) {
+      throw new Error("Missing required email fields (to, subject, or text)");
+    }
+
+    const transporter = getTransporter();
+    const mailOptions = {
+      from: process.env.ZOHO_EMAIL,
+      to: options.to,
+      subject: options.subject,
+      text: options.text,
+      html: options.html || `<p>${options.text}</p>`,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+   console.log(error);
+
+    throw new Error(`Email sending failed: ${error.message}`);
+  }
+};
+export {sendMail}
