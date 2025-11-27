@@ -65,7 +65,7 @@ const handler = async (req, res) => {
     const otp = generateOTP();
     await saveOtp(res, validEmail.email, otp);
 
-    import("@service/mail-service").then(async ({ sendMail }) => {
+    import("../../../../service/mail-service").then(async ({ sendMail }) => {
       try {
         const newMail = await sendMail({
           to: validEmail.email,
