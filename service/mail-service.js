@@ -1,7 +1,7 @@
 // /service/mail-service.js
 import { MailerooClient, EmailAddress } from "maileroo-sdk";
 
-const client = new MailerooClient(process.env.MAILEROO_API_KEY,{ timeout: 20000 });
+const client = new MailerooClient(process.env.MAILEROO_API_KEY,20000 );
 
 /**
  * options: { to: string, passcode: string, subject?: string, html?: string, plain?: string }
