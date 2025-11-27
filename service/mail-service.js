@@ -1,7 +1,7 @@
 // /service/mail-service.js
 import { MailerooClient, EmailAddress } from "maileroo-sdk";
 
-const client = new MailerooClient(process.env.MAILEROO_API_KEY);
+const client = new MailerooClient(process.env.MAILEROO_API_KEY,{ timeout: 20000 });
 
 /**
  * options: { to: string, passcode: string, subject?: string, html?: string, plain?: string }
@@ -93,10 +93,18 @@ If you did not request this code, please ignore this message.
 
     console.log("Email sent successfully, reference ID:", referenceId);
 
-    return {
+   if(referenceId){
+     return {
       success: true,
       messageId: referenceId,
     };
+   }
+   else{
+     return {
+      success: false,
+      messageId: "error",
+    };
+   }
   } catch (error) {
     console.error("Failed to send OTP email (Maileroo):", {
       message: error.message,
