@@ -17,7 +17,7 @@ export default function Following() {
   const { following } = useFollow(username);
 
   return (
-    <div className="mt-12 w-[72%] mx-auto">
+    <div className="mt-12 w-[72%] 2xl:w-[80%] mx-auto">
       <h2 className="text-[42px] font-bold border-b py-5">
         {following?.following ? formatNumber(following.following?.length) : 0}{" "}
         Following

@@ -60,7 +60,7 @@ export default function SearchPage({ stories, people, lists, topics }) {
           <TabsList className="bg-transparent p-0 border-b w-full justify-start rounded-none gap-x-6">
             <TabsTrigger
               value="stories"
-             className="rounded-none border-0 flex-0 text-sm transition-all
+              className="rounded-none border-0 flex-0 text-sm transition-all
   text-muted-foreground hover:text-foreground
   data-[state=active]:shadow-none 
   data-[state=active]:border-b-2 
@@ -97,7 +97,7 @@ export default function SearchPage({ stories, people, lists, topics }) {
             </TabsTrigger>
             <TabsTrigger
               value="lists"
-                  className="rounded-none border-0 flex-0 text-sm transition-all
+              className="rounded-none border-0 flex-0 text-sm transition-all
   text-muted-foreground hover:text-foreground
   data-[state=active]:shadow-none 
   data-[state=active]:border-b-2 
@@ -315,13 +315,13 @@ const SearchLists = ({ initialLists, query }) => {
       initialPageParam: 1,
     });
   const lists = data?.pages.flatMap((page) => page.lists) || initialLists || [];
-
+ 
   return (
     <>
       {lists.length > 0 ? (
         <div className="flex flex-col gap-y-8">
           {lists.map((item) => (
-            <ListCard key={item._id} {...item} />
+            <ListCard key={item._id} {...item} author={item.userId} saveItems={item.saveItems}/>
           ))}
           <ShowMoreBtn
             hasNextPage={hasNextPage}
@@ -360,33 +360,70 @@ export async function getServerSideProps(context) {
     }
     const trimmedQuery = q.trim();
     const [users, posts, topics, lists] = await Promise.all([
-      usersModel.find({
-        name: { $regex: trimmedQuery, $options: "i" },
-      }),
+      usersModel
+        .find({
+          name: { $regex: trimmedQuery, $options: "i" },
+        })
+        .select("name username profileImage email") // add field selection
+        .limit(10),
+
       postModel
         .find({
           title: { $regex: trimmedQuery, $options: "i" },
           status: "published",
         })
-        .populate("topics")
-        .populate({ path: "comments" })
-        .populate({ path: "likes" })
-        .populate({ path: "save", match: { userId: currentUser?._id } })
-        .populate("author", "name username")
-        .populate("postCover")
+        .populate("topics", "name slug") // select only needed fields
+        .populate("comments", "content createdAt") // be specific
+        .populate("likes", "userId") // be specific
+        .populate({
+          path: "save",
+          match: { userId: currentUser?._id },
+          select: "userId listId",
+        })
+        .populate("author", "name username profileImage")
+        .populate("postCover", "imageUrl fileName") // add field selection
         .limit(10)
-        .sort({ updatedAt: -1 }),
+        .sort({ updatedAt: -1 })
+        .lean(), // add lean for better performance
+
       topicModel
         .find({
           name: { $regex: trimmedQuery, $options: "i" },
         })
-        .limit(10),
+        .select("name slug description") // add field selection
+        .limit(10)
+        .lean(),
+
       saveListModel
         .find({
           name: { $regex: trimmedQuery, $options: "i" },
           isPrivate: false,
         })
-        .limit(10),
+        .populate({
+          path: "saveItems",
+          options: {
+            limit: 3, // limit items per list for search results
+            sort: { createdAt: -1 },
+          },
+          populate: {
+            path: "postId",
+            select: "title slug createdAt", // select post fields you need
+            populate: [
+              {
+                path: "author",
+                select: "name username profileImage",
+              },
+              {
+                path: "postCover",
+                select: "imageUrl fileName",
+              },
+            ],
+          },
+        })
+        .populate("userId", "name username profileImage") // add this to get list owner info
+        .select("name description createdAt itemCount") // select list fields
+        .limit(10)
+        .lean(),
     ]);
 
     return {

@@ -17,7 +17,7 @@ export default function AuthorProfilePage() {
   const { follower } = useFollow(username);
 
   return (
-    <div className="mt-12 w-[72%] mx-auto">
+    <div className="mt-12 w-[72%] 2xl:w-[80%] mx-auto">
       <h2 className="text-[42px] font-bold border-b py-5">
         {follower?.follower ? formatNumber(follower.follower?.length) : 0}{" "}
         Follower

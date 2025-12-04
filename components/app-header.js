@@ -236,7 +236,7 @@ export default function AppHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="xl:container px-3 pt-5 md:pt-0 md:px-8 flex h-20 md:h-16 items-center justify-between gap-4">
+      <div className=" px-3 pt-5 md:pt-0 md:px-8 flex h-20 md:h-16 items-center justify-between gap-4">
         <div className="flex items-center md:gap-4 w-[80%] md:w-[unset] justify-between md:justify-[unset]">
           <div className="flex items-center gap-2">
             <MobileNav />

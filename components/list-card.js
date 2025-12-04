@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { toast } from "sonner";
+import { ImageKitProvider } from "@imagekit/next";
 export function ListCard({
   author,
   name,
@@ -35,7 +36,7 @@ export function ListCard({
   description,
   saveItems,
   _id,
-  refetch
+  refetch,
 }) {
   const [isDelete, setIsDelete] = useState(false);
 
@@ -67,7 +68,7 @@ export function ListCard({
       }
 
       toast.success("list update successfully :)");
-     
+
       refetch();
     } catch (error) {
       toast.error("Failed to update list");
@@ -114,7 +115,7 @@ export function ListCard({
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation();
-                   updateStatusHandler(_id)
+                    updateStatusHandler(_id);
                   }}
                 >
                   Make to {isPrivate ? "Public" : "Private"}
@@ -142,21 +143,24 @@ export function ListCard({
             {[0, 1, 2].map((index) => {
               const item = saveItems?.[index];
               const hasImage = item?.postId?.postCover;
-
+              const img=item?.postId?.postCover?.imageUrl
+               
               return (
                 <div
-                  key={index}
+                  key={item?._id}
                   className={`relative z-[${3 - index}] w-full h-full ${
                     !hasImage ? "bg-gray-400" : ""
                   }`}
                 >
                   {hasImage && (
-                    <Image
-                      src={item.postId.postCover}
-                      alt={`List item ${index + 1}`}
-                      fill
-                      className="object-cover"
-                    />
+                    <ImageKitProvider urlEndpoint="https://ik.imagekit.io/gv5d2avxy">
+                      <Image
+                        src={img|| "/images/placeholder.webp"}
+                        alt={`List item ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </ImageKitProvider>
                   )}
                 </div>
               );

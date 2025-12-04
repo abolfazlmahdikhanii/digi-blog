@@ -63,7 +63,7 @@ export default function StoriesPage() {
     }
   };
   return (
-    <div className="container mx-auto px-4 max-w-6xl">
+    <div className=" mx-auto px-4 max-w-6xl">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold font-headline">Stories</h1>
       </div>

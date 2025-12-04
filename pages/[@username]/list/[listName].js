@@ -22,8 +22,7 @@ export default function Home({ userInfo, saveList }) {
   const { user } = useAuth();
 
   return (
-    <div className="w-8/12 mx-auto px-4">
-      
+    <div className="w-8/12 2xl:w-9/12 mx-auto px-4">
       <div className=" border-b  my-4 pb-8">
         <div className="flex items-center gap-5 ">
           <Avatar className="h-14 w-14">
@@ -33,14 +32,14 @@ export default function Home({ userInfo, saveList }) {
               data-ai-hint={userInfo?.profileImage}
             />
             <AvatarFallback>
-              {userInfo?.name.charAt(0).toUpperCase()}
+              {userInfo?.name?.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col gap-y-1.5">
             <HoverCard>
               <HoverCardTrigger asChild>
                 <Link
-                  href={`/@${userInfo?.username.toLowerCase()}`}
+                  href={`/@${userInfo?.username?.toLowerCase()}`}
                   className="flex items-center gap-3 hover:underline transition-all duration-150"
                 >
                   <p className="font-semibold text-sm not-prose capitalize">
@@ -56,7 +55,7 @@ export default function Home({ userInfo, saveList }) {
                       alt={userInfo?.username}
                     />
                     <AvatarFallback>
-                      {userInfo?.name.charAt(0).toUpperCase()}
+                      {userInfo?.name?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <Button
@@ -95,16 +94,16 @@ export default function Home({ userInfo, saveList }) {
 
       <main>
         <div className="space-y-12">
-          {saveItems &&
-            saveItems.length > 0 &&
-            saveItems?.map((post) => (
-              <PostCard
-                key={post.postId._id}
-                id={post.postId._id}
-                {...post.postId}
-                isSave={user?._id.toString() === userId?._id.toString()}
-              />
-            ))}
+          {saveItems && saveItems.length > 0
+            ? saveItems?.map((post) => (
+                <PostCard
+                  key={post?.postId?._id}
+                  id={post.postId?._id}
+                  {...post.postId}
+                  isSave={user?._id.toString() === userId?._id.toString()}
+                />
+              ))
+            : null}
         </div>
       </main>
     </div>
@@ -145,14 +144,28 @@ export async function getServerSideProps(context) {
         populate: [
           {
             path: "postId",
-            populate: [{ path: "author" }],
+            populate: [
+              { path: "author" },
+              {
+                path: "postCover", // if this references the image table
+                select: "imageUrl",
+              },
+            ],
           },
+
           // { path: "userId" },
         ],
       })
       .populate("userId")
       .lean();
-
+ 
+    if (!saveList) {
+      return {
+        redirect: {
+          destination: `/@${userInfo.username}`,
+        },
+      };
+    }
     if (saveList.isPrivate) {
       // No token = redirect immediately
       if (!token && !refreshToken) {
@@ -199,7 +212,6 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (error) {
-
     return {
       props: {
         userInfo: [],

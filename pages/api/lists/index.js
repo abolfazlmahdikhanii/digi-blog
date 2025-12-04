@@ -39,7 +39,16 @@ const getList = async (req, res) => {
           limit: 3,
           sort: { createdAt: -1 },
         },
-        populate: [{ path: "postId", select: "postCover" }],
+        populate: [
+          {
+            path: "postId",
+            select: "postCover",
+            populate: {
+              path: "postCover", // if this references the image table
+              select: "imageUrl",
+            },
+          },
+        ],
       })
       .skip(skip)
       .limit(limitNum)
@@ -56,10 +65,9 @@ const getList = async (req, res) => {
       message: "Get  List Successfully :)",
       lists: JSON.parse(JSON.stringify(lists)),
       total: totalCount,
-      hasMore
+      hasMore,
     });
   } catch (error) {
-    
     return res.status(500).json({ message: "Internal ServerError" });
   }
 };

@@ -33,6 +33,32 @@ const handler = async (req, res) => {
         name: { $regex: trimmedQuery, $options: "i" },
         isPrivate: false,
       })
+      .populate({
+        path: "saveItems",
+        options: {
+          limit: 3, // limit items for preview
+          sort: { createdAt: -1 },
+        },
+        populate: {
+          path: "postId",
+          select: "title slug createdAt", // select fields you need from post
+          populate: [
+            {
+              path: "author",
+              select: "name username profileImage", // select author fields
+            },
+            {
+              path: "postCover",
+              select: "imageUrl fileName", // select image fields
+            },
+          ],
+        },
+      })
+      .populate("userId", "name username profileImage") // get list owner info
+      .select("name description createdAt itemCount isPrivate") // select list fields
+      .limit(10) // limit number of lists returned
+      .sort({ createdAt: -1 }) // sort lists by most recent
+
       .skip(skip)
       .limit(limitNum)
       .lean();

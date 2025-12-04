@@ -47,19 +47,27 @@ export default function AuthorProfilePage({
   return (
     <div>
       <Head>
-        <title>{user.name} on DigiBlog</title>
-        <meta name="description" content={`Read writing from ${user.name} on DigiBlog.`} />
+        <title>{user?.name} on DigiBlog</title>
+        <meta
+          name="description"
+          content={`Read writing from ${user?.name} on DigiBlog.`}
+        />
       </Head>
       <div className="relative h-48 md:h-64 w-full">
-        <Image src={"/images/profile-bg.jpg"} alt={"profile background"} fill />
+        <Image
+          src={"/images/profile-bg.jpg"}
+          alt={"profile background"}
+          fill
+          priority
+        />
       </div>
-      <div className="container mx-auto px-4 mt-3">
+      <div className=" mx-auto px-4 mt-3">
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-12 lg:col-span-8 w-10/12 mx-auto">
             <div className="flex items-end gap-4 mb-4">
               <Avatar className="w-24 h-24 md:w-30 md:h-30 border-4 border-background ring-2 ring-primary">
                 <AvatarImage
-                  src={userInfo?.profileImage}
+                  src={userInfo && userInfo?.profileImage}
                   alt={userInfo?.name}
                 />
                 <AvatarFallback className={"capitalize text-2xl"}>
@@ -124,7 +132,7 @@ export default function AuthorProfilePage({
               <TabsContent value="home" className="mt-6">
                 <div className="space-y-8">
                   {saveList?.map((post) => (
-                    <ListCard key={post.id} {...post} author={post?.userId} />
+                    <ListCard key={post._id} {...post} author={post?.userId} />
                   ))}
                 </div>
               </TabsContent>
@@ -159,7 +167,10 @@ export default function AuthorProfilePage({
           <aside className="hidden lg:block col-span-4 space-y-8  col-start-9 -col-end-1 sticky top-[40px]">
             <div className="p-4 rounded-lg bg-card border ">
               <Avatar className="w-16 h-16 mb-4">
-                <AvatarImage src={userInfo?.profileImage} alt={userInfo.name} />
+                <AvatarImage
+                  src={userInfo && userInfo?.profileImage}
+                  alt={userInfo.name}
+                />
                 <AvatarFallback className={"capitalize text-lg"}>
                   {userInfo?.name?.charAt(0)}
                 </AvatarFallback>
@@ -249,7 +260,14 @@ export async function getServerSideProps(context) {
               sort: { createdAt: -1 },
             },
             populate: [
-              { path: "postId", select: "postCover" },
+              {
+                path: "postId",
+                select: "postCover",
+                populate: {
+                  path: "postCover", // assuming postCover is a reference to the image table
+                  select: "imageUrl", // select the fields you need from the image table
+                },
+              },
               // { path: "userId" },
             ],
           })
@@ -265,7 +283,17 @@ export async function getServerSideProps(context) {
             limit: 3,
             sort: { createdAt: -1 },
           },
-          populate: { path: "postId", select: "postCover" },
+          populate: [
+            {
+              path: "postId",
+              select: "postCover", // or whatever field references the image
+              populate: {
+                path: "postCover", // assuming postCover is a reference to the image table
+           
+                select: "imageUrl", // select the fields you need from the image table
+              },
+            },
+          ],
         })
         .populate("userId")
         .lean();
@@ -280,7 +308,6 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (error) {
-   
     return {
       redirect: {
         destination: "/500",

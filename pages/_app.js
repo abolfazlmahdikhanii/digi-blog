@@ -46,7 +46,7 @@ function MyApp({ Component, pageProps }) {
         >
           <div className=" min-h-screen flex flex-col ">
             {showHeader && <AppHeader />}
-            <div className="container mx-auto flex flex-1">
+            <div className="  flex flex-1">
               {showSidebars && <LeftSidebar />}
               <ProgressProvider
                 height="4px"

@@ -103,7 +103,7 @@ export default function PostPage({ post, totalComments, comments, likes }) {
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-12 max-w-4xl">
+    <div className=" mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-12 max-w-4xl 2xl:max-w-7xl">
       <Head>
         <title>{post.title}</title>
         <meta name="description" content={post?.shortDescription} />

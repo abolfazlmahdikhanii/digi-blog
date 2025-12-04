@@ -36,7 +36,7 @@ export default function LibraryPage() {
   const allList = data?.pages.flatMap((page) => page.lists) || [];
 
   return (
-    <div className="container mx-auto px-4 max-w-3xl mt-6 ">
+    <div className=" mx-auto px-4 max-w-3xl 2xl:max-w-6xl mt-6 ">
       <Head>
         <title>Your library</title>
       </Head>
