@@ -12,6 +12,7 @@ import { verifyRefreshToken, verifyToken } from "@/lib/utils";
 import usersModel from "@/models/users";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
+import Image from "next/image";
 
 const DigiBlogLogo = () => (
    <Image
