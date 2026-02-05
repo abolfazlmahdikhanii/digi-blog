@@ -352,7 +352,7 @@ export default function EditorPage({ id, initContent }) {
           )}
         </div>
       </header>
-      <div className="flex-grow container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
+      <div className="flex-grow w-full mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
         <div className="w-full sm:w-11/12 md:w-10/12 mx-auto space-y-4 sm:space-y-6">
           <Textarea
             placeholder="Post Title..."
