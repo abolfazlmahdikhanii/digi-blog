@@ -10,7 +10,7 @@ import { useEffect } from "react";
 
 const LoggedOutHeader = () => (
   <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-b-accent ">
-    <div className="container mx-auto px-6 py-4 flex justify-between items-center self-start max-h-[100px]">
+    <div className=" mx-auto px-6 py-4 flex justify-between items-center self-start max-h-[100px]">
       <div className="flex items-center">
         <Image
           width={150}
