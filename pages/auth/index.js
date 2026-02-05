@@ -121,7 +121,7 @@ export default function LoginPage() {
   };
 
   return (
-    <Card  className="mx-auto max-w-sm min-w-sm mt-[50%]">
+    <Card  className="mx-auto max-w-sm min-w-sm mt-[10%]">
       {step === "EMAIL" && (
         <>
           <CardHeader className={"w-full"}>
