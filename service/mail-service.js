@@ -1,46 +1,46 @@
-import { createTransport } from "nodemailer";
+import nodemailer from "nodemailer";
 
-const getTransporter = () => {
-  if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
-    throw new Error(
-      "Zoho email credentials not configured in environment variables"
-    );
-  }
+export const runtime = "nodejs";
 
-  return createTransport({
-    host: process.env.ZOHO_SMTP_HOST || "smtp.zoho.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.ZOHO_EMAIL,
-      pass: process.env.ZOHO_PASSWORD,
-    },
-  });
-};
+const transporter = nodemailer.createTransport({
+  host: process.env.ZOHO_SMTP_HOST || "smtp.zoho.com",
+  port: 465,
+  secure: true,
 
-const sendMail = async (options) => {
+  auth: {
+    user: process.env.ZOHO_EMAIL,
+    pass: process.env.ZOHO_PASSWORD,
+  },
+
+  tls: {
+    rejectUnauthorized: false,
+  },
+});
+
+export async function sendMail(options) {
   try {
-    // Validate inputs
-    if (!options?.to || !options?.subject || !options?.text) {
-      throw new Error("Missing required email fields (to, subject, or text)");
+    if (!options?.to || !options?.subject) {
+      throw new Error("Missing required fields");
     }
 
-    const transporter = getTransporter();
-    const mailOptions = {
+    const info = await transporter.sendMail({
       from: process.env.ZOHO_EMAIL,
       to: options.to,
       subject: options.subject,
-      text: options.text,
+      text: options.text || "",
       html: options.html || `<p>${options.text}</p>`,
+    });
+
+    return {
+      success: true,
+      messageId: info.messageId,
     };
-
-    const info = await transporter.sendMail(mailOptions);
-    
-    return { success: true, messageId: info.messageId };
   } catch (error) {
-   console.log(error);
+    console.error("MAIL ERROR:", error);
 
-    throw new Error(`Email sending failed: ${error.message}`);
+    return {
+      success: false,
+      error: error.message,
+    };
   }
-};
-export {sendMail}
+}
