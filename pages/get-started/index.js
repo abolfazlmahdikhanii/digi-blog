@@ -55,7 +55,7 @@ export default function FullNamePage({ userInfo }) {
       </header>
       <main className="flex mt-24 items-center justify-center">
         <div className="text-center max-w-lg w-full">
-          <h1 className="text-4xl  mb-8">Welcome to Medium!</h1>
+          <h1 className="text-4xl  mb-8">Welcome to Digi Blog!</h1>
           <p className="text-muted-foreground mb-12">
             We need a little more information to finish creating your account.
           </p>

@@ -317,7 +317,7 @@ export default function SettingsPage() {
                 </SettingsItem>
                 <SettingsItem
                   title="Custom domain"
-                  description="Upgrade to a Medium Membership to redirect your profile URL to a domain like yourdomain.com."
+                  description="Upgrade to a Digi Blog Membership to redirect your profile URL to a domain like yourdomain.com."
                   isLink
                 >
                   <span></span>
