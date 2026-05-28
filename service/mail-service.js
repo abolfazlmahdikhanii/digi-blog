@@ -20,7 +20,7 @@ export async function sendMail(options) {
     });
 
     const info = await transporter.sendMail({
-      from: `"My App" <${process.env.ZOHO_EMAIL}>`,
+      from: `"Digi Blog" <${process.env.ZOHO_EMAIL}>`,
       to: options.to,
       subject: options.subject,
       text: options.text,
