@@ -65,7 +65,7 @@ export default function LoginPage() {
           setStep("OTP");
           setTimer(120);
           setIsOtpLoading(false);
-          toast.info()
+          // toast.info()
         } else {
           throw Error;
         }
