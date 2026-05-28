@@ -72,16 +72,23 @@ const handler = async (req, res) => {
       subject: "Your OTP Code",
       text: `Your OTP code is ${otp}. It will expire in 2 minutes.`,
     });
+    const showDevOtp = process.env.NEXT_PUBLIC_SHOW_DEV_OTP === "true";
 
-    if (newMail.success) {
-      return res.status(200).json({
-        message: "send mail successfully :)",
-  
+    if (!newMail.success) {
+      return res.status(500).json({
+        success: false,
+        message:
+          "Email delivery is temporarily unstable due to current Vercel SMTP limitations.",
+
+        ...(showDevOtp && {
+          devOtp: otp,
+        }),
       });
     }
 
-    return res.status(400).json({
-      message: "send mail has problem!",
+    return res.status(200).json({
+      success: true,
+      message: "OTP sent successfully",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

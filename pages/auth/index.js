@@ -64,17 +64,35 @@ export default function LoginPage() {
           toast.success("Email Sent Succesfully:)");
           setStep("OTP");
           setTimer(120);
+        }
+        // DEV FALLBACK
+        if (data.devOtp) {
+          toast(
+            "Email delivery is temporarily unstable due to current Vercel SMTP limitations.",
+          );
+
+          toast.success(`DEV OTP: ${data.devOtp}`, {
+            duration: 10000,
+          });
+
+          setStep("OTP");
+          setTimer(120);
           setIsOtpLoading(false);
-          // toast.info()
-        } else {
-          throw Error;
+
+          return;
+        }
+
+        // REAL ERROR
+        if (!res.ok) {
+          throw new Error(data.message);
         }
       }
     } catch (error) {
       console.log(error);
       setIsOtpLoading(false);
-      toast.error("Email Is Not Valid !");
-      toast.error("Email Is Not Valid !");
+      toast.error(error.message || "Something went wrong while sending OTP");
+    } finally {
+      setIsOtpLoading(false);
     }
   };
 
