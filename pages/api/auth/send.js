@@ -5,33 +5,28 @@ import connectToDB from "@/configs/db";
 import otpModel from "@/models/userOtp";
 import { sendMail } from "@/service/mail-service";
 
-const saveOtp = async (res, email, otp) => {
-  try {
-    const expireTime = new Date(Date.now() + 2 * 60 * 1000);
-    // remove old otp
-    const userOtp = await otpModel.findOne({ email });
-    let blockedUntil = null;
-    if (userOtp && userOtp.attempts === 3) {
-      blockedUntil = new Date(Date.now() + 1 * 60 * 1000);
-    }
-    await otpModel.findOneAndDelete({ email });
+const saveOtp = async (email, otp) => {
+  const expireTime = new Date(Date.now() + 2 * 60 * 1000);
 
-    // save new otp
-    const newOtp = await otpModel.create({
-      email,
-      otp,
-      expireTime,
-      attempts: userOtp ? Number(userOtp.attempts) + 1 : 1,
-      blockedUntil: blockedUntil ? blockedUntil : null,
-    });
-    if (newOtp) {
-      res.status(200).json({ message: "generate new otp successfully:)" });
-    } else {
-      return res.status(400).json({ message: "generate new otp has problem!" });
-    }
-  } catch (error) {
-    return res.status(500).json({ message: "Internal ServerError" });
+  const userOtp = await otpModel.findOne({ email });
+
+  let blockedUntil = null;
+
+  if (userOtp && userOtp.attempts === 3) {
+    blockedUntil = new Date(Date.now() + 1 * 60 * 1000);
   }
+
+  await otpModel.findOneAndDelete({ email });
+
+  const newOtp = await otpModel.create({
+    email,
+    otp,
+    expireTime,
+    attempts: userOtp ? Number(userOtp.attempts) + 1 : 1,
+    blockedUntil: blockedUntil || null,
+  });
+
+  return !!newOtp;
 };
 
 const handler = async (req, res) => {
@@ -58,12 +53,19 @@ const handler = async (req, res) => {
           {
             attempts: 0,
             blockedUntil: null,
-          }
+          },
         );
       }
     }
     const otp = generateOTP();
-    await saveOtp(res, validEmail.email, otp);
+
+    const saved = await saveOtp(validEmail.email, otp);
+
+    if (!saved) {
+      return res.status(400).json({
+        message: "generate new otp has problem!",
+      });
+    }
 
     const newMail = await sendMail({
       to: validEmail.email,
@@ -72,10 +74,15 @@ const handler = async (req, res) => {
     });
 
     if (newMail.success) {
-      return res.status(200).json({ message: "send mail successfully:)",otp });
-    } else {
-      return res.status(400).json({ message: "send mail has problem!" });
+      return res.status(200).json({
+        message: "send mail successfully :)",
+        otp,
+      });
     }
+
+    return res.status(400).json({
+      message: "send mail has problem!",
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res
