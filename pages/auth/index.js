@@ -71,7 +71,7 @@ export default function LoginPage() {
         }
       }
     } catch (error) {
-      console.log(err);
+      console.log(error);
       setIsOtpLoading(false);
       toast.error("Email Is Not Valid !");
       toast.error("Email Is Not Valid !");
