@@ -51,7 +51,7 @@ export default function LoginPage() {
       setIsOtpLoading(true);
       const validEmail = authSchema.parse({ email });
       if (validEmail.email) {
-        fetch("/api/auth/send", {
+        const res = await fetch("/api/auth/send", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
