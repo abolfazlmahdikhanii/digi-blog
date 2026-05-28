@@ -23,15 +23,13 @@ import { formatTime } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { Spinner } from "@/components/ui/spinner";
 
-
-
 export default function LoginPage() {
   const [step, setStep] = useState("EMAIL");
   const [email, setEmail] = useState("");
   const [timer, setTimer] = useState(120);
   const [isLoading, setIsLoading] = useState(false);
   const [isOtpLoading, setIsOtpLoading] = useState(false);
-  const { refetch ,user} = useAuth();
+  const { refetch, user } = useAuth();
   const [otp, setOtp] = useState("");
   const router = useRouter();
   useEffect(() => {
@@ -46,11 +44,11 @@ export default function LoginPage() {
     };
   }, [timer]);
 
-  const handleSendOtp = (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
 
     try {
-      setIsOtpLoading(true)
+      setIsOtpLoading(true);
       const validEmail = authSchema.parse({ email });
       if (validEmail.email) {
         fetch("/api/auth/send", {
@@ -59,25 +57,23 @@ export default function LoginPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ email }),
-        })
-          .then((res) => {
-            if (res.status === 200) {
-              toast.success("Email Sent Succesfully:)");
-              setStep("OTP");
-              setTimer(120);
-              setIsOtpLoading(false)
-            }
-            else {
-              throw Error
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-            setIsOtpLoading(false)
-            toast.error(err);
-          });
+        });
+
+        const data = await res.json();
+        if (res.status === 200) {
+          toast.success("Email Sent Succesfully:)");
+          setStep("OTP");
+          setTimer(120);
+          setIsOtpLoading(false);
+          toast.info()
+        } else {
+          throw Error;
+        }
       }
     } catch (error) {
+      console.log(err);
+      setIsOtpLoading(false);
+      toast.error("Email Is Not Valid !");
       toast.error("Email Is Not Valid !");
     }
   };
@@ -105,7 +101,7 @@ export default function LoginPage() {
       if (!res.ok) {
         throw new Error("Failed Verify Otp!");
       }
-      
+
       refetch();
       console.log(user);
       if (data.isProfileComplete) {
@@ -113,7 +109,6 @@ export default function LoginPage() {
       } else {
         router.replace("/get-started");
       }
-    
     } catch (error) {
       setIsLoading(false);
       toast.error(error.message);
@@ -121,7 +116,7 @@ export default function LoginPage() {
   };
 
   return (
-    <Card  className="mx-auto max-w-sm min-w-sm mt-[10%]">
+    <Card className="mx-auto max-w-sm min-w-sm mt-[10%]">
       {step === "EMAIL" && (
         <>
           <CardHeader className={"w-full"}>
@@ -142,8 +137,13 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              <Button type="submit" className="w-full" onClick={handleSendOtp} disabled={isOtpLoading}>
-                Continue {isOtpLoading&&<Spinner/>}
+              <Button
+                type="submit"
+                className="w-full"
+                onClick={handleSendOtp}
+                disabled={isOtpLoading}
+              >
+                Continue {isOtpLoading && <Spinner />}
               </Button>
             </form>
             <div className="relative my-4">

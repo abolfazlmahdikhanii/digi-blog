@@ -72,7 +72,7 @@ const handler = async (req, res) => {
     });
 
     if (newMail.success) {
-      return res.status(200).json({ message: "send mail successfully:)" });
+      return res.status(200).json({ message: "send mail successfully:)",otp });
     } else {
       return res.status(400).json({ message: "send mail has problem!" });
     }
