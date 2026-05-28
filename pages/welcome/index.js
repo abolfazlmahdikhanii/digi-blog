@@ -18,6 +18,7 @@ const LoggedOutHeader = () => (
           src={"/images/logo.png"}
           className="object-cover w-[140px] h-[180px]"
           alt="logo"
+          priority
         />
       </div>
       <nav className="hidden md:flex items-center space-x-6 text-sm text-muted-foreground">
