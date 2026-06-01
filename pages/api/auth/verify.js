@@ -10,7 +10,7 @@ import { z } from "zod";
 
 const saveNewUser = async (email) => {
   try {
-    const users = await usersModel.find({});
+    const users = await usersModel.countDocuments({});
     const user = await usersModel.findOne({ email });
     const rndNumber = crypto.randomInt(1, 20000);
     if (!user) {
@@ -22,7 +22,7 @@ const saveNewUser = async (email) => {
           name: splitMail(email),
           username: `${splitMail(email)}-${rndNumber}`,
           email,
-          role: users.length > 0 ? "USER" : "ADMIN",
+          role: users===0 ? "ADMIN" : "USER",
           profileImage: "",
           bio: "",
           isProfileComplete: false,
@@ -34,7 +34,7 @@ const saveNewUser = async (email) => {
           name: splitMail(email),
           username: `${splitMail(email)}`,
           email,
-          role: users.length > 0 ? "USER" : "ADMIN",
+           role: users===0 ? "ADMIN" : "USER",
           profileImage: "",
           bio: "",
           isProfileComplete: false,
@@ -58,14 +58,14 @@ const handler = async (req, res) => {
     // check otp filed has fill
     if (!otp) return res.status(400).json({ message: "invalid otp!" });
     // check otp is verify
-    const userOtp = await otpModel.find({ email: `${validEmail.email}` });
+    const userOtp = await otpModel.findOne({ email: `${validEmail.email}` });
 
     if (!userOtp) {
       return res.status(404).json({ message: "not found otp for this email!" });
     }
     // Check if OTP is expired
-    if (userOtp.expiresAt && new Date() > new Date(userOtp.expiresAt)) {
-      await otpModel.findOneAndDelete({ email: validEmail });
+    if (userOtp.expireTime && new Date() > new Date(userOtp.expireTime)) {
+      await otpModel.findOneAndDelete({ email: validEmail.email });
       return res.status(410).json({ message: "OTP has expired" });
     }
 
@@ -75,11 +75,11 @@ const handler = async (req, res) => {
           message: "max used otp disable for min",
         });
       } else if (new Date(userOtp.blockedUntil) <= new Date()) {
-        await otpModel.findOneAndDelete({ email: validEmail });
+        await otpModel.findOneAndDelete({ email: validEmail.email });
         return res.status(410).json({ message: "OTP has expired" });
       }
     }
-    if (userOtp.used >= 3) {
+    if (userOtp.attempts >= 3) {
       await otpModel.findOneAndUpdate(
         { email: validEmail.email },
         {
@@ -97,7 +97,7 @@ const handler = async (req, res) => {
       await otpModel.findOneAndUpdate(
         { email: validEmail.email },
         {
-          $inc: { used: 1 },
+          $inc: { attempts: 1 },
         }
       );
       return res.status(401).json({ message: "invalid otp!" });

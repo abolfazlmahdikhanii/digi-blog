@@ -44,8 +44,8 @@ const handler = async (req, res) => {
       return res.status(404).json({ message: "not found otp for this email!" });
     }
     // Check if OTP is expired
-    if (userOtp.expiresAt && new Date() > new Date(userOtp.expiresAt)) {
-      await otpModel.findOneAndDelete({ email: validEmail });
+    if (userOtp.expiresTime && new Date() > new Date(userOtp.expireTime)) {
+      await otpModel.findOneAndDelete({ email: validEmail.email });
       return res.status(410).json({ message: "OTP has expired" });
     }
 
@@ -55,11 +55,11 @@ const handler = async (req, res) => {
           message: "max used otp disable for min",
         });
       } else if (new Date(userOtp.blockedUntil) <= new Date()) {
-        await otpModel.findOneAndDelete({ email: validEmail });
+        await otpModel.findOneAndDelete({ email: validEmail.email });
         return res.status(410).json({ message: "OTP has expired" });
       }
     }
-    if (userOtp.used >= 3) {
+    if (userOtp.attempts >= 3) {
       await otpModel.findOneAndUpdate(
         { email: validEmail.email },
         {
@@ -77,7 +77,7 @@ const handler = async (req, res) => {
       await otpModel.findOneAndUpdate(
         { email: validEmail.email },
         {
-          $inc: { used: 1 },
+          $inc: { attempts: 1 },
         }
       );
       return res.status(401).json({ message: "invalid otp!" });
