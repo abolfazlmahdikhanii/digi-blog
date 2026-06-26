@@ -189,8 +189,8 @@ const TextEditor = ({
 
     if (!readOnly || !isPublish) {
       if (!isMobile) {
-        document.addEventListener("mouseover", handlePointerDown, true);
-        document.addEventListener("mousedown", handlePointerDown, true);
+        // document.addEventListener("mouseover", handlePointerDown, true);
+        // document.addEventListener("mousedown", handlePointerDown, true);
         document.addEventListener("keydown", handleKeyDown);
       }
       document.addEventListener("touchstart", handlePointerDown, {
