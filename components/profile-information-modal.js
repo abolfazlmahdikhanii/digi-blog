@@ -27,7 +27,7 @@ export default function ProfileInformationModal({ onClose }) {
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isRemoveLoading, setIsRemoveLoading] = useState(false);
 
-  const [name, setName] = useState(user.name || "");
+  const [name, setName] = useState(user?.name || "");
 
   const [bio, setBio] = useState(user.bio || "");
   const [job, setJob] = useState(user.job || "");

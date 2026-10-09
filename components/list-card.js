@@ -83,7 +83,7 @@ export function ListCard({
         <div className="flex-1 mr-3">
           <div className="flex items-center gap-x-2">
             <Avatar className="h-6 w-6 ">
-              <AvatarImage src={author?.profileImage} alt={author.name} />
+              <AvatarImage src={author?.profileImage} alt={author?.name} />
               <AvatarFallback className={"capitalize"}>
                 {author?.name.charAt(0)}
               </AvatarFallback>
