@@ -47,7 +47,7 @@ export function RightSidebar() {
                     <Avatar className="h-6 w-6 mr-1">
                       <AvatarImage
                         src={userInfo?.follower?.profileImage}
-                        alt={userInfo?.follower.name}
+                        alt={userInfo?.follower?.name}
                       />
                       <AvatarFallback className={"capitalize"}>
                         {userInfo?.follower?.name?.charAt(0)}
