@@ -36,7 +36,7 @@ export function RightSidebar() {
           <>
             <h3 className="font-bold mb-4 font-headline">Who to follow</h3>
             <div className="space-y-4.5">
-              {data.whoFollow.map((userInfo) => (
+              {data?.whoFollow.map((userInfo) => (
                 <Button
                   key={userInfo?.following?._id}
                   variant="ghost"
