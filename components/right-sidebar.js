@@ -38,7 +38,7 @@ export function RightSidebar() {
             <div className="space-y-4.5">
               {data.whoFollow.map((userInfo) => (
                 <Button
-                  key={userInfo?.following._id}
+                  key={userInfo?.following?._id}
                   variant="ghost"
                   className="justify-start h-auto mb-12"
                   asChild
