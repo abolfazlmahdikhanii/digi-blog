@@ -75,7 +75,7 @@ const UserMenu = ({ email, name,username, profileImage = "", logOut }) => (
     <DropdownMenuTrigger asChild>
       <Button variant="ghost" className="relative h-9 w-9 rounded-full">
         <Avatar className="h-9 w-9">
-          <AvatarImage src={profileImage} alt="User" />
+          <AvatarImage src={profileImage?profileImage:""} alt="User" />
           <AvatarFallback className={"capitalize"}>{name.charAt(0)}</AvatarFallback>
         </Avatar>
       </Button>

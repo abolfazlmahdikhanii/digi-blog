@@ -196,7 +196,7 @@ export default function ProfileInformationModal({ onClose }) {
                   <AvatarFallback className={"capitalize text-sm"}>
                     {user?.name.charAt(0)}
                   </AvatarFallback>
-                  {isRemoveLoading &&user.profileImage&& (
+                  {isRemoveLoading &&user?.profileImage&& (
                     <Spinner
                       className={
                         "absolute top-1/2 left-1/2 -translate-1/2 after:w-full after:h-full after:bg-white after:backdrop-blur-md after:block"

@@ -12,7 +12,7 @@ export function WhoToFollowCard({ _id, name, bio, profileImage, username }) {
     <div className="flex flex-col items-center justify-center p-6 border rounded-lg text-center h-full">
       <Link href={`/@${username}`}>
         <Avatar className="h-16 w-16 mb-4">
-          <AvatarImage src={profileImage} alt={name} />
+          <AvatarImage src={profileImage?profileImage:""} alt={name} />
           <AvatarFallback className={"capitalize text-lg"}>
             {name.charAt(0)}
           </AvatarFallback>

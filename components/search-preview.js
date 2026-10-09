@@ -22,7 +22,7 @@ export function SearchPreview({ query, results, onClose }) {
                   onClick={() => onClose()}
                 >
                   <Avatar className="h-6 w-6">
-                    <AvatarImage src={person.profileImage} alt={person.name} />
+                    <AvatarImage src={person?.profileImage} alt={person.name} />
                     <AvatarFallback className={"text-xs capitalize"}>
                       {person.name.charAt(0)}
                     </AvatarFallback>
